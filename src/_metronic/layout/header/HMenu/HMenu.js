@@ -23,7 +23,7 @@ class HMenu extends React.Component {
   ktMenuCommonRef = React.createRef();
 
   getHeaderLogo() {
-    let result = "logo-light.png";
+    let result = "tender_logo.png";
     console.log("this.props.headerSelfSkin", this.props.headerSelfSkin);
     if (this.props.headerSelfSkin && this.props.headerSelfSkin !== "dark") {
       result = "logo-dark.png";

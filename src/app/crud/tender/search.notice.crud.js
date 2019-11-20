@@ -23,3 +23,7 @@ export function getBusinessFields() {
 export function getNotifiationNotices(page, size) {
     return axios.get(NOTIFICATION_NOTICES_URL  + '?page=' + page + '&size=' + size);
 }
+
+export function getNotice(id) {
+    return axios.get(NOTIFICATION_NOTICES_URL  + '/'  + id);
+}

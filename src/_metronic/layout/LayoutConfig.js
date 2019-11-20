@@ -7,7 +7,7 @@ export const initLayoutConfig = {
     layout: "fluid",
     // body: { "background-image": toAbsoluteUrl("/media/misc/bg-1.jpg") },
     logo: {
-      dark: toAbsoluteUrl("/media/logos/logo-light.png"),
+      dark: toAbsoluteUrl("/media/logos/logo-ligh.png"),
       light: toAbsoluteUrl("/media/logos/logo-dark.png"),
       brand: toAbsoluteUrl("/media/logos/logo-light.png"),
       green: toAbsoluteUrl("/media/logos/logo-light.png")
