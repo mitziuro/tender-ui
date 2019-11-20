@@ -1,0 +1,42 @@
+.noticeSearch .noticeSearchContainerCheckboxes, .noticeSearchContainerTexts, .noticeSearchContainerButtons {
+  display: flex;
+  justify-content: center;
+}
+
+.noticeSearchContainerTexts {
+  justify-content: left;
+}
+
+.noticeSearchContainerTexts:nth-child(3), .noticeSearchContainerTexts:nth-child(4) {
+  position: relative;
+  top: 20px;
+}
+
+.noticeSearchContainerTexts:nth-child(4) {
+  top: 40px;
+}
+
+.noticeSearch .noticeSearchContainerTexts .date {
+  position: relative;
+  top: 17px;
+}
+
+.noticeSearch{
+  width: 100%
+}
+
+.noticeSearch .noticeSearchContainerButtons {
+  position: relative;
+  top: 65px;
+  padding-bottom: 40px;
+  justify-content: right;
+}
+
+.noticeSearch .noticeSearchContainerButtons button {
+  margin-right: 10px;
+}
+
+.noticeSearch .kt-portlet__head {
+  display: none;
+}
+
