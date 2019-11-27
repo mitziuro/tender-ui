@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { Dropdown } from "react-bootstrap";
 import { metronic, toAbsoluteUrl } from "../../../_metronic";
 import HeaderDropdownToggle from "../content/CustomDropdowns/HeaderDropdownToggle";
+import { getUserByToken } from '../../../app/crud/auth.crud';
 
 const languages = [
   {
@@ -18,9 +19,16 @@ const languages = [
   }
 ];
 
-class LanguageSelector extends React.Component {
+ class LanguageSelector extends React.Component {
+
   render() {
     const { lang, iconType, setLanguage } = this.props;
+    var lastUser = window.localStorage.getItem('_USER') != null ? JSON.parse(window.localStorage.getItem('_USER')) : {};
+    if(lang != lastUser.langKey) {
+      setLanguage(lastUser.langKey);
+      this.setState({ open: false });
+      setTimeout(()=> window.location.reload(), 400);
+    }
     const currentLanguage = languages.find(x => x.lang === lang);
     return (
       <Dropdown
@@ -71,6 +79,7 @@ class LanguageSelector extends React.Component {
 }
 
 const mapStateToProps = ({ i18n }) => ({ lang: i18n.lang });
+
 
 export default connect(
   mapStateToProps,

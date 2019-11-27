@@ -75,7 +75,6 @@ export default class OfferPage extends React.Component {
                             <div className="kt-section">
                                 <div className="col-md-12">
                                     <div className="kt-section__content">
-                                        <h1> This is the content of the offer</h1>
                                     </div>
                                     <div className="kt-section__content" style={{textAlign: 'center'}}>
                                         {this.state.offer.state == 1 ?

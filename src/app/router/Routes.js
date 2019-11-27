@@ -12,6 +12,7 @@ import { useLastLocation } from "react-router-last-location";
 import HomePage from "../pages/home/HomePage";
 import AuthPage from "../pages/auth/AuthPage";
 import Registration from "../pages/auth/Registration";
+import ForgotPassword from "../pages/auth/ForgotPassword";
 import ErrorsPage from "../pages/errors/ErrorsPage";
 import LogoutPage from "../pages/auth/Logout";
 import { LayoutContextProvider } from "../../_metronic";
@@ -29,6 +30,9 @@ export const Routes = withRouter(({ Layout, history }) => {
     shallowEqual
   );
 
+
+  console.log(lastLocation);
+
   return (
     /* Create `LayoutContext` from current `history` and `menuConfig`. */
     <LayoutContextProvider history={history} menuConfig={menuConfig}>
@@ -41,10 +45,12 @@ export const Routes = withRouter(({ Layout, history }) => {
           <Redirect from="/auth" to={userLastLocation} />
         )}
 
+        <Route path="/auth/registration" component={AuthPage} />
+        <Route path="/auth/forgot-password" component={AuthPage} />
         <Route path="/error" component={ErrorsPage} />
         <Route path="/logout" component={LogoutPage} />
 
-        {!isAuthorized ? (
+        {!isAuthorized  ? (
           /* Redirect to `/auth` when user is not authorized */
           <Redirect to="/auth/login" />
         ) : (

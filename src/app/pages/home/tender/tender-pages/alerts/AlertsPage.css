@@ -1,0 +1,15 @@
+.alertsResults .kt-portlet__body {
+    padding: 0;
+}
+
+.alertsResults .kt-section div {
+    padding: 0;
+}
+
+.alertsResults {
+    width: 100%;
+}
+
+.alertsResults .row .fa {
+    margin-left: 10px;
+}

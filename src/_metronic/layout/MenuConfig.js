@@ -502,11 +502,12 @@ export default {
   aside: {
     self: {},
     items: [
-      { section: "Tender" },
+      { section: "Tender",  role: "ROLE_TENDER" },
       {
         title: "Dashboard",
         root: true,
         bullet: "dot",
+        role: "ROLE_TENDER",
         translate: "MENU.DASHBOARD",
         icon: "flaticon2-architecture-and-city",
         page: "tender/tender-pages/TenderDashboardPage",
@@ -515,9 +516,64 @@ export default {
         title: "Search",
         root: true,
         bullet: "dot",
+        role: "ROLE_TENDER",
+        translate: "MENU.SEARCH",
         icon: "fa fa-search",
         page: "tender/tender-pages/NoticeSearchPage",
-      }
+      },
+      {
+        title: "Alerts",
+        root: true,
+        alignment: "left",
+        role: "ROLE_TENDER",
+        toggle: "click",
+        translate: "MENU.ALERTS",
+        submenu: [
+          {
+            title: "My Alerts",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.MY_ALERTS",
+            page: "tender/tender-pages/AlertsPage"
+          },
+          {
+            title: "My Notifications",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.MY_NOTIFICATIONS",
+            page: "tender/tender-pages/NoticesPage"
+          }
+        ]
+      },
+      {
+        title: "Procedures",
+        root: true,
+        alignment: "left",
+        toggle: "click",
+        role: "ROLE_TENDER",
+        translate: "MENU.PROCEDURES",
+        submenu: [
+          {
+            title: "My Procedures",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.MY_OPEN_PROCEDURES",
+            page: "tender/tender-pages/MyOpenOffersPage"
+          }
+        ]
+      },
+      { section: "Supervisor",
+        role: "ROLE_SUPERVISOR"
+      },
+      {
+        title: "Dashboard",
+        root: true,
+        role: "ROLE_SUPERVISOR",
+        bullet: "dot",
+        translate: "MENU.DASHBOARD",
+        icon: "flaticon2-architecture-and-city",
+        page: "tender/tender-pages/SupervisorDashboardPage",
+      },
     ]
   }
 };

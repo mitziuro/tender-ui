@@ -7,6 +7,19 @@
   "MENU.FEATURES": "Features",
   "MENU.APPS": "Apps",
   "MENU.DASHBOARD": "Dashboard",
+
+
+  "MENU.SEARCH": "SICAP Integration",
+
+
+  "MENU.ALERTS": "Alerts",
+  "MENU.MY_ALERTS": "My Alerts",
+  "MENU.MY_NOTIFICATIONS": "My Notifications",
+
+
+  "MENU.PROCEDURES": "Procedures",
+  "MENU.MY_OPEN_PROCEDURES": "My Open Procedures",
+
   "AUTH.GENERAL.OR": "Or",
   "AUTH.GENERAL.SUBMIT_BUTTON": "Submit",
   "AUTH.GENERAL.NO_ACCOUNT": "Don't have an account?",

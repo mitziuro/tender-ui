@@ -23,3 +23,11 @@ export function takeOffer(id) {
 export function closeOffer(id) {
     return axios.put(OFFER_URL + '/me/close/' + id);
 }
+
+export function getOffersForTender(states, page, size) {
+    return axios.get(OFFER_URL  + '/me/tender/'  + states.join(',') + '?page=' + page + '&size=' + size);
+}
+
+export function getOffersForSupervisor(states, page, size) {
+    return axios.get(OFFER_URL  + '/me/supervisor/'  + states.join(',') + '?page=' + page + '&size=' + size);
+}

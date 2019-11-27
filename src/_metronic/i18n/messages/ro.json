@@ -7,6 +7,16 @@
   "MENU.FEATURES": "Features",
   "MENU.APPS": "Apps",
   "MENU.DASHBOARD": "Board",
+
+  "MENU.SEARCH": "Integrare SICAP",
+
+  "MENU.ALERTS": "Alerte",
+  "MENU.MY_ALERTS": "Alertele mele",
+  "MENU.MY_NOTIFICATIONS": "Notificarile mele",
+
+  "MENU.PROCEDURES": "Proceduri",
+  "MENU.MY_OPEN_PROCEDURES": "Proceduri deschise",
+
   "AUTH.GENERAL.OR": "Or",
   "AUTH.GENERAL.SUBMIT_BUTTON": "Submit",
   "AUTH.GENERAL.NO_ACCOUNT": "Don't have an account?",

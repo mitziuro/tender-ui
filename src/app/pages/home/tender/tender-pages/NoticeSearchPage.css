@@ -40,3 +40,14 @@
   display: none;
 }
 
+.noticeResults .kt-portlet__body {
+  padding: 0;
+}
+
+.noticeResults .kt-section div {
+  padding: 0;
+}
+
+.noticeResults {
+  width: 100%;
+}

@@ -18,6 +18,6 @@ export function getMyAlerts() {
     return axios.get(ALERT_URL);
 }
 
-export function deleteAlerts(ids) {
-    return axios.delete(ALERT_DELETE_URL + '/' + ids.join(','));
+export function deleteAlerts(id) {
+    return axios.delete(ALERT_DELETE_URL + '/' + id);
 }

@@ -3,14 +3,34 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
 import { connect } from "react-redux";
+import { getUserByToken } from '../../crud/auth.crud';
 import { toAbsoluteUrl } from "../../../_metronic";
 import HeaderDropdownToggle from "../content/CustomDropdowns/HeaderDropdownToggle";
 
 class UserProfile extends React.Component {
+
+
+  constructor(props) {
+
+    super(props);
+
+    this.state = {user: props.user, img:''};
+    Promise.all([getUserByToken()]).then(response => {
+      var _user = response[0].data;
+
+      this.setState({user: _user});
+
+      var md5 = require('md5');
+      this.setState({img: 'http://gravatar.com/avatar/' + md5(this.state.user.login)});
+
+    });
+
+  }
+
+
   render() {
     const { user, showHi, showAvatar, showBadge } = this.props;
-    var md5 = require('md5');
-    var img_url = 'http://gravatar.com/avatar/' + md5(user.email);
+
 
     return (
       <Dropdown className="kt-header__topbar-item kt-header__topbar-item--user" drop="down" alignRight>
@@ -27,11 +47,11 @@ class UserProfile extends React.Component {
 
             {showHi && (
               <span className="kt-header__topbar-username kt-hidden-mobile">
-                {user.firstName} {user.lastName}
+                {this.state.user.firstName} {this.state.user.lastName}
               </span>
             )}
 
-            {showAvatar && <img alt="Pic" src={img_url} />}
+            {showAvatar && <img alt="Pic" src={this.state.img} />}
 
             {showBadge && (
               <span className="kt-badge kt-badge--username kt-badge--unified-success kt-badge--lg kt-badge--rounded kt-badge--bold">

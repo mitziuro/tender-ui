@@ -63,12 +63,7 @@ export default class AlertListingComponent extends React.Component {
 
     handleDelete = () => {
 
-        let toBeDeleted = this.state.alerts.filter(a => a.checked === true).map(a => a.id);
-        if(toBeDeleted.length === 0) {
-            return;
-        }
-
-        Promise.all([deleteAlerts(toBeDeleted)]).then(response => {
+        Promise.all([deleteAlerts(this.state.toBeDeleted)]).then(response => {
             this.getAlerts();
             this.setState({confirm: false});
         });
@@ -89,15 +84,8 @@ export default class AlertListingComponent extends React.Component {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell align="left">
-                                <Tooltip title="Delete">
-                                    <IconButton aria-label="Delete">
-                                        <DeleteIcon onClick={() => this.setState({confirm: true})} />
-                                    </IconButton>
-                                </Tooltip>
-                            </TableCell>
                             <TableCell>Name</TableCell>
-                            <TableCell align="left">Description</TableCell>
+                            <TableCell align="right">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -107,20 +95,47 @@ export default class AlertListingComponent extends React.Component {
 
                                 return (
                                     <TableRow key={alert.id}>
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                checked={alert.checked == true}
-                                                onChange={() => this.markAlert(alert.id)}
-                                                inputProps={{
-                                        "aria-labelledby": alert.id
-                                      }}
-                                            />
-                                        </TableCell>
                                         <TableCell component="th" scope="row">
-                                            <Link
-                                                to={`/tender/tender-pages/NoticeSearchPage?alert=${alert.id}`}>{alert.alertName}</Link>
+                                            {alert.alertName}
+
+                                            <div className="row" style={{position: "relative", top:"10px"}}>
+                                                <div className="">
+                                                    <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Types:</span>
+                                                    <b>
+                                                        {alert.rfq ? 'Call for tenders (RFQ) ' : ''}  {alert.cn ? 'Contract notice (CN) ' : ''}  {alert.scn ? 'Simplified contract notice (SCN) ' : ''}  {alert.ccn ? 'Concession notice (PC) ' : ''}  {alert.dccn ? 'Design Contest Notice (DC) ' : ''}
+                                                    </b>
+                                                    {alert.name ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Name:</span> <b> {alert.name} </b> </>) : ''}
+                                                    {alert.number ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Number:</span> <b> {alert.number} </b> </>) : ''}
+
+                                                    {alert.pdStart ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Publication Start Date:</span> <b> {alert.pdStart.split('T')[0].replace('-','.').replace('-','.')} </b> </>) : ''}
+                                                    {alert.pdEnd ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Publication End Date:</span> <b> {alert.pdEnd.split('T')[0].replace('-','.').replace('-','.')} </b> </>) : ''}
+
+                                                    {alert.contractingAuthority ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Contracting Authority:</span> <b> {alert.contractingAuthority.name} </b> </>) : ''}
+
+                                                    {alert.businessField ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Business Field:</span> <b> {alert.businessField.nameEn} </b> </>) : ''}
+
+                                                    {alert.rdStart ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Receipt Start Date:</span> <b> {alert.rdStart.split('T')[0].replace('-','.').replace('-','.')} </b> </>) : ''}
+                                                    {alert.rdEnd ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Receipt End Date:</span> <b> {alert.rdEnd.split('T')[0].replace('-','.').replace('-','.')} </b> </>) : ''}
+
+                                                    {alert.cpv ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Business Field:</span> <b> {alert.cpv.nameEn} </b> </>) : ''}
+
+
+                                                    {alert.tevStart ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Receipt Start Date:</span> <b> {alert.tevStart} </b> </>) : ''}
+                                                    {alert.tevEnd ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Receipt End Date:</span> <b> {alert.tevEnd} </b> </>) : ''}
+
+                                                </div>
+                                            </div>
                                         </TableCell>
-                                        <TableCell align="left">{alert.alertDescription}</TableCell>
+                                        <TableCell align="right">
+                                            <Link
+                                                to={`/tender/tender-pages/NoticeSearchPage?alert=${alert.id}`}>
+                                                <i className="fa fa-edit fa-lg" title="Edit"> </i>
+                                            </Link>
+                                            &nbsp;
+                                            <a onClick={() => this.setState({toBeDeleted: alert.id, confirm: true})}>
+                                                <i className="fa fa-trash fa-lg"  title="Delete"> </i>
+                                            </a>
+                                        </TableCell>
                                     </TableRow>
                                 )
                             })}

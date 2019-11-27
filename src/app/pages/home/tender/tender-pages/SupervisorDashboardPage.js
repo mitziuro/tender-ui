@@ -11,7 +11,7 @@ import  OfferListingComponent from '../components/OfferListingComponent';
 import  NoticeListingComponent from '../components/NoticeListingComponent';
 
 
-import './TenderDashboardPage.css';
+import './SupervisorDashboardPage.css';
 
 
 import {
@@ -30,7 +30,7 @@ import {
 } from "@material-ui/core";
 
 
-export default class TenderDashboardPage extends React.Component {
+export default class SupervisorDashboardPage extends React.Component {
 
 
 
@@ -45,36 +45,36 @@ export default class TenderDashboardPage extends React.Component {
                 <div className="row">
                     <div className="col-md-12" style={{display: 'flex'}}>
                         <div className="col-md-6">
-                            <div className="noticeResults">
-                                <CodeExample beforeCodeTitle="Alert Results">
+                            <div className="offersResults">
+                                <CodeExample beforeCodeTitle="Open Offers">
                                     <div className="kt-section">
                                         <div className="col-md-12">
-                                            <div className="kt-section__content">
-                                                <NoticeListingComponent />
+                                            <div className="kt-separator kt-separator--dashed">
+                                                <OfferListingComponent user={'supervisor'} states={[1]} />
                                             </div>
                                         </div>
                                     </div>
                                 </CodeExample>
                             </div>
                         </div>
-                        <div className="col-md-6">
-                            <div className="alertsResults">
-                                <CodeExample beforeCodeTitle="My Alerts">
+                        <div className="col-md-6" style={{display: 'flex', flexDirection: 'column', minHeight: '300px'}}>
+                            <div className="offersResults">
+                                <CodeExample beforeCodeTitle="My Work">
                                     <div className="kt-section">
-                                        <div className="col-md-12" >
-                                            <div className="kt-section__content">
-                                                <AlertListingComponent />
+                                        <div className="col-md-12">
+                                            <div className="kt-separator kt-separator--dashed">
+                                                <OfferListingComponent user={'supervisor'} states={[2]} />
                                             </div>
                                         </div>
                                     </div>
                                 </CodeExample>
                             </div>
                             <div className="offersResults">
-                                <CodeExample beforeCodeTitle="My Offers">
+                                <CodeExample beforeCodeTitle="My Completed Offers">
                                     <div className="kt-section">
                                         <div className="col-md-12">
                                             <div className="kt-separator kt-separator--dashed">
-                                                <OfferListingComponent states={[1,2]} />
+                                                <OfferListingComponent user={'supervisor'} states={[3]} />
                                             </div>
                                         </div>
                                     </div>

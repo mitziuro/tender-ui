@@ -7,6 +7,8 @@ import './NoticeSearchPage.css';
 import {getCpvs, getContractingAuthorities, getBusinessFields} from "../../../../crud/tender/search.notice.crud";
 import {saveAlert, getAlert} from "../../../../crud/tender/alert.crud";
 
+import  NoticeListingComponent from '../components/NoticeListingComponent';
+
 import {
     Checkbox,
     FormControlLabel,
@@ -25,12 +27,8 @@ import {
 
 export default class NoticeSearchPage extends React.Component {
 
-
     constructor(props) {
         super(props);
-
-        console.log(this.props)
-
 
         this.alertId = this.props.location.search != null && this.props.location.search.split('alert=').length == 2 ? this.props.location.search.split('alert=')[1] : null;
 
@@ -169,9 +167,7 @@ export default class NoticeSearchPage extends React.Component {
             objCopy['cpv'] = {id: objCopy['cpv']};
         }
 
-        saveAlert(objCopy).then(response => {
-            this.setState({id: response.data.id});
-        });
+        return objCopy;
     }
 
     handleSaveAlert = () => {
@@ -180,7 +176,12 @@ export default class NoticeSearchPage extends React.Component {
             return;
         }
 
-        this.getSearchObject();
+        var value = this.getSearchObject();
+
+        saveAlert(value).then(response => {
+            this.setState({id: response.data.id});
+        });
+
         this.handleCloseSaveAlert();
 
     }
@@ -203,7 +204,8 @@ export default class NoticeSearchPage extends React.Component {
     }
 
     handleSearch = () => {
-        console.log(this.state);
+        this.child.getNotices(this.getSearchObject());
+        this.setState({});
     }
 
     render() {
@@ -404,6 +406,19 @@ export default class NoticeSearchPage extends React.Component {
                                 </div>
                             </div>
 
+                        </div>
+                    </CodeExample>
+                </div>
+            </div>
+            <div className="row">
+                <div class="col-md-12" className="noticeResults">
+                    <CodeExample beforeCodeTitle="Search Results">
+                        <div className="kt-section">
+                            <div className="col-md-12">
+                                <div className="kt-section__content">
+                                    <NoticeListingComponent onRef={ref => (this.child = ref)} />
+                                </div>
+                            </div>
                         </div>
                     </CodeExample>
                 </div>

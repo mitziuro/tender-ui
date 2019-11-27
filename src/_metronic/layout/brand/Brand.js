@@ -23,9 +23,9 @@ class Brand extends React.Component {
         className={`kt-aside__brand kt-grid__item ${this.props.brandClasses}`}
         id="kt_aside_brand"
       >
-        <div className="kt-aside__brand-logo">
-          <Link to="">
-            <img alt="logo" src={this.props.headerLogo} style={{height: '40px', wdth: '40px'}}/> tEnDeR
+        <div className="kt-aside__brand-logo" >
+          <Link to="" style={{color: "white"}}>
+            <img src={this.props.headerLogo} style={{height: '40px', width: '40px'}}/> <span alt="logo">tEnDeR</span>
           </Link>
         </div>
 
