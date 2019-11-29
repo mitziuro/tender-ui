@@ -26,7 +26,6 @@ const languages = [
     const lastUser = window.localStorage.getItem('_USER') != null ? JSON.parse(window.localStorage.getItem('_USER')) : null;
 
     if(lastUser != null && lang != lastUser.langKey) {
-      setLanguage(lastUser.langKey);
       this.setState({ open: false });
       setTimeout(()=> window.location.reload(), 400);
     }
