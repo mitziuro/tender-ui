@@ -35,8 +35,8 @@ export function getNotice(id) {
     return axios.get(NOTIFICATION_NOTICES_URL  + '/'  + id);
 }
 
-export function getNoticeContent(noticeId) {
-    return axios.get(NOTICE_CONTENT_URL  + '/notice/'  + noticeId);
+export function getNoticeContent(noticeId, type, language) {
+    return axios.get(NOTICE_CONTENT_URL  + '/notice/'  + noticeId + '?type=' + type + '&lang=' + language);
 }
 
 export function getNoticeDocuments(noticeId) {

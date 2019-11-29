@@ -25,12 +25,12 @@ const languages = [
     var { lang, iconType, setLanguage } = this.props;
     const lastUser = window.localStorage.getItem('_USER') != null ? JSON.parse(window.localStorage.getItem('_USER')) : null;
 
-    if(lastUser != null && lang != lastUser.langKey) {
-      this.setState({ open: false });
-      setTimeout(()=> window.location.reload(), 400);
+    if(lastUser != null && lastUser.langKey != null && lang != lastUser.langKey) {
+      setLanguage(lastUser.langKey);
+    //  setTimeout(()=> window.location.reload(), 400);
     }
 
-    var currentLanguage = languages.find(x => x.lang === lang);
+    var currentLanguage = languages.find(x => x.lang === lastUser.langKey);
     currentLanguage = currentLanguage ? currentLanguage : languages.find(x => x.lang === 'en');
     return (
       <Dropdown

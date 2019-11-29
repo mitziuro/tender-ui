@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from 'react-router-dom';
+import { CircularProgress } from "@material-ui/core";
 
 import Notice from "../../../../partials/content/Notice";
 import CodeExample from "../../../../partials/content/CodeExample";
@@ -49,8 +50,16 @@ export default class NoticePage extends React.Component {
         Promise.all([getNotice(this.noticeId), getMyOfferForNotice(this.noticeId)]).then(response => {
             this.setState({notice: response[0].data, offer: response[1].data});
 
-            Promise.all([getNoticeContent(this.state.notice.noticeId)]).then(response => {
-                this.setState({content: response[0].data.contentEn});
+            Promise.all([getNoticeContent(this.state.notice.noticeId, this.state.notice.type, 'en')]).then(response => {
+
+                if(response[0].data.contentEn == null) {
+                    Promise.all([getNoticeContent(this.state.notice.noticeId, this.state.notice.type, 'en')]).then(response => {
+                        this.setState({content: response[0].data.contentEn});
+                    });
+                } else {
+                    this.setState({content: response[0].data.contentEn});
+                }
+
             });
 
             Promise.all([getNoticeDocuments(this.state.notice.noticeId)]).then(response => {
@@ -83,7 +92,10 @@ export default class NoticePage extends React.Component {
                             <div className="kt-section">
                                 <div className="col-md-12">
                                     <div className="kt-section__content">
-                                       <div dangerouslySetInnerHTML={{__html: this.state.content}}></div>
+                                        { this.state.content == null ? (
+                                            <> <div classNAme="md-12" style={{display: "flex", marginBottom: "10px", justifyContent: "center"}}> <CircularProgress className="kt-splash-screen__spinner" /> </div> </>
+                                        ) :
+                                            (<div dangerouslySetInnerHTML={{__html: this.state.content}}></div>)}
                                     </div>
                                     {this.state.documents.length > 0 ?
                                         <div className="kt-section__content">
@@ -103,7 +115,7 @@ export default class NoticePage extends React.Component {
                                                 <div className="widget-body " style={{minHeight: "50px"}}>
 
                                                     <div className="row ng-scope">
-                                                        <div className="col-md-6">
+                                                        <div className="col-md-12">
                                                             <h4>PDF Files: </h4>
                                                             <div className="c-df-notice__box">
                                                                 <div className="u-displayfield s-row">
@@ -112,12 +124,12 @@ export default class NoticePage extends React.Component {
                                                                         this.state.documents.map((d) => {
 
                                                                             return (
-                                                                                <span>
+                                                                                <div>
                                                                                     <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
                                                                                         <i style={{color: "red"}} class="fa fa-file-pdf"> </i>
                                                                                         <span> {d.fileName} </span>
                                                                                     </a>
-                                                                                </span>
+                                                                                </div>
                                                                             )
                                                                         })
                                                                     }

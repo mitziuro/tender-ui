@@ -282,6 +282,9 @@
 .noticeResult .c-lots-list__item__header a {
     cursor: auto !important;
 }
+#section-0 .btn-group {
+    display: none;
+}
 
 /*
 .noticeResult .c-lots-list .row:last-child {
