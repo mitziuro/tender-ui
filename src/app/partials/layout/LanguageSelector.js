@@ -23,7 +23,7 @@ const languages = [
 
   render() {
     var { lang, iconType, setLanguage } = this.props;
-    var lastUser = window.localStorage.getItem('_USER') != null ? JSON.parse(window.localStorage.getItem('_USER')) : null;
+    const lastUser = window.localStorage.getItem('_USER') != null ? JSON.parse(window.localStorage.getItem('_USER')) : null;
 
     if(lastUser != null && lang != lastUser.langKey) {
       setLanguage(lastUser.langKey);
