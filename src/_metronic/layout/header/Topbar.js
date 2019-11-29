@@ -34,7 +34,6 @@ export default class Topbar extends React.Component {
   render() {
     return (
       <div className="kt-header__topbar">
-        <SearchDropdown useSVG="true" />
 
         <LanguageSelector user={this.state.user} iconType="" />
 
