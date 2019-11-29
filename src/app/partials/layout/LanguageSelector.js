@@ -22,18 +22,17 @@ const languages = [
  class LanguageSelector extends React.Component {
 
   render() {
-    const { lang, iconType, setLanguage } = this.props;
+    var { lang, iconType, setLanguage } = this.props;
     var lastUser = window.localStorage.getItem('_USER') != null ? JSON.parse(window.localStorage.getItem('_USER')) : {};
-    if(lastUser == null) {
-      lang = 'en';
-    }​​
+
     if(lastUser != null && lang != lastUser.langKey) {
       setLanguage(lastUser.langKey);
       this.setState({ open: false });
       setTimeout(()=> window.location.reload(), 400);
     }
+
     var currentLanguage = languages.find(x => x.lang === lang);
-    currentLanguage = currentLanguage ? currentLanguage : languages.find(x => x.lang === 'ro');
+    currentLanguage = currentLanguage ? currentLanguage : languages.find(x => x.lang === 'en');
     return (
       <Dropdown
         className="kt-header__topbar-item kt-header__topbar-item--langs"
