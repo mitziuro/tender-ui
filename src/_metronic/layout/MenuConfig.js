@@ -581,6 +581,20 @@ export default {
             page: "builder",
             translate: "MENU.MY_OPEN_PROCEDURES",
             page: "tender/tender-pages/MyOpenOffersPage"
+          },
+          {
+            title: "My Completed Procedures",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.MY_COMPLETED_PROCEDURES",
+            page: "tender/tender-pages/MyCompletedOffersPage"
+          },
+          {
+            title: "My Declined Procedures",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.MY_DECLINED_PROCEDURES",
+            page: "tender/tender-pages/MyDeclinedOffersPage"
           }
         ]
       },

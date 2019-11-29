@@ -58,7 +58,7 @@ export default class OfferListingComponent extends React.Component {
     }
 
     render() {
-        return this.state.type == 'big' ? this._render_big() : this._render_small();
+        return this.state.offers.length == 0 ? (<><div className="col-md-12" style={{justifyContent: "center", textAlign: "center"}}><i>There are no results</i></div></>) : this.state.type == 'big' ? this._render_big() : this._render_small();
     }
 
     _render_big() {

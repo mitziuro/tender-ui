@@ -23,6 +23,8 @@
 
   "MENU.PROCEDURES": "Proceduri",
   "MENU.MY_OPEN_PROCEDURES": "Proceduri deschise",
+  "MENU.MY_COMPLETED_PROCEDURES": "Proceduri terminate",
+  "MENU.MY_DECLINED_PROCEDURES": "Proceduri anulate",
 
   "AUTH.GENERAL.OR": "Or",
   "AUTH.GENERAL.SUBMIT_BUTTON": "Submit",

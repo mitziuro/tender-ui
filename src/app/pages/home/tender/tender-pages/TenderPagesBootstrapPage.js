@@ -10,6 +10,9 @@ import AlertsPage from './alerts/AlertsPage';
 import NoticesPage from './alerts/NoticesPage';
 
 import MyOpenOffersPage from './offers/MyOpenOffersPage'
+import MyCompletedOffersPage from './offers/MyCompletedOffersPage'
+import MyDeclinedOffersPage from './offers/MyDeclinedOffersPage'
+
 
 import PersonalPage from './profile/PersonalPage';
 import MyAccountPage from './profile/MyAccountPage';
@@ -65,6 +68,15 @@ export default function TenderPagesBootstrapPage() {
                 component={MyOpenOffersPage}
             />
 
+        <Route
+            path="/tender/tender-pages/MyCompletedOffersPage"
+            component={MyCompletedOffersPage}
+        />
+
+                <Route
+                    path="/tender/tender-pages/MyDeclinedOffersPage"
+                    component={MyDeclinedOffersPage}
+                />
 
             <Route
                 path="/tender/tender-pages/PersonalPage"

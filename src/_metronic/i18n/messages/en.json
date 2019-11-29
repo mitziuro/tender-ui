@@ -23,6 +23,9 @@
 
   "MENU.PROCEDURES": "Procedures",
   "MENU.MY_OPEN_PROCEDURES": "My Open Procedures",
+  "MENU.MY_COMPLETED_PROCEDURES": "My Completed Procedures",
+  "MENU.MY_DECLINED_PROCEDURES": "My Declined Procedures",
+
 
   "AUTH.GENERAL.OR": "Or",
   "AUTH.GENERAL.SUBMIT_BUTTON": "Submit",
