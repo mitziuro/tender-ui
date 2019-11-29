@@ -62,7 +62,7 @@
     "perfect-scrollbar": "^1.4.0",
     "prop-types": "^15.7.2",
     "react": "^16.10.2",
-    "react-bootstrap": "^1.0.0-beta.14",
+    "react-bootstrap": "1.0.0-beta.14",
     "react-dom": "^16.10.2",
     "react-draggable": "^4.0.3",
     "react-helmet": "^5.2.1",
