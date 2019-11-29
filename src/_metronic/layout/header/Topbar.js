@@ -23,6 +23,7 @@ export default class Topbar extends React.Component {
 
             var lastUser = window.localStorage.getItem('_USER') != null ? JSON.parse(window.localStorage.getItem('_USER')) : null;
             if(lastUser && JSON.stringify(lastUser) != JSON.stringify(_user)) {
+                window.localStorage.setItem('_USER', JSON.stringify(_user));
                 window.location.reload();
             }
             window.localStorage.setItem('_USER', JSON.stringify(_user));
