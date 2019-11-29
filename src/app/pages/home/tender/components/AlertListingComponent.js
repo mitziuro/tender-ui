@@ -96,11 +96,12 @@ export default class AlertListingComponent extends React.Component {
                                 return (
                                     <TableRow key={alert.id}>
                                         <TableCell component="th" scope="row">
-                                            {alert.alertName}
+                                            <b style={{fontSize:"15px"}}> {alert.alertName}</b>
 
                                             <div className="row" style={{position: "relative", top:"10px"}}>
                                                 <div className="">
                                                     <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Types:</span>
+                                                    <b> {!alert.rfq && !alert.cn && !alert.scn && !alert.ccn && !alert.dccn ? 'All ' : ''} </b>
                                                     <b>
                                                         {alert.rfq ? 'Call for tenders (RFQ) ' : ''}  {alert.cn ? 'Contract notice (CN) ' : ''}  {alert.scn ? 'Simplified contract notice (SCN) ' : ''}  {alert.ccn ? 'Concession notice (PC) ' : ''}  {alert.dccn ? 'Design Contest Notice (DC) ' : ''}
                                                     </b>

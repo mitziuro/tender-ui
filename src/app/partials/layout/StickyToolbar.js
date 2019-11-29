@@ -11,20 +11,6 @@ export default class StickyToolbar extends React.Component {
   
           <OverlayTrigger
             placement="left"
-            overlay={<Tooltip id="layout-tooltip">Layout Builder</Tooltip>}
-          >
-            <li
-              className="kt-sticky-toolbar__item kt-sticky-toolbar__item--brand"
-              data-placement="left"
-            >
-              <Link to="/builder">
-                <i className="flaticon2-gear" />
-              </Link>
-            </li>
-          </OverlayTrigger>
-  
-          <OverlayTrigger
-            placement="left"
             overlay={<Tooltip id="documentations-tooltip">Documentation</Tooltip>}
           >
             <li
@@ -34,7 +20,7 @@ export default class StickyToolbar extends React.Component {
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                href="https://keenthemes.com/metronic/?page=docs"
+                href="http://seap.ro"
               >
                 <i className="flaticon2-telegram-logo" />
               </a>

@@ -11,6 +11,10 @@ import NoticesPage from './alerts/NoticesPage';
 
 import MyOpenOffersPage from './offers/MyOpenOffersPage'
 
+import PersonalPage from './profile/PersonalPage';
+import MyAccountPage from './profile/MyAccountPage';
+import ChangePasswordPage from './profile/ChangePasswordPage';
+
 
 export default function TenderPagesBootstrapPage() {
     return (
@@ -56,11 +60,28 @@ export default function TenderPagesBootstrapPage() {
                 component={NoticesPage}
             />
 
-                <Route
-                    path="/tender/tender-pages/MyOpenOffersPage"
-                    component={MyOpenOffersPage}
-                />
+            <Route
+                path="/tender/tender-pages/MyOpenOffersPage"
+                component={MyOpenOffersPage}
+            />
 
+
+            <Route
+                path="/tender/tender-pages/PersonalPage"
+                component={PersonalPage}
+            />
+
+
+            <Route
+                path="/tender/tender-pages/MyAccountPage"
+                component={MyAccountPage}
+            />
+
+
+            <Route
+                path="/tender/tender-pages/ChangePasswordPage"
+                component={ChangePasswordPage}
+            />
         </Switch>
     );
 }

@@ -8,6 +8,13 @@
   "MENU.APPS": "Apps",
   "MENU.DASHBOARD": "Board",
 
+
+  "MENU.PROFILE": "Profil",
+  "MENU.MY_PAGE": "Informatii personale",
+  "MENU.MY_ACCOUNT": "Contul meu",
+  "MENU.CHANGE_PASSWORD": "Schimbare parola",
+
+
   "MENU.SEARCH": "Integrare SICAP",
 
   "MENU.ALERTS": "Alerte",

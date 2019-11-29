@@ -29,7 +29,8 @@ const languages = [
       this.setState({ open: false });
       setTimeout(()=> window.location.reload(), 400);
     }
-    const currentLanguage = languages.find(x => x.lang === lang);
+    var currentLanguage = languages.find(x => x.lang === lang);
+    currentLanguage = currentLanguage ? currentLanguage : languages.find(x => x.lang === 'ro');
     return (
       <Dropdown
         className="kt-header__topbar-item kt-header__topbar-item--langs"

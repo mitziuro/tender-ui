@@ -504,13 +504,35 @@ export default {
     items: [
       { section: "Tender",  role: "ROLE_TENDER" },
       {
-        title: "Dashboard",
+        title: "Profile",
         root: true,
         bullet: "dot",
         role: "ROLE_TENDER",
-        translate: "MENU.DASHBOARD",
+        translate: "MENU.PROFILE",
         icon: "flaticon2-architecture-and-city",
-        page: "tender/tender-pages/TenderDashboardPage",
+        submenu: [
+          {
+            title: "Personal Info",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.MY_PAGE",
+            page: "tender/tender-pages/PersonalPage"
+          },
+          {
+            title: "My Account",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.MY_ACCOUNT",
+            page: "tender/tender-pages/MyAccountPage"
+          },
+          {
+            title: "Change Password",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.CHANGE_PASSWORD",
+            page: "tender/tender-pages/ChangePasswordPage"
+          }
+        ]
       },
       {
         title: "Search",

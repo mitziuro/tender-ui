@@ -8,6 +8,10 @@
   "MENU.APPS": "Apps",
   "MENU.DASHBOARD": "Dashboard",
 
+  "MENU.PROFILE": "Profile",
+  "MENU.MY_PAGE": "Personal Info",
+  "MENU.MY_ACCOUNT": "My Account",
+  "MENU.CHANGE_PASSWORD": "Change Password",
 
   "MENU.SEARCH": "SICAP Integration",
 

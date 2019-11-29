@@ -81,7 +81,6 @@ export default class NoticeSearchPage extends React.Component {
                         _alert['rdEnd'] = _alert['rdEnd'].split('T')[0];
                     }
 
-                    console.log(_alert);
 
                     this.setState(_alert);
                 });
@@ -118,7 +117,8 @@ export default class NoticeSearchPage extends React.Component {
             businessField: '',
             cpv: '',
 
-            alertOpen: false
+            alertOpen: false,
+            showErrors: false
         };
 
         this.state = this.initialState;
@@ -173,6 +173,7 @@ export default class NoticeSearchPage extends React.Component {
     handleSaveAlert = () => {
 
         if (this.state.alertName == null || this.state.alertName.length === 0) {
+            this.setState({showErrors: true});
             return;
         }
 
@@ -182,12 +183,13 @@ export default class NoticeSearchPage extends React.Component {
             this.setState({id: response.data.id});
         });
 
+        this.setState({showErrors: false});
         this.handleCloseSaveAlert();
 
     }
 
     handleCloseSaveAlert = () => {
-        this.setState({alertOpen: false});
+        this.setState({alertOpen: false, showErrors: false});
     }
 
 
@@ -213,6 +215,9 @@ export default class NoticeSearchPage extends React.Component {
             <>
             <div className="row">
                 <div className="col-md-12" className="noticeSearch">
+                    <Button style={{background: 'green', position: "absolute", right: "30px", top: "10px", zIndex:"999"}} color="green" onClick={this.handleSave}>
+                        <i className="fa fa-save"> </i> Save
+                    </Button>
                     <CodeExample beforeCodeTitle="Notice Search">
                         <div className="kt-section">
                             <div className="col-md-12" className="noticeSearchContainerCheckboxes">
@@ -285,21 +290,19 @@ export default class NoticeSearchPage extends React.Component {
                                                onChange={(e) => this.applySearchState({name: e.target.value})}
                                                margin="normal"/>
                                 </div>
-                                <div className="col-md-1">
-                                    <TextField label="Current Procedure State" value="In progress" disabled={true}
-                                               margin="normal"/>
-                                </div>
-                                <div className="col-md-2">
-                                    <TextField className="date" label="Publication Date Start" type="date"
-                                               value={this.state.pdStart}
-                                               onChange={(e) => this.applySearchState({pdStart: e.target.value})}
-                                               InputLabelProps={{shrink: true}}/>
-                                </div>
-                                <div className="col-md-2">
-                                    <TextField className="date" label="Publication Date End" type="date"
-                                               value={this.state.pdEnd}
-                                               onChange={(e) => this.applySearchState({pdEnd: e.target.value})}
-                                               InputLabelProps={{shrink: true}}/>
+                                <div className="col-md-6" style={{display: "flex", justifyContent: "center"}}>
+                                    <div className="col-md-2">
+                                        <TextField className="date" label="Publication Date Start" type="date"
+                                                   value={this.state.pdStart}
+                                                   onChange={(e) => this.applySearchState({pdStart: e.target.value})}
+                                                   InputLabelProps={{shrink: true}}/>
+                                    </div>
+                                    <div className="col-md-2">
+                                        <TextField className="date" label="Publication Date End" type="date"
+                                                   value={this.state.pdEnd}
+                                                   onChange={(e) => this.applySearchState({pdEnd: e.target.value})}
+                                                   InputLabelProps={{shrink: true}}/>
+                                    </div>
                                 </div>
                             </div>
 
@@ -344,18 +347,19 @@ export default class NoticeSearchPage extends React.Component {
                                         ))}
                                     </Select>
                                 </div>
-
-                                <div className="col-md-2">
-                                    <TextField className="date" label="Receipt Deadline Start" type="date"
-                                               value={this.state.rdStart}
-                                               onChange={(e) => this.applySearchState({rdStart: e.target.value})}
-                                               InputLabelProps={{shrink: true}}/>
-                                </div>
-                                <div className="col-md-2">
-                                    <TextField className="date" label="Receipt Deadline End" type="date"
-                                               value={this.state.rdEnd}
-                                               onChange={(e) => this.applySearchState({rdEnd: e.target.value})}
-                                               InputLabelProps={{shrink: true}}/>
+                                <div className="col-md-6" style={{display: "flex", justifyContent: "center"}}>
+                                    <div className="col-md-2">
+                                        <TextField className="date" label="Receipt Deadline Start" type="date"
+                                                   value={this.state.rdStart}
+                                                   onChange={(e) => this.applySearchState({rdStart: e.target.value})}
+                                                   InputLabelProps={{shrink: true}}/>
+                                    </div>
+                                    <div className="col-md-2">
+                                        <TextField className="date" label="Receipt Deadline End" type="date"
+                                                   value={this.state.rdEnd}
+                                                   onChange={(e) => this.applySearchState({rdEnd: e.target.value})}
+                                                   InputLabelProps={{shrink: true}}/>
+                                    </div>
                                 </div>
                             </div>
 
@@ -379,19 +383,22 @@ export default class NoticeSearchPage extends React.Component {
                                         ))}
                                     </Select>
                                 </div>
-
-
-                                <div className="col-md-2">
-                                    <TextField label="Total Estimated Value From" className="date"
-                                               value={this.state.tevStart}
-                                               onChange={(e) => this.applySearchState({tevStart: e.target.value})}
-                                    />
-                                </div>
-                                <div className="col-md-2">
-                                    <TextField label="Total Estimated Value To" className="date"
-                                               value={this.state.tevEnd}
-                                               onChange={(e) => this.applySearchState({tevEnd: e.target.value})}
-                                    />
+                                <div className="col-md-3" ></div>
+                                <div className="col-md-6" style={{display: "flex", justifyContent: "center"}}>
+                                    <div className="col-md-2">
+                                        <TextField label="Total Estimated Value From" className="date"
+                                                   value={this.state.tevStart}
+                                                   InputLabelProps={{shrink: true}}
+                                                   onChange={(e) => this.applySearchState({tevStart: e.target.value})}
+                                        />
+                                    </div>
+                                    <div className="col-md-2">
+                                        <TextField label="Total Estimated Value To" className="date"
+                                                   value={this.state.tevEnd}
+                                                   InputLabelProps={{shrink: true}}
+                                                   onChange={(e) => this.applySearchState({tevEnd: e.target.value})}
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
@@ -399,10 +406,9 @@ export default class NoticeSearchPage extends React.Component {
                                 <div className="col-md-3">
                                     <Button color="primary" onClick={this.handleSearch}> <i
                                         className="fa fa-search"> </i> Search </Button>
-                                    <Button color="secondary" onClick={this.handleClear}> <i
+                                    <Button color="secondary" style={{background: "gray"}} onClick={this.handleClear}> <i
                                         className="fa fa-trash"> </i> Clear </Button>
-                                    <Button style={{background: 'green'}} color="green" onClick={this.handleSave}> <i
-                                        className="fa fa-save"> </i> Save </Button>
+
                                 </div>
                             </div>
 
@@ -444,22 +450,12 @@ export default class NoticeSearchPage extends React.Component {
                         type="text"
                         fullWidth
                     />
-
-                    <TextField
-                        style={{fontSize: '10px'}}
-                        margin="dense"
-                        id="description"
-                        value={this.state.alertDescription}
-                        onChange={(e) => this.applySearchState({alertDescription: e.target.value})}
-                        label="Description"
-                        type="text"
-                        fullWidth
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <p style={{position: 'absolute', left: '22px', float: 'left', display : (this.state.alertName == null || this.state.alertName.length === 0) ? 'block' : 'none', color: 'red'}}>
+                    <p style={{fontSize: "10px", position: 'absolute', left: '22px', float: 'left', display : this.state.showErrors == true && (this.state.alertName == null || this.state.alertName.length === 0) ? 'block' : 'none', color: 'red'}}>
                         The name must not be null
                     </p>
+                </DialogContent>
+                <DialogActions>
+
                     <Button onClick={this.handleCloseSaveAlert} color="primary">
                         Cancel
                     </Button>
@@ -475,104 +471,3 @@ export default class NoticeSearchPage extends React.Component {
 
 }
 
-//style={{display: "flex"}}
-/*
- class FormExample extends React.Component {
- constructor(...args) {
- super(...args);
-
- this.state = {validated: false};
- }
-
- handleSubmit(event) {
- const form = event.currentTarget;
- if (form.checkValidity() === false) {
- event.preventDefault();
- event.stopPropagation();
- }
- this.setState({validated: true});
- }
-
- render() {
- const { validated } = this.state;
- return (
- <Form
- noValidate
- validated={validated}
- onSubmit={e => this.handleSubmit(e)}
- >
- <Form.Row>
- <Form.Group as={Col} md="4" controlId="validationCustom01">
- <Form.Label>First name</Form.Label>
- <Form.Control
- required
- type="text"
- placeholder="First name"
- defaultValue="Mark"
- />
- <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
- </Form.Group>
- <Form.Group as={Col} md="4" controlId="validationCustom02">
- <Form.Label>Last name</Form.Label>
- <Form.Control
- required
- type="text"
- placeholder="Last name"
- defaultValue="Otto"
- />
- <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
- </Form.Group>
- <Form.Group as={Col} md="4" controlId="validationCustomUsername">
- <Form.Label>Username</Form.Label>
- <InputGroup>
- <InputGroup.Prepend>
- <InputGroup.Text id="inputGroupPrepend">@</InputGroup.Text>
- </InputGroup.Prepend>
- <Form.Control
- type="text"
- placeholder="Username"
- aria-describedby="inputGroupPrepend"
- required
- />
- <Form.Control.Feedback type="invalid">
- Please choose a username.
- </Form.Control.Feedback>
- </InputGroup>
- </Form.Group>
- </Form.Row>
- <Form.Row>
- <Form.Group as={Col} md="6" controlId="validationCustom03">
- <Form.Label>City</Form.Label>
- <Form.Control type="text" placeholder="City" required/>
- <Form.Control.Feedback type="invalid">
- Please provide a valid city.
- </Form.Control.Feedback>
- </Form.Group>
- <Form.Group as={Col} md="3" controlId="validationCustom04">
- <Form.Label>State</Form.Label>
- <Form.Control type="text" placeholder="State" required/>
- <Form.Control.Feedback type="invalid">
- Please provide a valid state.
- </Form.Control.Feedback>
- </Form.Group>
- <Form.Group as={Col} md="3" controlId="validationCustom05">
- <Form.Label>Zip</Form.Label>
- <Form.Control type="text" placeholder="Zip" required/>
- <Form.Control.Feedback type="invalid">
- Please provide a valid zip.
- </Form.Control.Feedback>
- </Form.Group>
- </Form.Row>
- <Form.Group>
- <Form.Check
- required
- label="Agree to terms and conditions"
- feedback="You must agree before submitting."
- />
- </Form.Group>
- <Button type="submit">Submit form</Button>
- </Form>
- );
- }
- }
- */

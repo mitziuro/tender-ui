@@ -29,15 +29,11 @@
   position: relative;
   top: 65px;
   padding-bottom: 40px;
-  justify-content: right;
+  justify-content: center;
 }
 
 .noticeSearch .noticeSearchContainerButtons button {
   margin-right: 10px;
-}
-
-.noticeSearch .kt-portlet__head {
-  display: none;
 }
 
 .noticeResults .kt-portlet__body {

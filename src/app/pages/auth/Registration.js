@@ -22,8 +22,8 @@ function Registration(props) {
         <Formik
           initialValues={{
             email: "",
-            fullname: "",
-            username: "",
+            firstName: "",
+            lastName: "",
             password: "",
             acceptTerms: true,
             confirmPassword: ""
@@ -43,14 +43,14 @@ function Registration(props) {
               });
             }
 
-            if (!values.fullname) {
-              errors.fullname = intl.formatMessage({
+            if (!values.firstname) {
+              errors.firstname = intl.formatMessage({
                 id: "AUTH.VALIDATION.REQUIRED_FIELD"
               });
             }
 
-            if (!values.username) {
-              errors.username = intl.formatMessage({
+            if (!values.lastname) {
+              errors.lastname = intl.formatMessage({
                 id: "AUTH.VALIDATION.REQUIRED_FIELD"
               });
             }
@@ -59,6 +59,10 @@ function Registration(props) {
               errors.password = intl.formatMessage({
                 id: "AUTH.VALIDATION.REQUIRED_FIELD"
               });
+            }
+
+            if (values.password.length < 4) {
+              errors.password = "Passowrd must be grater that 4 characters";
             }
 
             if (!values.confirmPassword) {
@@ -79,12 +83,13 @@ function Registration(props) {
           onSubmit={(values, { setStatus, setSubmitting }) => {
             register(
               values.email,
-              values.fullname,
-              values.username,
+              values.firstname,
+              values.lastname,
               values.password
             )
               .then(({ data: { accessToken } }) => {
-                props.register(accessToken);
+                //props.register(accessToken);
+                window.location = '/';
               })
               .catch(() => {
                 setSubmitting(false);
@@ -116,20 +121,34 @@ function Registration(props) {
               <div className="form-group mb-0">
                 <TextField
                   margin="normal"
-                  label="Fullname"
+                  label="First Name"
                   className="kt-width-full"
-                  name="fullname"
+                  name="firstname"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.fullname}
-                  helperText={touched.fullname && errors.fullname}
-                  error={Boolean(touched.fullname && errors.fullname)}
+                  value={values.firstname}
+                  helperText={touched.firstname && errors.firstname}
+                  error={Boolean(touched.firstname && errors.firstname)}
                 />
               </div>
 
+            <div className="form-group mb-0">
+                <TextField
+                    margin="normal"
+                    label="Last Name"
+                    className="kt-width-full"
+                    name="lastname"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.lastname}
+                    helperText={touched.lastname && errors.lastname}
+                    error={Boolean(touched.lastname && errors.lastname)}
+                />
+            </div>
+
               <div className="form-group mb-0">
                 <TextField
-                  label="Email"
+                  label="Username/Email"
                   margin="normal"
                   className="kt-width-full"
                   name="email"
@@ -138,20 +157,6 @@ function Registration(props) {
                   value={values.email}
                   helperText={touched.email && errors.email}
                   error={Boolean(touched.email && errors.email)}
-                />
-              </div>
-
-              <div className="form-group mb-0">
-                <TextField
-                  margin="normal"
-                  label="Username"
-                  className="kt-width-full"
-                  name="username"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.username}
-                  helperText={touched.username && errors.username}
-                  error={Boolean(touched.username && errors.username)}
                 />
               </div>
 

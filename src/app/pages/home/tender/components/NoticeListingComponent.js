@@ -41,6 +41,12 @@ export default class NoticeListingComponent extends React.Component {
         this.getNotices = this.getNotices.bind(this);
         this.handleChangePage = this.handleChangePage.bind(this);
 
+        this.handleLastPageButtonClick = this.handleLastPageButtonClick.bind(this);
+        this.handleFirstPageButtonClick = this.handleFirstPageButtonClick.bind(this);
+        this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+        this.handleNextButtonClick = this.handleNextButtonClick.bind(this);
+
+
         if(this.props['onRef']) {
             this.props['onRef'](this);
         } else {
@@ -48,20 +54,36 @@ export default class NoticeListingComponent extends React.Component {
         }
     }
 
-    getNotices = (alert) => {
+    getNotices = (alert, page) => {
 
         if(alert) {
             this.alert = alert;
             this.setState({page: 0});
         }
-        Promise.all([this.alert == null ? getNotifiationNotices(this.state.page, this.state.size) : searchNotices(this.alert, this.state.page, this.state.size)]).then(response => {
-            this.setState({notices: response[0].data, total: response[0].headers['x-total-count']});
+
+        Promise.all([this.alert == null ? getNotifiationNotices(this.state.page, this.state.size) : searchNotices(this.alert, page != null ? page : this.state.page, this.state.size)]).then(response => {
+            this.setState({notices: response[0].data, total: response[0].headers['x-total-count'], page: page != null ? page : this.state.page});
         });
     }
 
-    handleChangePage = (event, page) => {
-        this.setState({page: page});
-        this.getNotices();
+    handleChangePage = (page) => {
+        this.getNotices(null, page);
+    }
+
+    handleFirstPageButtonClick = () =>  {
+        this.handleChangePage(0);
+    }
+
+    handleBackButtonClick = () =>  {
+        this.handleChangePage(this.state.page - 1);
+    }
+
+    handleNextButtonClick = () =>  {
+        this.handleChangePage(this.state.page + 1);
+    }
+
+    handleLastPageButtonClick = () =>  {
+        this.handleChangePage(Math.max(0, Math.ceil(this.state.total / this.state.size) - 1));
     }
 
     render() {
@@ -72,8 +94,8 @@ export default class NoticeListingComponent extends React.Component {
                     <TableHead>
                         <TableRow>
                             <TableCell>
-                                Notice number <br/>
-                                Publication date
+                                No. number <br/>
+                                Pub. date
                             </TableCell>
                             <TableCell align="left">
                                 Contract Name
@@ -94,7 +116,7 @@ export default class NoticeListingComponent extends React.Component {
                                             {notice.publicationDate.split('T')[0].replace('-','.').replace('-','.')}
                                         </TableCell>
                                         <TableCell align="left">
-                                            <b>
+                                            <b style={{fontSize:"15px"}}>
                                                 <Link
                                                     to={`/tender/tender-pages/NoticePage?id=${notice.id}`}>
                                                     {notice.name}
@@ -127,7 +149,7 @@ export default class NoticeListingComponent extends React.Component {
                                                 </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell component="th" scope="row">
+                                        <TableCell component="th" scope="row" style={{fontSize: "15px", fontStyle: "italic"}}>
                                             {notice.estimatedValue} RON
                                         </TableCell>
                                     </TableRow>
@@ -137,21 +159,41 @@ export default class NoticeListingComponent extends React.Component {
                     </TableBody>
                     <TableFooter>
                         <TableRow>
-                            <TablePagination
-                                rowsPerPageOptions={[this.state.size]}
-                                colSpan={3}
-                                count={this.state.total}
-                                rowsPerPage={this.state.size}
-                                page={this.state.page}
-                                SelectProps={{
-                                     inputProps: { "aria-label": "Rows per page" },
-                                     native: true
-                                }}
-
-                                onChangePage={this.handleChangePage}
-                                onChangeRowsPerPage={() => {}}
-                                ActionsComponent={TablePaginationActions}
-                            />
+                            <td colspan="3">
+                                <div style={{width: '100%', textAlign: 'center'}}>
+                                    <span>
+                                        {(this.state.page * this.state.size) + 1} - {((this.state.page + 1)* this.state.size) > this.state.total ? this.state.total : ((this.state.page + 1)* this.state.size)}  of {this.state.total}
+                                    </span>
+                                    <IconButton
+                                        onClick={this.handleFirstPageButtonClick}
+                                        disabled={this.state.page == 0}
+                                        aria-label="First Page"
+                                    >
+                                        <FirstPageIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        onClick={this.handleBackButtonClick}
+                                        disabled={this.state.page == 0}
+                                        aria-label="Previous Page"
+                                    >
+                                        <KeyboardArrowLeft />
+                                    </IconButton>
+                                    <IconButton
+                                        onClick={this.handleNextButtonClick}
+                                        disabled={this.state.page >= Math.ceil(this.state.total / this.state.size) - 1}
+                                        aria-label="Next Page"
+                                    >
+                                        <KeyboardArrowRight />
+                                    </IconButton>
+                                    <IconButton
+                                        onClick={this.handleLastPageButtonClick}
+                                        disabled={this.state.page >= Math.ceil(this.state.total / this.state.size) - 1}
+                                        aria-label="Last Page"
+                                    >
+                                        <LastPageIcon />
+                                    </IconButton>
+                                </div>
+                            </td>
                         </TableRow>
                     </TableFooter>
 
@@ -160,58 +202,4 @@ export default class NoticeListingComponent extends React.Component {
             </>
         )
     }
-}
-
-function TablePaginationActions(props) {
-
-    const { count, page, rowsPerPage, onChangePage } = props;
-
-    function handleFirstPageButtonClick(event) {
-        onChangePage(event, 0);
-    }
-
-    function handleBackButtonClick(event) {
-        onChangePage(event, page - 1);
-    }
-
-    function handleNextButtonClick(event) {
-        onChangePage(event, page + 1);
-    }
-
-    function handleLastPageButtonClick(event) {
-        onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-    }
-
-    return (
-        <div style={{width: '100%'}}>
-            <IconButton
-                onClick={handleFirstPageButtonClick}
-                disabled={page === 0}
-                aria-label="First Page"
-            >
-                <FirstPageIcon />
-            </IconButton>
-            <IconButton
-                onClick={handleBackButtonClick}
-                disabled={page === 0}
-                aria-label="Previous Page"
-            >
-                <KeyboardArrowLeft />
-            </IconButton>
-            <IconButton
-                onClick={handleNextButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                aria-label="Next Page"
-            >
-                <KeyboardArrowRight />
-            </IconButton>
-            <IconButton
-                onClick={handleLastPageButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                aria-label="Last Page"
-            >
-                <LastPageIcon />
-            </IconButton>
-        </div>
-    );
 }
