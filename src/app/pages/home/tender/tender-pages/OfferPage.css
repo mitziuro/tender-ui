@@ -1,3 +1,37 @@
 .offerResult {
     width: 100%;
 }
+
+.contentTable {
+
+}
+
+.contentTable  th {
+    margin-right: 10px;
+    background: #646c9a;
+    color: white;
+}
+
+
+.contentTable tr {
+    height: 20px;
+    border: 1px solid #646c9a;
+}
+.noResults {
+    display: flex;
+    text-align: justify;
+    justify-content: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.contentTable table {
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 50px;
+    border: 1px solid gray;
+}
+
+.contentTable table tr td {
+    border:  1px solid #646c9a;
+}

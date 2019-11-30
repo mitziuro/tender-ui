@@ -40,7 +40,7 @@ export default class MyCompletedOffersPage extends React.Component {
         return (
             <>
             <div className="row">
-                <div className="col-md-12" style={{display: 'flex'}}>
+                <div className="col-md-12" style={{display: 'flex', flexWrap : "wrap"}}>
                     <OfferListingComponent states={[3]} type="big" />
                 </div>
             </div>
