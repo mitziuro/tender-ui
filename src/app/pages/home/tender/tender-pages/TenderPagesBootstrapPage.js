@@ -18,6 +18,8 @@ import PersonalPage from './profile/PersonalPage';
 import MyAccountPage from './profile/MyAccountPage';
 import ChangePasswordPage from './profile/ChangePasswordPage';
 
+import UsersPage from './admin/UsersPage';
+
 
 export default function TenderPagesBootstrapPage() {
     return (
@@ -93,6 +95,12 @@ export default function TenderPagesBootstrapPage() {
             <Route
                 path="/tender/tender-pages/ChangePasswordPage"
                 component={ChangePasswordPage}
+            />
+
+
+            <Route
+                path="/tender/admin-pages/UsersPage"
+                component={UsersPage}
             />
         </Switch>
     );

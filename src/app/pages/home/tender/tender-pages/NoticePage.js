@@ -81,7 +81,6 @@ export default class NoticePage extends React.Component {
         });
     }
 
-
     render() {
         return (
             <>

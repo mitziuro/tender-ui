@@ -24,6 +24,10 @@ export function closeOffer(id) {
     return axios.put(OFFER_URL + '/me/close/' + id);
 }
 
+export function declineOffer(id, offer) {
+    return axios.post(OFFER_URL + '/decline/' + id, offer);
+}
+
 export function getOffersForTender(states, page, size) {
     return axios.get(OFFER_URL  + '/me/tender/'  + states.join(',') + '?page=' + page + '&size=' + size);
 }

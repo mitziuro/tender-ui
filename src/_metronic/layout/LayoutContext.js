@@ -58,7 +58,14 @@ function findPageConfig(currentPage, items) {
     return;
   }
 
+
+
   for (const item of items) {
+
+    if(item == null) {
+      continue;
+    }
+
     // Return `item` if it's `page` matches `currentPage`
     if (currentPage === item.page) {
       return item;

@@ -610,6 +610,18 @@ export default {
         icon: "flaticon2-architecture-and-city",
         page: "tender/tender-pages/SupervisorDashboardPage",
       },
+      { section: "Admin",
+        role: "ROLE_ADMIN"
+      },
+      {
+        title: "Dashboard",
+        root: true,
+        role: "ROLE_ADMIN",
+        bullet: "dot",
+        translate: "MENU.USERS",
+        icon: "flaticon2-architecture-and-city",
+        page: "tender/admin-pages/UsersPage",
+      },
     ]
   }
 };

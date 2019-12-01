@@ -118,14 +118,16 @@ export default class OfferListingComponent extends React.Component {
                                         {offer.state == 1 ? (<><span class="badge badge-success">Started</span></>) : (<></>)}
                                         {offer.state == 2 ? (<><span class="badge badge-warning">In Supervision</span></>) : (<></>)}
                                         {offer.state == 3 ? (<><span class="badge badge-success">Supervision Ended</span></>) : (<></>)}
-
+                                        {offer.state == 10 ? (<><span class="badge badge-danger">Declined</span></>) : (<></>)}
                                     </span>
                                                     </div>
                                                 </div>
                                             </div>
 
+
                         <span className="kt-widget__text">
-                            <i> TO DO Description </i>
+                            <i> {offer.state == 10 ? (<><span
+                                style={{color: "red"}}>Offer Declined: {offer.declineReason}</span></>) : (<></>)} </i>
                         </span>
 
                                             <div className="kt-widget__content" style={{justifyContent: "space-between"}}>

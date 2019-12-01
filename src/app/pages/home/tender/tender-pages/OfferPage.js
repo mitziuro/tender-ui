@@ -6,7 +6,7 @@ import CodeExample from "../../../../partials/content/CodeExample";
 import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
 import './NoticeSearchPage.css';
 
-import {takeOffer, closeOffer, getOffer} from "../../../../crud/tender/offer.crud";
+import {takeOffer, closeOffer, getOffer, declineOffer} from "../../../../crud/tender/offer.crud";
 
 import {getUserByToken} from "../../../../crud/auth.crud";
 
@@ -44,6 +44,7 @@ export default class OfferPage extends React.Component {
 
         this.state = {
             offer: {id: null, notice: {id: null}, tender: {id: null}},
+            declineOpen: false, declineReason: null, user:{},
             content: [], contentSelected: {}, contentEditOpen: false
         }
 
@@ -56,6 +57,8 @@ export default class OfferPage extends React.Component {
         Promise.all([getOffer(this.offerId), getUserByToken()]).then(response => {
             this.setState({offer: response[0].data, user: response[1].data});
         });
+
+        this.handleCloseDecline= this.handleCloseDecline.bind(this);
 
 
         this.handleContentAddSection = this.handleContentAddSection.bind(this);
@@ -75,16 +78,27 @@ export default class OfferPage extends React.Component {
         });
     }
 
+    handleCloseDecline = () => {
+        this.state.offer.declineReason = this.state.declineReason;
+        Promise.all([declineOffer(this.offerId, this.state.offer)]).then(response => {
+            this.setState({offer: response[0].data});
+        });
+        this.setState({declineOpen: false, declineReason: null})
+    }
+
 
     render() {
 
         return (
             <>
             {this.state.offer.id != null ? this._render_big(this.state.offer) : (<></>)}
+            {
+                this._render_offer_content()
+            }
             <div className="row">
                 <div className="col-md-12" style={{display: 'flex'}}>
                     <div className="offerResult">
-                        <CodeExample beforeCodeTitle={this.state.offer.notice.name}>
+                        <CodeExample beforeCodeTitle="Actions">
                             <div className="kt-section">
                                 <div className="col-md-12">
                                     <div className="kt-section__content">
@@ -105,6 +119,13 @@ export default class OfferPage extends React.Component {
                                             <Button style={{marginLeft: "10px"}} color="primary" type="button">View
                                                 Notice</Button>
                                         </Link>
+                                        {this.state.offer.state < 3 && this.state.offer.tender.id == this.state.user.id ?
+                                            <Button style={{marginLeft: "10px", background: "red", border: "1px solid red"}} onClick={() => this.setState({declineOpen: true})} color="red">
+                                                Decline
+                                            </Button>
+                                            :
+                                            <div></div>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -112,10 +133,40 @@ export default class OfferPage extends React.Component {
                     </div>
                 </div>
             </div>
+            <Dialog
+                open={this.state.declineOpen}
+                onClose={this.handleCloseDecline}
+                aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">Alert</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Specify the reason for this decline
+                    </DialogContentText>
+                    <TextField
+                        color="red"
+                        autoFocus
+                        margin="dense"
+                        id="name"
+                        value={this.state.declineReason}
+                        onChange={(e) => this.setState({declineReason: e.target.value})}
+                        label="Name"
+                        type="text"
+                        fullWidth
+                    />
+                    <p style={{fontSize: "10px", position: 'absolute', left: '22px', float: 'left', display : this.state.showErrors == true && (this.state.alertName == null || this.state.alertName.length === 0) ? 'block' : 'none', color: 'red'}}>
+                        The name must not be null
+                    </p>
+                </DialogContent>
+                <DialogActions>
 
-            {
-                this._render_offer_content()
-            }
+                    <Button onClick={() => this.setState({declineOpen: false})} color="primary">
+                        Cancel
+                    </Button>
+                    <Button style={{background: 'green'}} onClick={this.handleCloseDecline} color="primary">
+                        <i className="fa fa-save"> </i> Decline
+                    </Button>
+                </DialogActions>
+            </Dialog>
             </>
 
         )
@@ -262,12 +313,10 @@ export default class OfferPage extends React.Component {
                                         {this._render_table_structure_component(this.state.offer.content)}
                                     </div>
                                     <div className="kt-section__content" style={{textAlign: 'center'}}>
-                                        <Link
-                                            to={`/tender/tender-pages/NoticePage?id=${this.state.offer.notice.id}`}>
-                                            <Button style={{marginLeft: "10px"}} color="primary" type="button">View
-                                                Notice
-                                            </Button>
-                                        </Link>
+
+                                        <Button style={{marginLeft: "10px"}} color="primary" type="button">Save Structure</Button>
+                                        <Button style={{marginLeft: "10px"}} color="primary" type="button">Cancel</Button>
+
                                     </div>
                                 </div>
                             </div>
@@ -338,6 +387,8 @@ export default class OfferPage extends React.Component {
                                         </>) : (<></>)}
                                         {offer.state == 3 ? (<><span
                                             class="badge badge-success">Supervision Ended</span></>) : (<></>)}
+                                        {offer.state == 10 ? (<><span
+                                            class="badge badge-danger">Declined</span></>) : (<></>)}
 
                                     </span>
                                         </div>
@@ -345,7 +396,8 @@ export default class OfferPage extends React.Component {
                                 </div>
 
                         <span className="kt-widget__text">
-                            <i> TO DO Description </i>
+                            <i> {offer.state == 10 ? (<><span
+                                style={{color: "red"}}>Offer Declined: {offer.declineReason}</span></>) : (<></>)} </i>
                         </span>
 
                                 <div className="kt-widget__content" style={{justifyContent: "space-between"}}>
