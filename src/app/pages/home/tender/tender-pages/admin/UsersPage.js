@@ -90,8 +90,9 @@ export default class UsersPage extends React.Component {
     }
 
     handleImport = () => {
+        this.setState({importing: true});
         Promise.all([doImport()]).then(response => {
-            this.setState({importing: true});
+            this.setState({importing: false});
             setTimeout(() => this.setState({importing: false}), 60000)
         });
 

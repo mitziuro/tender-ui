@@ -123,11 +123,16 @@ export default class NoticePage extends React.Component {
                                                                         this.state.documents.map((d) => {
 
                                                                             return (
-                                                                                <div>
-                                                                                    <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
+                                                                                <div style={{float: "left"}}>
+                                                                                    {d.fileName.indexOf('.pdf') >= 0 ? (
+                                                                                        <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
                                                                                         <i style={{color: "red"}} class="fa fa-file-pdf"> </i>
                                                                                         <span> {d.fileName} </span>
-                                                                                    </a>
+                                                                                    </a>) : ( <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
+                                                                                        <i style={{color: "red"}} class="fa fa-file"> </i>
+                                                                                        <span> {d.fileName} </span>
+                                                                                    </a>)
+                                                                                    }
                                                                                 </div>
                                                                             )
                                                                         })
