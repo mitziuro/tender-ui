@@ -20,7 +20,7 @@ export default class StickyToolbar extends React.Component {
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                href="http://seap.ro"
+                href="http://sicap-prod.e-licitatie.ro/pub"
               >
                 <i className="flaticon2-telegram-logo" />
               </a>

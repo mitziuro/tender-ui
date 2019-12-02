@@ -28,7 +28,11 @@ import {
     DialogContentText,
 } from "@material-ui/core";
 
+import CodeExample from "../../../../partials/content/CodeExample";
+
+
 import DeleteIcon from "@material-ui/icons/Delete";
+import  NoticeListingComponent from '../components/NoticeListingComponent';
 
 
 import {getMyAlerts, deleteAlerts} from "../../../../crud/tender/alert.crud";
@@ -39,11 +43,13 @@ export default class AlertListingComponent extends React.Component {
     constructor(props) {
 
         super(props);
-        this.state = {alerts: [], confirm: false};
+        this.state = {alerts: [], confirm: false, selectedAlert: null};
 
         this.getAlerts = this.getAlerts.bind(this);
         this.markAlert = this.markAlert.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
+
 
         this.getAlerts();
     }
@@ -76,6 +82,12 @@ export default class AlertListingComponent extends React.Component {
         });
     }
 
+    handleSearch = () => {
+        if(this.child) {
+            this.child.getNotices(this.state.selectedAlert);
+        }
+    }
+
 
     render() {
         return (
@@ -96,8 +108,11 @@ export default class AlertListingComponent extends React.Component {
                                 return (
                                     <TableRow key={alert.id}>
                                         <TableCell component="th" scope="row">
-                                            <b style={{fontSize:"15px"}}> {alert.alertName}</b>
-
+                                            <a onClick={() => {this.setState({selectedAlert : alert});this.handleSearch()}}>
+                                                <b style={{fontSize:"15px"}}>
+                                                    {alert.alertName}
+                                                </b>
+                                            </a>
                                             <div className="row" style={{position: "relative", top:"10px"}}>
                                                 <div className="">
                                                     <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Types:</span>
@@ -143,6 +158,23 @@ export default class AlertListingComponent extends React.Component {
                     </TableBody>
                 </Table>
             </Paper>
+
+            {
+                (<div className="row" style={{display : this.child != null && this.state.selectedAlert != null ? '' : 'none',position: 'relative', top: '10px',left: '10px', width: '100%'}}>
+                <div class="col-md-12" className="noticeResults">
+                    <CodeExample beforeCodeTitle="Search Results">
+                        <div className="kt-section">
+                            <div className="col-md-12">
+                                <div className="kt-section__content">
+                                    <NoticeListingComponent onRef={ref => (this.child = ref)} />
+                                </div>
+                            </div>
+                        </div>
+                    </CodeExample>
+                </div>
+            </div>)
+            }
+
             <Dialog
                 open={this.state.confirm}
                 aria-labelledby="form-dialog-title">
