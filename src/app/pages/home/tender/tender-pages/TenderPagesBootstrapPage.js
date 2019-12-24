@@ -13,6 +13,9 @@ import MyOpenOffersPage from './offers/MyOpenOffersPage'
 import MyCompletedOffersPage from './offers/MyCompletedOffersPage'
 import MyDeclinedOffersPage from './offers/MyDeclinedOffersPage'
 
+import ComparisonDashboardPage from './comparison/ComparisonDashboardPage'
+
+
 
 import PersonalPage from './profile/PersonalPage';
 import MyAccountPage from './profile/MyAccountPage';
@@ -102,6 +105,12 @@ export default function TenderPagesBootstrapPage() {
                 path="/tender/admin-pages/UsersPage"
                 component={UsersPage}
             />
+
+            <Route
+                path="/tender/admin-pages/ComparisonDashboardPage"
+                component={ComparisonDashboardPage}
+            />
+
         </Switch>
     );
 }

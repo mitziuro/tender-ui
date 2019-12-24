@@ -153,6 +153,7 @@ export default class AlertListingComponent extends React.Component {
                                             </a>
                                         </TableCell>
                                     </TableRow>
+                         
                                 )
                             })}
                     </TableBody>

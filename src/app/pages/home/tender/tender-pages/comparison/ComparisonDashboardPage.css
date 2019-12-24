@@ -1,0 +1,14 @@
+.entity_compare {
+   /* text-align: center;
+    font-size: 15px;
+    font-weight: bold; */
+    padding: 10px !important;
+}
+
+.offersResults {
+    min-height: 0px;
+}
+
+.kt-portlet__body {
+    min-height: 100px;
+}

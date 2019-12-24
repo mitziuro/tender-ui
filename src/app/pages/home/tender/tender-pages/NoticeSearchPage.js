@@ -6,6 +6,7 @@ import './NoticeSearchPage.css';
 
 import {getCpvs, getContractingAuthorities, getBusinessFields} from "../../../../crud/tender/search.notice.crud";
 import {saveAlert, getAlert} from "../../../../crud/tender/alert.crud";
+import { emphasize, makeStyles, useTheme } from "@material-ui/core/styles";
 
 import  NoticeListingComponent from '../components/NoticeListingComponent';
 
@@ -24,6 +25,17 @@ import {
     DialogContentText
 } from "@material-ui/core";
 
+import Downshift from "downshift";
+import {
+    Popper,
+    Paper,
+    Chip,
+    Typography,
+    NoSsr
+} from "@material-ui/core";
+
+import PropTypes from "prop-types";
+import deburr from "lodash/deburr";
 
 export default class NoticeSearchPage extends React.Component {
 
@@ -138,6 +150,71 @@ export default class NoticeSearchPage extends React.Component {
         this.alertOpen = false;
 
 
+
+        this.renderInput = function (inputProps) {
+            const { InputProps, classes, ref, ...other } = inputProps;
+
+            return (
+                <TextField
+                    InputProps={{
+        inputRef: ref,
+        classes: {
+          root: classes.inputRoot,
+          input: classes.inputInput
+        },
+        ...InputProps
+      }}
+                    {...other}
+                />
+            );
+        }
+
+        this.renderSuggestion = function(suggestionProps) {
+            const {
+                suggestion,
+                index,
+                itemProps,
+                highlightedIndex,
+                selectedItem
+                } = suggestionProps;
+            const isHighlighted = highlightedIndex === index;
+            const isSelected = (selectedItem || "").indexOf(suggestion.name) > -1;
+
+            return (
+                <MenuItem
+                    {...itemProps}
+                    key={`suggestion1${suggestion.id}`}
+                    selected={isHighlighted}
+                    component="div"
+                    style={{
+        fontWeight: isSelected ? 500 : 400
+      }}
+                >
+                    {suggestion.name}
+                </MenuItem>
+            );
+        }
+
+
+        this.getSuggestions = function(value, { showEmpty = false } = {}) {
+            const inputValue = deburr(value.trim()).toLowerCase();
+            const inputLength = inputValue.length;
+            let count = 0;
+
+            return inputLength === 0 && !showEmpty
+                ? []
+                : this.cas.filter(suggestion => {
+                const keep =
+                    count < 5 &&
+                    suggestion.name.slice(0, inputLength).toLowerCase() === inputValue;
+
+                if (keep) {
+                    count += 1;
+                }
+
+                return keep;
+            });
+        }
     }
 
 
@@ -211,6 +288,8 @@ export default class NoticeSearchPage extends React.Component {
     }
 
     render() {
+
+
         return (
             <>
             <div className="row">
@@ -327,6 +406,56 @@ export default class NoticeSearchPage extends React.Component {
                                             <MenuItem value={e.id}>{e.name}</MenuItem>
                                         ))}
                                     </Select>
+                                </div>
+                                <div className="col-md-3">
+                                    <Downshift id="downshift-simple">
+                                        {({
+                                            getInputProps,
+                                            getItemProps,
+                                            getLabelProps,
+                                            getMenuProps,
+                                            highlightedIndex,
+                                            inputValue,
+                                            isOpen,
+                                            selectedItem
+                                            }) => {
+                                            const { onBlur, onFocus, ...inputProps } = getInputProps({
+                                                placeholder: "Search for a country (start with a)"
+                                            });
+
+                                            return (
+                                                <div>
+                                                    {this.renderInput({
+                                                        fullWidth: true,
+                                                        classes: {},
+                                                        label: "Country",
+                                                        InputLabelProps: getLabelProps({ shrink: true }),
+                                                        InputProps: { onBlur, onFocus },
+                                                        inputProps
+                                                    })}
+
+                                                    <div {...getMenuProps()}>
+                                                        {isOpen ? (
+                                                            <Paper square>
+                                                                {this.getSuggestions(inputValue).map(
+                                                                    (suggestion, index) =>
+                                                                        this.renderSuggestion({
+                                                                            suggestion,
+                                                                            index,
+                                                                            itemProps: getItemProps({
+                                                                                item: suggestion.label
+                                                                            }),
+                                                                            highlightedIndex,
+                                                                            selectedItem
+                                                                        })
+                                                                )}
+                                                            </Paper>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
+                                            );
+                                        }}
+                                    </Downshift>
                                 </div>
                                 <div className="col-md-3">
                                     <InputLabel htmlFor="businessField" style={{position: 'relative', top: '13px'}}>Business

@@ -50,6 +50,8 @@ export default class NoticePage extends React.Component {
         Promise.all([getNotice(this.noticeId), getMyOfferForNotice(this.noticeId)]).then(response => {
             this.setState({notice: response[0].data, offer: response[1].data});
 
+            console.log(this.state.notice);
+
             Promise.all([getNoticeContent(this.state.notice.noticeId, this.state.notice.type, 'en')]).then(response => {
 
                 if(response[0].data.contentEn == null) {
@@ -65,6 +67,8 @@ export default class NoticePage extends React.Component {
             Promise.all([getNoticeDocuments(this.state.notice.noticeId)]).then(response => {
                 this.setState({documents: response[0].data});
             });
+
+
 
 
 
@@ -161,6 +165,17 @@ export default class NoticePage extends React.Component {
                                                 </Button>
                                             </Link>
                                         }
+
+                                        {this.state.notice.contractingAuthority ?
+                                            ( <Link style={{position:'relative',left: '10px'}}
+                                                to={`/tender/admin-pages/ComparisonDashboardPage?caId=${this.state.notice.contractingAuthority.id}&cpvId=${this.state.notice.cpv.id}`}>
+                                                <Button color="primary">
+                                                    Compare
+                                                </Button>
+                                            </Link>) :(<></>)
+                                        }
+
+
                                     </div>
                                 </div>
                             </div>
