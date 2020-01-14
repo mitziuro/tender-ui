@@ -44,6 +44,7 @@ export default class CompletedNoticeListingComponent extends React.Component {
             cans: [],
 
             selectedEntity: null,
+            inverse: props.inverse != null ? props.inverse : false,
             size: 10, page: 0, total: 0
         };
 
@@ -71,6 +72,8 @@ export default class CompletedNoticeListingComponent extends React.Component {
 
     getCans = (searchObj, page) => {
 
+        this.searchObj = searchObj;
+
         Promise.all([searchCans(searchObj, page != null ? page : this.state.page, this.state.size)]).then(response => {
             this.setState({cans: response[0].data, total: response[0].headers['x-total-count'], page: page != null ? page : this.state.page});
         });
@@ -96,7 +99,7 @@ export default class CompletedNoticeListingComponent extends React.Component {
     }
 
     handleChangePage = (page) => {
-        this.getCans(null, page);
+        this.getCans(this.searchObj, page);
     }
 
     handleFirstPageButtonClick = () =>  {
@@ -127,22 +130,32 @@ export default class CompletedNoticeListingComponent extends React.Component {
                                 Pub. date
                             </TableCell>
                             <TableCell align="left">
-                                Contract Name
+                                Main Participant (# Participants)
                             </TableCell>
                             <TableCell align="left">
-                                Main Partipant
-                            </TableCell>
-                            <TableCell align="left">
-                                Status
-                            </TableCell>
-                            <TableCell align="left">
-                                Estimated Value
+                                Value (Winner)
                             </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {
                             this.state.cans.map((can, index) => {
+
+                                let mainProvider = {name: '', tin: '', crc: ''};
+
+                                try {
+
+                                    if(can.providers.length  == 0) {
+                                        mainProvider = {name: '', tin: '', crc: ''};
+                                    } else {
+                                        let offerProvider = can.canOfferProviders.filter(q => q.main).length > 0 ? can.canOfferProviders.filter(q => q.main)[0] : can.canOfferProviders[0];
+
+                                        if(offerProvider) {
+                                            mainProvider = can.providers.filter(p => p.id == offerProvider.provider).length > 0 ? can.providers.filter(p => p.id == offerProvider.provider)[0] : can.providers[0];
+                                        }
+                                    }
+
+                                } catch(ex) {}
 
                                 return (
 
@@ -156,53 +169,47 @@ export default class CompletedNoticeListingComponent extends React.Component {
                                             </TableCell>
                                             <TableCell align="left">
                                                 <b style={{fontSize:"15px"}}>
-                                                    <DocumentLink name={can.can.name} noticeId={can.can.noticeId} type={can.can.noticeType} />
+                                                    {
+                                                        !this.state.inverse ?
+                                                            mainProvider.name + ' (' + can.providers.length + ')' :
+                                                            <DocumentLink name={can.can.name} noticeId={can.can.noticeId} type={can.can.noticeType} />
+                                                    }
                                                 </b>
 
                                                 <div className="row" style={{position: "relative", top:"10px"}}>
-                                                    <div className="col-md-6">
+                                                    <div className="col-md-4">
 
                                                         <i sicap-icon="CPVCode" className="fa fa-sitemap"></i> CPV: <strong className="ng-binding">{can.can.cpv ? can.can.cpv.nameEn : '-'}</strong><br/>
+                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Contracting authority: <strong className="ng-binding">{can.can.ca ? can.can.ca.name : '-'}</strong>
 
                                                     </div>
-                                                    <div className="col-md-6">
+                                                    <div className="col-md-4">
 
 
 
-                                                        <div className="ng-scope">
-                                                            <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Contracting authority: <strong className="ng-binding">{can.can.ca ? can.can.ca.name : '-'}</strong>
-                                                        </div>
+                                                        <i sicap-icon="CPVCode" className="fa fa-sitemap"></i> TIN: <strong className="ng-binding">{mainProvider.tin}</strong><br/>
+                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> J Number: <strong className="ng-binding">{mainProvider.crc}</strong>
+
                                                     </div>
+
+                                                    <div className="col-md-4">
+                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Location: <strong className="ng-binding">{can.can.nuts.name}</strong>
+
+                                                    </div>
+
+                                                    { !this.state.inverse ?
+                                                    <div className="col-md-12">
+                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> <strong> <DocumentLink name={can.can.name} noticeId={can.can.noticeId} type={can.can.noticeType} /> </strong>
+
+                                                    </div> : (<></>)
+                                                    }
+
+
 
                                                 </div>
-                                            </TableCell>
-                                            <TableCell align="left">
-                                                <b style={{fontSize:"15px", cursor: "pointer"}}>
-
-                                                        {can.providers.length > 0 ? can.providers.filter(p => p.id == can.canOfferProviders.filter(q => q.main)[0].provider)[0].name + ' (' + can.canOfferProviders.length + ')' : ''}
-                                                </b>
-
-                                                <div className="row" style={{position: "relative", top:"10px"}}>
-                                                    <div className="col-md-6">
-
-                                                        <i sicap-icon="CPVCode" className="fa fa-sitemap"></i> TIN: <strong className="ng-binding">{can.providers.length > 0 ? can.providers.filter(p => p.id == can.canOfferProviders.filter(q => q.main)[0].provider)[0].tin : ''}</strong><br/>
-
-                                                    </div>
-                                                    <div className="col-md-6">
-
-
-
-                                                        <div className="ng-scope">
-                                                            <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> J Number: <strong className="ng-binding">{can.providers.length > 0 ? can.providers.filter(p => p.id == can.canOfferProviders.filter(q => q.main)[0].provider)[0].crc : ''}</strong>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell align="left">
-                                                {can.winner ? <i sicap-icon="winner" className="fa fa-thumbs-up"> Won </i> : <i sicap-icon="winner" className="fa fa-thumbs-down"> Lost </i>}
                                             </TableCell>
                                             <TableCell component="th" scope="row" style={{fontSize: "15px", fontStyle: "italic"}}>
-                                                {can.value} RON
+                                                {can.winner || this.state.inverse ? can.can.value + ' RON' : ''}
                                             </TableCell>
                                         </TableRow>
                                 )

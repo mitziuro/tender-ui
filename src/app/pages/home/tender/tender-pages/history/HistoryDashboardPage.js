@@ -9,11 +9,10 @@ import  AlertListingComponent from '../../components/AlertListingComponent';
 import  OfferListingComponent from '../../components/OfferListingComponent';
 import  CompletedNoticeListingComponent from '../../components/CompletedNoticeListingComponent';
 import  CompletedNoticeOffersListingComponent from '../../components/CompletedNoticeOffersListingComponent';
-import  CompletedNoticeOffersGroupingComponent from '../../components/CompletedNoticeOffersGroupingComponent';
 import  ExplainedOfferComponent from '../../components/ExplainedOfferComponent';
 
 
-import './ComparisonDashboardPage.css';
+import './HistoryDashboardPage.css';
 
 
 import Downshift from "downshift";
@@ -44,7 +43,7 @@ import {
 import PropTypes from "prop-types";
 import deburr from "lodash/deburr";
 
-export default class ComparisonDashboardPage extends React.Component {
+export default class HistoryDashboardPage extends React.Component {
 
 
     constructor(props) {
@@ -59,9 +58,7 @@ export default class ComparisonDashboardPage extends React.Component {
             selectedDocument: null,
 
             canInput: null,
-            canOfferInputCPV: null,
-            canOfferInputCA: null,
-
+            canOfferInput: null,
 
             notAwardedOffers: true,
             awardedOffers: true,
@@ -108,9 +105,6 @@ export default class ComparisonDashboardPage extends React.Component {
         this.removeNut = this.removeNut.bind(this);
 
         this.applyOffer = this.applyOffer.bind(this);
-
-        this.applyOfferCPV = this.applyOfferCPV.bind(this);
-        this.applyOfferCA = this.applyOfferCA.bind(this);
 
         this.setState({});
         setTimeout(() => this.handleSearch(),0);
@@ -352,15 +346,6 @@ export default class ComparisonDashboardPage extends React.Component {
             this.childCan.getCans(this.getCanSearchObject());
         }
 
-        if(this.childOffersCPV) {
-            this.childOffersCPV.getCans(this.getOfferSearchObject());
-        }
-
-
-        if(this.childOffersCA) {
-            this.childOffersCA.getCans(this.getOfferSearchObject());
-        }
-
         if(this.childOffers) {
             this.childOffers.getCans(this.getOfferSearchObject());
         }
@@ -370,21 +355,7 @@ export default class ComparisonDashboardPage extends React.Component {
 
     applyOffer = (data) => {
         this.setState({selectedOffer: data});
-       // this.extendedOffers.handleApplyData(data);
-    }
-
-    applyOfferCPV = (data) => {
-        this.setState({selectedOfferCPVCA: data});
-        setTimeout(() => this.childOffers.getCans(this.getOfferSearchObject()), 0);
-
-        // this.extendedOffers.handleApplyData(data);
-    }
-
-    applyOfferCA = (data) => {
-        this.setState({selectedOfferCPVCA: data});
-        setTimeout(() => this.childOffers.getCans(this.getOfferSearchObject()), 0);
-
-        //  this.extendedOffers.handleApplyData(data);
+        this.extendedOffers.handleApplyData(data);
     }
 
     applyDocument = (data) => {
@@ -458,6 +429,10 @@ export default class ComparisonDashboardPage extends React.Component {
         return {
             input: this.state.canOfferInput,
 
+            document: this.state.selectedDocument ? this.state.selectedDocument.number : null,
+            notAwardedOffers: this.state.notAwardedOffers,
+            awardedOffers: this.state.awardedOffers,
+
             cas: this.state.cas.map( c => c.id),
             cpvs: this.state.cpvs.map( c => c.id),
             nuts: this.state.nuts.map( c => c.id),
@@ -465,11 +440,7 @@ export default class ComparisonDashboardPage extends React.Component {
             number: this.state.number,
 
             startDate: this.state.startDate,
-            endDate: this.state.endDate,
-
-            id: this.state.selectedOfferCPVCA != null ? this.state.selectedOfferCPVCA.id : null,
-
-            aggregate: true
+            endDate: this.state.endDate
         }
     }
 
@@ -733,58 +704,93 @@ export default class ComparisonDashboardPage extends React.Component {
                     </div>
 
                 </div>
+                { this.state.showSelectDocuments ? <div className="col-md-12" style={{position: 'relative', top: '-60px'}}>
+                    <div className="offersResults">
+                        <TextField label="Filter (Name or number)"
+                                   style={{width: '200px', position: 'relative', top: '50px', left: '250px', zIndex: '999'}}
+                                   onChange={(e) => {this.setState({canInput: e.target.value});setTimeout(() => this.handleSearch(),0);}}
+                                   margin="normal"/>
+                        <CodeExample beforeCodeTitle="Awarded Contracts">
+                            <div className="kt-section">
+                                <div className="col-md-12">
+                                    <div>
+
+                                        { this.state.selectedDocument ?
+                                            (<span className="arrow_box" style={{position: 'absolute', right: '71px', top: '-39px'}}>
+                                                <i> {this.state.selectedDocument.number}  &nbsp; {'(' + this.state.selectedDocument.noticeNumber + ')'} </i>
+                                                &nbsp;
+                                                <i class="fa fa-trash" onClick={() => this.setState({selectedDocument : null})}> </i>
+                                            </span>) :
+                                            (<></>)
+                                        }
 
 
-                <div className={this.state.cas.length > 0 ? 'col-md-6' : 'col-md-12'} style={{position: 'relative', top: '-60px'}}>
+                                        <i onClick={() => {this.setState({showSelectDocuments : false}); setTimeout(() => this.handleSearch(),0);}} className="fa fa-fast-backward" style={{position: 'absolute', right: '16px', top: '-40px', 'font-size': '21px', cursor: 'pointer'}}></i>
+                                        <CompletedNoticeListingComponent onRef={ref => (this.childCan = ref)} onSelected={ref => (this.applyDocument(ref))}/>
+                                    </div>
+                                </div>
+                            </div>
+                        </CodeExample>
+                    </div>
+                </div> : <></> }
+                { !this.state.showSelectDocuments ? <div className="col-md-12" style={{position: 'relative', top: '-60px'}}>
                     <div className="offersResults">
                         <TextField label="Filter (Name, TIN or J)"
                                    style={{width: '200px', position: 'relative', top: '50px', left: '100px', zIndex: '999'}}
-                                   onChange={(e) => {this.setState({canOfferInputCPV: e.target.value});setTimeout(() => this.handleSearch(),0);}}
+                                   onChange={(e) => {this.setState({canOfferInput: e.target.value});setTimeout(() => this.handleSearch(),0);}}
                                    margin="normal"/>
+                        <FormControlLabel control={
+                                <Checkbox
+                                    checked={this.state.awardedOffers}
+                                       onChange={(e) => {this.setState({awardedOffers: e.target.checked});setTimeout(() => this.handleSearch(),0);}}
+                                    value={this.state.awardedOffers}
+                                    color="primary"
+                                        />
+                          } label="Awarded Offers"   style={{width: '200px', position: 'relative', top: '83px', left: '150px', zIndex: '999'}}/>
+                        <FormControlLabel control={
+                                <Checkbox
+                                   checked={this.state.notAwardedOffers}
+                                    onChange={(e) => {this.setState({notAwardedOffers: e.target.checked});setTimeout(() => this.handleSearch(),0);}}
+                                    value={this.state.notAwardedOffers}
+                                    color="primary"
+                                        />
+                          } label="Not Awarded Offers"   style={{width: '200px', position: 'relative', top: '83px', left: '150px', zIndex: '999'}}/>
                         <CodeExample beforeCodeTitle="Offers">
                             <div className="kt-section">
                                 <div className="col-md-12">
                                     <div>
-                                        <CompletedNoticeOffersGroupingComponent  noCa={true}  onRef={ref => (this.childOffersCPV = ref)} onSelected={ref => (this.applyOfferCPV(ref))}/>
+                                        { this.state.selectedDocument ?
+                                            (<span className="arrow_box" style={{position: 'absolute', right: '71px', top: '-39px'}}>
+                                                <i> {this.state.selectedDocument.number}  &nbsp; {'(' + this.state.selectedDocument.noticeNumber + ')'} </i>
+                                                &nbsp;
+                                                <i class="fa fa-trash" onClick={() => this.setState({selectedDocument : null})}> </i>
+                                            </span>) :
+                                            (<></>)
+                                        }
+
+                                        <i onClick={() => {this.setState({showSelectDocuments : true}); setTimeout(() => this.handleSearch(),0);}} className="fa fa-fast-forward" style={{position: 'absolute', right: '16px', top: '-40px', 'font-size': '21px', cursor: 'pointer'}}></i>
+                                        <CompletedNoticeOffersListingComponent onRef={ref => (this.childOffers = ref)} onSelected={ref => (this.applyOffer(ref))}/>
                                     </div>
                                 </div>
                             </div>
                         </CodeExample>
                     </div>
-                </div>
+                </div> : <></> }
 
-                <div className={this.state.cas.length > 0 ? 'col-md-6' : 'col-md-12'} style={{position: 'relative', top: '-60px', visibility: this.state.cas.length > 0 ? '' : 'hidden', height: this.state.cas.length > 0 ? '' : '0px'}}>
+                <div className="col-md-12" style={{visibility: (this.state.selectedOffer != null ? '' : 'hidden'), position: 'relative', top: '-45px'}}>
                     <div className="offersResults">
-                        <TextField label="Filter (Name, TIN or J)"
-                                   style={{width: '200px', position: 'relative', top: '50px', left: '100px', zIndex: '999'}}
-                                   onChange={(e) => {this.setState({canOfferInputCA: e.target.value});setTimeout(() => this.handleSearch(),0);}}
-                                   margin="normal"/>
-                        <CodeExample beforeCodeTitle="Offers">
+                        <CodeExample beforeCodeTitle="Offer Summary">
                             <div className="kt-section">
                                 <div className="col-md-12">
                                     <div>
-                                        <CompletedNoticeOffersGroupingComponent onRef={ref => (this.childOffersCA = ref)} onSelected={ref => (this.applyOfferCA(ref))}/>
+                                        <ExplainedOfferComponent onRef={ref => (this.extendedOffers = ref)}  />
                                     </div>
                                 </div>
+
                             </div>
                         </CodeExample>
                     </div>
                 </div>
-
-                <div className="col-md-12" style={{position: 'relative', top: '-60px'}}>
-                    <div className="offersResults">
-                        <CodeExample beforeCodeTitle="Offers">
-                            <div className="kt-section">
-                                <div className="col-md-12">
-                                    <div>
-                                        <CompletedNoticeOffersListingComponent inverse={true} onRef={ref => (this.childOffers = ref)} onSelected={ref => (this.applyOffer(ref))}/>
-                                    </div>
-                                </div>
-                            </div>
-                        </CodeExample>
-                    </div>
-                </div>
-
 
             </div>
             </>

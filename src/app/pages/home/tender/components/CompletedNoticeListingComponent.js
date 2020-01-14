@@ -72,6 +72,8 @@ export default class CompletedNoticeListingComponent extends React.Component {
 
     getCans = (searchObj, page) => {
 
+        this.searchObj = searchObj;
+
         Promise.all([searchCans(searchObj, page != null ? page : this.state.page, this.state.size)]).then(response => {
             this.setState({cans: response[0].data, total: response[0].headers['x-total-count'], page: page != null ? page : this.state.page});
         });
@@ -93,7 +95,7 @@ export default class CompletedNoticeListingComponent extends React.Component {
     }
 
     handleChangePage = (page) => {
-        this.getCans(null, page);
+        this.getCans(this.searchObj, page);
     }
 
     handleFirstPageButtonClick = () =>  {
@@ -165,6 +167,7 @@ export default class CompletedNoticeListingComponent extends React.Component {
                                                     </div>
                                                 </div>
                                                 <div className="col-md-4">
+                                                    <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Contracting authority: <strong className="ng-binding">{can.nuts ? can.nuts.name : '-'}</strong>
 
                                                 </div>
                                             </div>

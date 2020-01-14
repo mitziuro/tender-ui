@@ -17,7 +17,10 @@
   "MENU.USERS": "Utilizatori",
 
 
-  "MENU.SEARCH": "Integrare SICAP",
+  "MENU.SICAP": "Integrare SICAP",
+  "MENU.SEARCH": "Cautare",
+  "MENU.HISTORY": "Istoric contracte",
+  "MENU.NOTICE_ANALYSIS": "Analiza istoric contracte",
 
   "MENU.ALERTS": "Alerte",
   "MENU.MY_ALERTS": "Alertele mele",

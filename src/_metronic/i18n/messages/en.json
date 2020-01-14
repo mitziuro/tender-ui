@@ -13,7 +13,10 @@
   "MENU.MY_ACCOUNT": "My Account",
   "MENU.CHANGE_PASSWORD": "Change Password",
 
-  "MENU.SEARCH": "SICAP Integration",
+  "MENU.SICAP": "SICAP Integration",
+  "MENU.SEARCH": "Search",
+  "MENU.HISTORY": "Contract Notice History",
+  "MENU.NOTICE_ANALYSIS": "Contract Notice Analysis",
 
 
   "MENU.ALERTS": "Alerts",

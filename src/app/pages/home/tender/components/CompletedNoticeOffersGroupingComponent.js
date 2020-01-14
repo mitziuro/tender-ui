@@ -23,7 +23,7 @@ import {
 } from "@material-ui/core";
 
 
-import {getNotifiationNotices, searchNotices} from "../../../../crud/tender/search.notice.crud";
+import {searchProviders} from "../../../../crud/tender/provider.crud";
 
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -33,14 +33,22 @@ import LastPageIcon from "@material-ui/icons/LastPage";
 import DocumentLink from "../utilities/document.link";
 
 
-export default class NoticeListingComponent extends React.Component {
+export default class CompletedNoticeListingComponent extends React.Component {
 
     constructor(props) {
 
         super(props);
-        this.state = {notices: [], size: 10, page: 0, total: 0};
+        this.state = {
 
-        this.getNotices = this.getNotices.bind(this);
+            selectedDocument: null,
+            cans: [],
+
+            selectedEntity: null,
+            noCa: props.noCa != null ? props.noCa : false,
+            size: 10, page: 0, total: 0
+        };
+
+        this.getCans = this.getCans.bind(this);
         this.handleChangePage = this.handleChangePage.bind(this);
 
         this.handleLastPageButtonClick = this.handleLastPageButtonClick.bind(this);
@@ -48,28 +56,54 @@ export default class NoticeListingComponent extends React.Component {
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
         this.handleNextButtonClick = this.handleNextButtonClick.bind(this);
 
+        this.handleProviderClick = this.handleProviderClick.bind(this);
+
 
         if(this.props['onRef']) {
             this.props['onRef'](this);
         } else {
-            this.getNotices()
+            this.getCans()
+        }
+
+        if(this.props['onSelected']) {
+            this.onSelected = this.props['onSelected'];
         }
     }
 
-    getNotices = (alert, page) => {
+    getCans = (searchObj, page) => {
 
-        if(alert) {
-            this.alert = alert;
-            this.setState({page: 0});
+        this.searchObj = searchObj;
+
+        if(this.state.noCa) {
+            searchObj.cas = [];
         }
 
-        Promise.all([this.alert == null ? getNotifiationNotices(this.state.page, this.state.size) : searchNotices(this.alert, page != null ? page : this.state.page, this.state.size)]).then(response => {
-            this.setState({notices: response[0].data, total: response[0].headers['x-total-count'], page: page != null ? page : this.state.page});
+        Promise.all([searchProviders(searchObj, page != null ? page : this.state.page, this.state.size)]).then(response => {
+            this.setState({cans: response[0].data, total: response[0].headers['x-total-count'], page: page != null ? page : this.state.page});
         });
     }
 
+    handleApplyDocument = (data) => {
+        this.setState({selectedDocument: data});
+    }
+
+    handleProviderClick = (data) => {
+        if(!this.state.selectedEntity) {
+            this.setState({selectedEntity: data});
+        } else {
+            if(this.state.selectedEntity.id == data.id) {
+                this.setState({selectedEntity: null});
+                this.onSelected(null);
+                return;
+            } else {
+                this.setState({selectedEntity: data});
+            }
+        }
+        this.onSelected(data);
+    }
+
     handleChangePage = (page) => {
-        this.getNotices(null, page);
+        this.getCans(this.searchObj, page);
     }
 
     handleFirstPageButtonClick = () =>  {
@@ -96,72 +130,47 @@ export default class NoticeListingComponent extends React.Component {
                     <TableHead>
                         <TableRow>
                             <TableCell>
-                                No. number <br/>
-                                Pub. date
+
                             </TableCell>
                             <TableCell align="left">
-                                Contract Name
+                                Participant
                             </TableCell>
                             <TableCell align="left">
-                                Estimated Value
+                               Win/Loss
                             </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {
-                            this.state.notices.map((notice, index) => {
+                            this.state.cans.map((can, index) => {
 
                                 return (
-                                    <TableRow key={notice.id}>
-                                        <TableCell component="th" scope="row">
-                                            {notice.number} <br/>
-                                            {notice.publicationDate.split('T')[0].replace('-','.').replace('-','.')}
-                                        </TableCell>
-                                        <TableCell align="left">
-                                            <b style={{fontSize:"15px"}}>
-                                                <Link
-                                                    to={`/tender/tender-pages/NoticePage?id=${notice.id}`}>
-                                                    {notice.name}
 
-                                                </Link>
-                                                <DocumentLink noName={true} name={notice.name} noticeId={notice.noticeId} type={notice.type.toString()} />
+                                        <TableRow key={can.id} style={{backgroundColor: this.state.selectedEntity && this.state.selectedEntity.id == can.id ? 'lightgray' : ''}}
+                                                  onClick={ (e) => this.handleProviderClick(can)}
+                                        >
+                                            <TableCell component="th" scope="row">
 
-                                            </b>
+                                            </TableCell>
+                                            <TableCell align="left">
+                                                <b style={{fontSize:"15px"}}>
+                                                    {can.name}
+                                                </b>
 
-                                            <div className="row" style={{position: "relative", top:"10px"}}>
-                                                <div className="col-md-4">
+                                                <div className="row" style={{position: "relative", top:"10px"}}>
+                                                    <div className="col-md-6">
 
-                                                    <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Procedure State:</span>
-                                                    <strong className="ng-binding ng-scope">In progress</strong>
-                                                    <br/>
+                                                        <i sicap-icon="CPVCode" className="fa fa-sitemap"></i> TIN: <strong className="ng-binding">{can.tin}</strong><br/>
+                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> J Number: <strong className="ng-binding">{can.crc}</strong>
 
-                                                    <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Type of procurement:</span> <strong className="ng-binding">{notice.online ? 'ONLINE' : 'OFFLINE'}</strong>
-                                                </div>
-                                                <div className="col-md-4">
-
-                                                    <i sicap-icon="ContractType" className="fa fa-balance-scale"></i>Contract Assigment Type: <strong className="ng-binding">{notice.awardingManner ? notice.awardingManner.nameEn : ''}</strong><br/>
-
-                                                    <i sicap-icon="CPVCode" className="fa fa-sitemap"></i> CPV: <strong className="ng-binding">{notice.cpv ? notice.cpv.nameEn : '-'}</strong><br/>
-
-                                                    <div className="ng-scope">
-                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Contracting authority: <strong className="ng-binding">{notice.contractingAuthority ? notice.contractingAuthority.name : '-'}</strong>
                                                     </div>
-                                                </div>
-                                                <div className="col-md-4">
 
-                                                    <i sicap-icon="ContractDate" className="fa fa-calendar"></i> Receipt deadline:
-                                                    <strong className="ng-binding ng-scope">{notice.deadline.split('T')[0].replace('-','.').replace('-','.')} </strong>
-
-                                                    <div className="ng-scope">
-                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Location: <strong className="ng-binding">{notice.nuts.name ? notice.nuts.name : '-'}</strong>
-                                                    </div>
                                                 </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell component="th" scope="row" style={{fontSize: "15px", fontStyle: "italic"}}>
-                                            {notice.estimatedValue} RON
-                                        </TableCell>
-                                    </TableRow>
+                                            </TableCell>
+                                            <TableCell component="th" scope="row" style={{fontSize: "15px", fontStyle: "italic"}}>
+                                                {can.won} / {can.lost}
+                                            </TableCell>
+                                        </TableRow>
                                 )
                             })
                         }

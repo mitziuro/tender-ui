@@ -14,6 +14,7 @@ import {getMyOfferForNotice, putMyOfferForNotice} from "../../../../crud/tender/
 import  AlertListingComponent from '../components/AlertListingComponent';
 import  NoticeListingComponent from '../components/NoticeListingComponent';
 
+import DocumentLink from "../utilities/document.link";
 
 import './NoticePage.css';
 
@@ -49,8 +50,6 @@ export default class NoticePage extends React.Component {
 
         Promise.all([getNotice(this.noticeId), getMyOfferForNotice(this.noticeId)]).then(response => {
             this.setState({notice: response[0].data, offer: response[1].data});
-
-            console.log(this.state.notice);
 
             Promise.all([getNoticeContent(this.state.notice.noticeId, this.state.notice.type, 'en')]).then(response => {
 
@@ -91,12 +90,15 @@ export default class NoticePage extends React.Component {
             <div className="row">
                 <div className="col-md-12" style={{display: 'flex'}}>
                     <div className="noticeResult">
+                        {this.state.notice.id ? (<div style={{position: 'absolute', right: '46px', top: '14px', fontSize: '20px', zIndex: '9999999'}}>
+                            <DocumentLink noName={true} name={this.state.notice.name} noticeId={this.state.notice.noticeId} type={this.state.notice.type.toString()} />
+                        </div>) : (<></>)}
                         <CodeExample beforeCodeTitle={this.state.notice.name}>
                             <div className="kt-section">
                                 <div className="col-md-12">
                                     <div className="kt-section__content">
                                         { this.state.content == null ? (
-                                            <> <div classNAme="md-12" style={{display: "flex", marginBottom: "10px", justifyContent: "center"}}> <CircularProgress className="kt-splash-screen__spinner" /> </div> </>
+                                            <> <div className="md-12" style={{display: "flex", marginBottom: "10px", justifyContent: "center"}}> <CircularProgress className="kt-splash-screen__spinner" /> </div> </>
                                         ) :
                                             (<div dangerouslySetInnerHTML={{__html: this.state.content}}></div>)}
                                     </div>
@@ -170,7 +172,7 @@ export default class NoticePage extends React.Component {
                                             ( <Link style={{position:'relative',left: '10px'}}
                                                 to={`/tender/admin-pages/ComparisonDashboardPage?caId=${this.state.notice.contractingAuthority.id}&cpvId=${this.state.notice.cpv.id}`}>
                                                 <Button color="primary">
-                                                    Compare
+                                                    Contract Notice Analysis
                                                 </Button>
                                             </Link>) :(<></>)
                                         }

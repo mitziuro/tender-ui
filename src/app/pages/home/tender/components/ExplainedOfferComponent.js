@@ -82,10 +82,10 @@ export default class ExplainedOfferComponent extends React.Component {
                         { this.state.cans &&  this.state.cans.providers  ?
                             this.state.cans.providers.map((can, index) => {
 
-                                return (
-                                    <TableRow key={can.id} style={{backgroundColor: this.state.cans.canOfferProviders[index].main ? 'lightgray' : ''}}>
+                                return this.state.cans.canOfferProviders[index] == null ? (<></>) : (
+                                    <TableRow key={can.id}>
                                         <TableCell component="th" scope="row">
-                                            {can.name}
+                                            {can.name} <sup> {this.state.cans.canOfferProviders[index].main ? '*' : ''} </sup>
                                         </TableCell>
                                         <TableCell align="left">
                                             {can.tin}
@@ -97,7 +97,7 @@ export default class ExplainedOfferComponent extends React.Component {
                                             {this.state.cans.canOfferProviders[index].percentage == 0 ? 'Supplier' : 'Subcontractor : ' + this.state.cans.canOfferProviders[index].percentage + '%'}
                                         </TableCell>
                                         <TableCell align="left">
-                                            {this.state.cans.canOfferProviders[index].type == 1 ? 'Big' : this.state.cans.canOfferProviders[index].type == 2 ? 'Medium' : 'Small'}
+                                            {this.state.cans.canOfferProviders[index].type == 1 ? 'Small' : this.state.cans.canOfferProviders[index].type == 2 ? 'Medium' : 'Big'}
                                         </TableCell>
                                         <TableCell align="left">
                                             {this.state.cans.canOfferProviders[index].representative}
@@ -112,6 +112,8 @@ export default class ExplainedOfferComponent extends React.Component {
                     </TableBody>
 
                 </Table>
+
+                <div style={{paddingLeft: '10px'}}> * - Main Provider</div>
             </Paper>
             </>
         )

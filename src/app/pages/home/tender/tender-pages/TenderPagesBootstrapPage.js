@@ -14,6 +14,7 @@ import MyCompletedOffersPage from './offers/MyCompletedOffersPage'
 import MyDeclinedOffersPage from './offers/MyDeclinedOffersPage'
 
 import ComparisonDashboardPage from './comparison/ComparisonDashboardPage'
+import HistoryDashboardPage from './history/HistoryDashboardPage'
 
 
 
@@ -107,7 +108,12 @@ export default function TenderPagesBootstrapPage() {
             />
 
             <Route
-                path="/tender/admin-pages/ComparisonDashboardPage"
+                path="/tender/tender-pages/HistoryDashboardPage"
+                component={HistoryDashboardPage}
+            />
+
+            <Route
+                path="/tender/tender-pages/ComparisonDashboardPage"
                 component={ComparisonDashboardPage}
             />
 

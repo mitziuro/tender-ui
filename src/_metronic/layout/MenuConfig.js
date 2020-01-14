@@ -47,7 +47,31 @@ export default {
         role: "ROLE_TENDER",
         translate: "MENU.SEARCH",
         icon: "fa fa-search",
-        page: "tender/tender-pages/NoticeSearchPage",
+        submenu: [
+          {
+            title: "Search",
+            root: true,
+            bullet: "dot",
+            role: "ROLE_TENDER",
+            translate: "MENU.SEARCH",
+            icon: "fa fa-search",
+            page: "tender/tender-pages/NoticeSearchPage"
+          },
+          {
+            title: "Contract Notice History",
+            icon: "fa fa-search",
+            role: "ROLE_TENDER",
+            translate: "MENU.HISTORY",
+            page: "tender/tender-pages/HistoryDashboardPage"
+          },
+          {
+            title: "Contract Notice Analysis",
+            icon: "fa fa-search",
+            role: "ROLE_TENDER",
+            translate: "MENU.NOTICE_ANALYSIS",
+            page: "tender/tender-pages/ComparisonDashboardPage"
+          }
+        ]
       },
       {
         title: "Alerts",
