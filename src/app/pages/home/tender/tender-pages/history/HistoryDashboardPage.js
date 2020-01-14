@@ -705,7 +705,7 @@ export default class HistoryDashboardPage extends React.Component {
 
                 </div>
                 { this.state.showSelectDocuments ? <div className="col-md-12" style={{position: 'relative', top: '-60px'}}>
-                    <div className="offersResults">
+                    <div className="offersResults" style={{height: "0px"}}>
                         <TextField label="Filter (Name or number)"
                                    style={{width: '200px', position: 'relative', top: '50px', left: '250px', zIndex: '999'}}
                                    onChange={(e) => {this.setState({canInput: e.target.value});setTimeout(() => this.handleSearch(),0);}}
