@@ -15,8 +15,6 @@ import  CompletedNoticeOffersListingComponent from '../../components/CompletedNo
 import  CompletedNoticeOffersGroupingComponent from '../../components/CompletedNoticeOffersGroupingComponent';
 import  ExplainedOfferComponent from '../../components/ExplainedOfferComponent';
 
-import $ from 'jquery';
-import 'jquery-ui-bundle';
 
 import './ComparisonDashboardPage.css';
 
