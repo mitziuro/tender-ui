@@ -14,13 +14,6 @@ export default class MenuList extends React.Component {
         var user = window.localStorage.getItem('_USER') != null ? JSON.parse(window.localStorage.getItem('_USER')) : null;
 
         var hasRole = function(item) {
-            console.log(item.role);
-            if(user) {
-                console.log(user['authorities']);
-            }
-
-            console.log(user ? user['authorities'].indexOf(item.role) :'***');
-
             return item.role == null || (user != null && user['authorities'].indexOf(item.role) >=0);
         };
 

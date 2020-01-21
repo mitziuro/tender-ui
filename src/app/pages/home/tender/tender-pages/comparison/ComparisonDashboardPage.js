@@ -4,7 +4,10 @@ import CodeExample from "../../../../../partials/content/CodeExample";
 import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
 
 import {getCpv, getContractingAuthority, getBusinessFields, getNuts, searchCpvs, searchContractingAuthorities} from "../../../../../crud/tender/search.notice.crud";
+import { getAgg } from "../../../../../crud/tender/provider.crud";
+
 import {saveAlert, getAlert} from "../../../../../crud/tender/alert.crud";
+import { getMap } from "../../../../../crud/tender/map";
 import  AlertListingComponent from '../../components/AlertListingComponent';
 import  OfferListingComponent from '../../components/OfferListingComponent';
 import  CompletedNoticeListingComponent from '../../components/CompletedNoticeListingComponent';
@@ -12,6 +15,8 @@ import  CompletedNoticeOffersListingComponent from '../../components/CompletedNo
 import  CompletedNoticeOffersGroupingComponent from '../../components/CompletedNoticeOffersGroupingComponent';
 import  ExplainedOfferComponent from '../../components/ExplainedOfferComponent';
 
+import $ from 'jquery';
+import 'jquery-ui-bundle';
 
 import './ComparisonDashboardPage.css';
 
@@ -53,6 +58,7 @@ export default class ComparisonDashboardPage extends React.Component {
         this.cpvs = [];
         this.cas = [];
 
+
         this.initialState = {
 
             selectedOffer: null,
@@ -67,6 +73,8 @@ export default class ComparisonDashboardPage extends React.Component {
             awardedOffers: true,
 
             number: null,
+
+            aggs: null,
 
             cas: [],
             cpvs: [],
@@ -95,6 +103,43 @@ export default class ComparisonDashboardPage extends React.Component {
             this.nuts = response[0].data;
         });
 
+        Promise.all([getMap()]).then(response => {
+             this.setState({map: response[0].data});
+
+            let self = this;
+            $( "path" ).each(function(index) {
+                $(this).on("click", function(evt){
+                    let nut = {id: $(this).attr('id'), name: ''};
+                    $(this).attr('fill', 'indigo');
+                    let res = self.addNut(nut);
+                    if(res == 0) {
+                        self.removeNut(nut);
+                        $(this).attr('fill', '#999999');
+                    }
+
+                });
+
+                $(this).on("mousemove", function(evt){
+
+
+                    if(document.getElementById("best_" + $(this).attr('id')) == null) {
+                        return;
+                    }
+
+                    let tooltip = document.getElementById("tooltip");
+                    tooltip.innerHTML = document.getElementById("best_" + $(this).attr('id')).innerHTML;
+                    tooltip.style.display = "block";
+                    tooltip.style.left = evt.pageX - 250 + 'px';
+                    tooltip.style.top = evt.pageY - 150 + 'px';
+                });
+
+                $(this).on("mouseout", function(evt){
+                    var tooltip = document.getElementById("tooltip");
+                    tooltip.style.display = "none";
+                });
+            });
+        });
+
 
         if(this.state.cpvs[0]) {
             Promise.all([getCpv(this.state.cpvs[0].id), getContractingAuthority(this.state.cas[0].id)]).then(response => {
@@ -104,6 +149,7 @@ export default class ComparisonDashboardPage extends React.Component {
         }
 
 
+        this.getAggs = this.getAggs.bind(this);
         this.addNut = this.addNut.bind(this);
         this.removeNut = this.removeNut.bind(this);
 
@@ -353,35 +399,45 @@ export default class ComparisonDashboardPage extends React.Component {
         }
 
         if(this.childOffersCPV) {
-            this.childOffersCPV.getCans(this.getOfferSearchObject());
+            this.childOffersCPV.getCans(this.getOfferSearchObject({input : this.state.canOfferInputCPV, selectedDocument: {number: null}}));
         }
 
 
         if(this.childOffersCA) {
-            this.childOffersCA.getCans(this.getOfferSearchObject());
+            this.childOffersCA.getCans(this.getOfferSearchObject({input : this.state.canOfferInputCA, selectedDocument: {number: null}}));
         }
 
         if(this.childOffers) {
-            this.childOffers.getCans(this.getOfferSearchObject());
+            this.childOffers.getCans(this.getOfferSearchObject({selectedDocument: {number: null}}));
         }
 
+        if(this.childComponents) {
+            this.childComponents.getCans(this.getOfferSearchObject());
+        }
+
+        this.getAggs(this.getOfferSearchObject());
         this.setState({});
+    }
+
+    getAggs = (data) => {
+        Promise.all([getAgg(data)]).then(response => {
+            this.setState({aggs : response[0].data});
+        });
     }
 
     applyOffer = (data) => {
         this.setState({selectedOffer: data});
-       // this.extendedOffers.handleApplyData(data);
+        this.extendedOffers.handleApplyData(data);
     }
 
     applyOfferCPV = (data) => {
-        this.setState({selectedOfferCPVCA: data});
+        this.setState({selectedOfferCPVCA: data, selectedDocument: null});
         setTimeout(() => this.childOffers.getCans(this.getOfferSearchObject()), 0);
-
         // this.extendedOffers.handleApplyData(data);
     }
 
     applyOfferCA = (data) => {
-        this.setState({selectedOfferCPVCA: data});
+        this.setState({selectedOfferCPVCA: data, selectedDocument: null});
         setTimeout(() => this.childOffers.getCans(this.getOfferSearchObject()), 0);
 
         //  this.extendedOffers.handleApplyData(data);
@@ -389,18 +445,19 @@ export default class ComparisonDashboardPage extends React.Component {
 
     applyDocument = (data) => {
         this.setState({selectedDocument: data});
-        this.childOffers.handleApplyDocument(data);
-        setTimeout(() => this.childOffers.getCans(this.getOfferSearchObject()), 0);
+        this.childComponents.handleApplyDocument(data);
+        setTimeout(() => this.childComponents.getCans(this.getOfferSearchObject()), 0);
     }
 
 
     addNut = (nut) => {
         if(this.state.nuts.filter(n => n.id == nut.id).length > 0) {
-            return;
+            return 0;
         }
         this.state.nuts.push(nut);
         this.setState({nuts: this.state.nuts});
         this.handleSearch();
+        return 1;
     }
 
     removeNut = (nut) => {
@@ -454,9 +511,11 @@ export default class ComparisonDashboardPage extends React.Component {
         }
     }
 
-    getOfferSearchObject = () => {
+    getOfferSearchObject = (i) => {
         return {
-            input: this.state.canOfferInput,
+            input: i && i.input ? i.input : this.state.canOfferInput,
+
+            document: i && i.selectedDocument != null ? i.selectedDocument.number : (this.state.selectedDocument ? this.state.selectedDocument.number : null),
 
             cas: this.state.cas.map( c => c.id),
             cpvs: this.state.cpvs.map( c => c.id),
@@ -474,17 +533,69 @@ export default class ComparisonDashboardPage extends React.Component {
     }
 
     render() {
+
         return (
             <>
+            <div id="tooltip" display="none" style={{position: "absolute", display: "none"}}></div>
             <div className="row">
-                <div className="col-md-12" style={{display: 'flex'}}>
+
+                    <div className="col-md-12" style={{display: 'flex', flexDirection: 'column'}}>
+                        <div className="offersResults">
+                            <div style={{display: "flex", justifyContent: "center", float: 'right', top: '10px', left: '200px', position: 'absolute', zIndex: '9999'}}>
+                                <div className="col-md-6">
+                                    <TextField className="date" label="Start Date" type="date"
+                                               value={this.state.startDate}
+                                               onChange={(e) => {this.setState({startDate: e.target.value});setTimeout(() => this.handleSearch(),0);}}
+                                               InputLabelProps={{shrink: true}}/>
+                                </div>
+                                <div className="col-md-6">
+                                    <TextField className="date" label="End Date" type="date"
+                                               value={this.state.endDate}
+                                               onChange={(e) => {this.setState({endDate: e.target.value});setTimeout(() => this.handleSearch(),0);}}
+                                               InputLabelProps={{shrink: true}}/>
+                                </div>
+                            </div>
+                            <CodeExample beforeCodeTitle="Locations">
+                                <div className="kt-section">
+                                    <div className="col-md-12">
+                                        <div className="entity_compare">
+
+                                            {this.state.map ? (<div dangerouslySetInnerHTML={{__html: this.state.map}}></div>) : (<></>)}
+
+                                        </div>
+                                    </div>
+
+                                    <div className="col-md-12" style={{display: 'none', position: 'relative', top: '0px', padding: '10px', minHeight: '40px'}}>
+                                        {
+                                            this.state.aggs ? Object.keys(this.state.aggs).map((d) => {
+                                                return (
+                                                    <div id={'best_' + d}>
+                                                        <div>
+                                                            {
+                                                               (
+                                                                    this.state.aggs[d].map((e) => {
+                                                                        return (<div> {e.name} : {e.won} </div>)
+                                                                    })
+                                                                )
+                                                            }
+                                                        </div>
+                                                    </div>)
+                                            }) : (<></>)
+                                        }
+                                    </div>
+                                </div>
+                            </CodeExample>
+                        </div>
+                    </div>
                     <div className="col-md-12" style={{display: 'flex'}}>
-                        <div className="col-md-4" style={{display: 'flex', flexDirection: 'column'}}>
+
+                        <div className="col-md-6" style={{display: 'flex', flexDirection: 'column'}}>
                             <div className="offersResults">
                                 <CodeExample beforeCodeTitle="CPV">
                                     <div className="kt-section">
                                         <div className="col-md-12">
                                             <div className="entity_compare">
+
 
                                                 <Downshift id="downshift-simple">
                                                     {({
@@ -543,7 +654,7 @@ export default class ComparisonDashboardPage extends React.Component {
                                                                 <span style={{ paddingRight: '20px', paddingBottom: '5px'}}>
                                             {(
                                                 <span className="arrow_box" style={{top: '10px', left: '10px'}}> {d.nameEn.substr(0, 50)}  {d.nameEn.length > 50 ? '...' : ''} &nbsp;
-                                                    <i class="fa fa-trash" onClick={(e) => this.removeCPV(d)}> </i>
+                                                    <i className="fa fa-trash" onClick={(e) => this.removeCPV(d)}> </i>
                                                 </span>)}
                                         </span>
                                                             )
@@ -558,100 +669,9 @@ export default class ComparisonDashboardPage extends React.Component {
                                 </CodeExample>
                             </div>
                         </div>
-                        <div className="col-md-4" style={{display: 'flex', flexDirection: 'column'}}>
-                            <div className="offersResults">
-                                <div style={{display: "flex", justifyContent: "center", float: 'right', top: '10px', left: '200px', position: 'absolute', zIndex: '9999'}}>
-                                    <div className="col-md-6">
-                                        <TextField className="date" label="Start Date" type="date"
-                                                   value={this.state.startDate}
-                                                   onChange={(e) => {this.setState({startDate: e.target.value});setTimeout(() => this.handleSearch(),0);}}
-                                                   InputLabelProps={{shrink: true}}/>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <TextField className="date" label="End Date" type="date"
-                                                   value={this.state.endDate}
-                                                   onChange={(e) => {this.setState({endDate: e.target.value});setTimeout(() => this.handleSearch(),0);}}
-                                                   InputLabelProps={{shrink: true}}/>
-                                    </div>
-                                </div>
-                                <CodeExample beforeCodeTitle="Locations">
-                                    <div className="kt-section">
-                                        <div className="col-md-12">
-                                            <div className="entity_compare">
-
-                                                <Downshift id="downshift-simple">
-                                                    {({
-                                                        getInputProps,
-                                                        getItemProps,
-                                                        getLabelProps,
-                                                        getMenuProps,
-                                                        highlightedIndex,
-                                                        inputValue,
-                                                        isOpen,
-                                                        selectedItem
-                                                        }) => {
-                                                        const { onBlur, onFocus, ...inputProps } = getInputProps({
-                                                            placeholder: "Search for a region"
-                                                        });
-
-                                                        return (
-                                                            <div>
-                                                                {this.renderInput({
-                                                                    fullWidth: true,
-                                                                    classes: {},
-                                                                    label: "Regions",
-                                                                    InputLabelProps: getLabelProps({ shrink: true }),
-                                                                    InputProps: { onBlur, onFocus },
-                                                                    inputProps
-                                                                })}
-
-                                                                <div {...getMenuProps()}>
-                                                                    {isOpen ? (
-                                                                        <Paper square style={{position: "absolute", background: "white", padding: "10px", zIndex: "999999", maxHeight: '250px', overflow: 'auto' }}>
-                                                                            {this.getSuggestions(inputValue).map(
-                                                                                (suggestion, index) =>
-                                                                                    this.renderSuggestion({
-                                                                                        suggestion,
-                                                                                        index,
-                                                                                        itemProps: getItemProps({
-                                                                                            item: suggestion.label
-                                                                                        }),
-                                                                                        highlightedIndex,
-                                                                                        selectedItem
-                                                                                    })
-                                                                            )}
-                                                                        </Paper>
-                                                                    ) : null}
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    }}
-                                                </Downshift>
-                                            </div>
-                                        </div>
-
-                                        <div className="col-md-12" style={{position: 'relative', top: '0px', padding: '10px', minHeight: '40px'}}>
-                                            {
-                                                this.state.nuts.map((d) => {
-
-                                                    return (
-                                                        <span style={{ paddingRight: '20px', paddingBottom: '5px'}}>
-                                            {(
-                                                <span className="arrow_box" style={{top: '10px', left: '10px'}}> {d.name} &nbsp;
-                                                    <i class="fa fa-trash" onClick={(e) => this.removeNut(d)}> </i>
-                                                </span>)}
-                                        </span>
-                                                    )
-                                                })
-                                            }
-                                        </div>
-                                    </div>
-                                </CodeExample>
-                            </div>
-                        </div>
 
 
-                        <div className="col-md-4" style={{display: 'flex', flexDirection: 'column'}}>
+                        <div className="col-md-6" style={{display: 'flex', flexDirection: 'column'}}>
                             <div className="offersResults">
                                 <CodeExample beforeCodeTitle="Contracting Authority">
                                     <div className="kt-section">
@@ -716,7 +736,7 @@ export default class ComparisonDashboardPage extends React.Component {
                                                                 <span style={{ paddingRight: '20px', paddingBottom: '5px'}}>
                                             {(
                                                 <span className="arrow_box" style={{top: '10px', left: '10px'}}> {d.name.substr(0, 50)}  {d.name.length > 50 ? '...' : ''} &nbsp;
-                                                    <i class="fa fa-trash" onClick={(e) => this.removeCA(d)}> </i>
+                                                    <i className="fa fa-trash" onClick={(e) => this.removeCA(d)}> </i>
                                                 </span>)}
                                         </span>
                                                             )
@@ -732,16 +752,14 @@ export default class ComparisonDashboardPage extends React.Component {
                         </div>
                     </div>
 
-                </div>
-
 
                 <div className={this.state.cas.length > 0 ? 'col-md-6' : 'col-md-12'} style={{position: 'relative', top: '-60px'}}>
                     <div className="offersResults">
                         <TextField label="Filter (Name, TIN or J)"
-                                   style={{width: '200px', position: 'relative', top: '50px', left: '100px', zIndex: '999'}}
+                                   style={{width: '200px', position: 'relative', top: '50px', left: '200px', zIndex: '999'}}
                                    onChange={(e) => {this.setState({canOfferInputCPV: e.target.value});setTimeout(() => this.handleSearch(),0);}}
                                    margin="normal"/>
-                        <CodeExample beforeCodeTitle="Offers">
+                        <CodeExample beforeCodeTitle="Offers (CPV)">
                             <div className="kt-section">
                                 <div className="col-md-12">
                                     <div>
@@ -756,10 +774,10 @@ export default class ComparisonDashboardPage extends React.Component {
                 <div className={this.state.cas.length > 0 ? 'col-md-6' : 'col-md-12'} style={{position: 'relative', top: '-60px', visibility: this.state.cas.length > 0 ? '' : 'hidden', height: this.state.cas.length > 0 ? '' : '0px'}}>
                     <div className="offersResults">
                         <TextField label="Filter (Name, TIN or J)"
-                                   style={{width: '200px', position: 'relative', top: '50px', left: '100px', zIndex: '999'}}
+                                   style={{width: '200px', position: 'relative', top: '50px', left: '200px', zIndex: '999'}}
                                    onChange={(e) => {this.setState({canOfferInputCA: e.target.value});setTimeout(() => this.handleSearch(),0);}}
                                    margin="normal"/>
-                        <CodeExample beforeCodeTitle="Offers">
+                        <CodeExample beforeCodeTitle="Offers (CPV and CA)">
                             <div className="kt-section">
                                 <div className="col-md-12">
                                     <div>
@@ -771,13 +789,13 @@ export default class ComparisonDashboardPage extends React.Component {
                     </div>
                 </div>
 
-                <div className="col-md-12" style={{position: 'relative', top: '-60px'}}>
+                <div className="col-md-12" style={{position: 'relative', top: '-60px', visibility : this.state.selectedOfferCPVCA ? '' : 'hidden', height: this.state.selectedOfferCPVCA ? '' : '0'}}>
                     <div className="offersResults">
-                        <CodeExample beforeCodeTitle="Offers">
+                        <CodeExample beforeCodeTitle="All the Notices for the selected Provider">
                             <div className="kt-section">
                                 <div className="col-md-12">
                                     <div>
-                                        <CompletedNoticeOffersListingComponent inverse={true} onRef={ref => (this.childOffers = ref)} onSelected={ref => (this.applyOffer(ref))}/>
+                                        <CompletedNoticeOffersListingComponent inverse={true} onRef={ref => (this.childOffers = ref)} onSelected={ref => ref ? this.applyDocument(ref.can) : null}/>
                                     </div>
                                 </div>
                             </div>
@@ -785,6 +803,34 @@ export default class ComparisonDashboardPage extends React.Component {
                     </div>
                 </div>
 
+                <div className="col-md-12" style={{position: 'relative', top: '-60px', visibility : this.state.selectedDocument ? '' : 'hidden', height: this.state.selectedDocument ? '' : '0'}}>
+                    <div className="offersResults">
+                        <CodeExample beforeCodeTitle="Offers For the Above Notice">
+                            <div className="kt-section">
+                                <div className="col-md-12">
+                                    <div>
+                                        <CompletedNoticeOffersListingComponent onRef={ref => (this.childComponents = ref)} onSelected={ref => (this.applyOffer(ref))}/>
+                                    </div>
+                                </div>
+                            </div>
+                        </CodeExample>
+                    </div>
+                </div>
+
+                <div className="col-md-12" style={{visibility: (this.state.selectedOffer != null ? '' : 'hidden'), position: 'relative', top: '-45px'}}>
+                    <div className="offersResults">
+                        <CodeExample beforeCodeTitle="Offer Summary">
+                            <div className="kt-section">
+                                <div className="col-md-12">
+                                    <div>
+                                        <ExplainedOfferComponent onRef={ref => (this.extendedOffers = ref)}  />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </CodeExample>
+                    </div>
+                </div>
 
             </div>
             </>

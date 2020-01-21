@@ -6,8 +6,6 @@ export default class DocumentLink extends React.Component {
 
         super(props);
 
-        console.log(this.props);
-
         this.state = {
             name: this.props.name,
             noticeId: this.props.noticeId,

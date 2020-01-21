@@ -209,7 +209,7 @@ export default class CompletedNoticeListingComponent extends React.Component {
                                                 </div>
                                             </TableCell>
                                             <TableCell component="th" scope="row" style={{fontSize: "15px", fontStyle: "italic"}}>
-                                                {can.winner || this.state.inverse ? can.can.value + ' RON' : ''}
+                                                {(can.winner || this.state.inverse) ? can.can.value + ' RON' : ''}
                                             </TableCell>
                                         </TableRow>
                                 )

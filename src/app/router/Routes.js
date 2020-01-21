@@ -31,8 +31,6 @@ export const Routes = withRouter(({ Layout, history }) => {
   );
 
 
-  console.log(lastLocation);
-
   return (
     /* Create `LayoutContext` from current `history` and `menuConfig`. */
     <LayoutContextProvider history={history} menuConfig={menuConfig}>

@@ -24,7 +24,6 @@ class HMenu extends React.Component {
 
   getHeaderLogo() {
     let result = "tender_logo.png";
-    console.log("this.props.headerSelfSkin", this.props.headerSelfSkin);
     if (this.props.headerSelfSkin && this.props.headerSelfSkin !== "dark") {
       result = "logo-dark.png";
     }
@@ -104,7 +103,7 @@ class HMenu extends React.Component {
           {disabledAsideSelfDisplay && (
             <div className="kt-header-logo">
               <Link to="/">
-                <img alt="logo" src={this.getHeaderLogo()} />
+                <img alt="logo" src="/media/logos/logo-light.png" />
               </Link>
             </div>
           )}
