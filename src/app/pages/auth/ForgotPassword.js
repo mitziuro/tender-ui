@@ -50,7 +50,7 @@ class ForgotPassword extends Component {
               onSubmit={(values, { setStatus, setSubmitting }) => {
                 requestPassword(values.email)
                   .then(() => {
-                    this.setState({ isRequested: true });
+                    window.location = '/auth/login?password=requested';
                   })
                   .catch(() => {
                     setSubmitting(false);

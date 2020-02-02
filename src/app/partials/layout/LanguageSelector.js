@@ -30,7 +30,7 @@ const languages = [
     //  setTimeout(()=> window.location.reload(), 400);
     }
 
-    var currentLanguage = languages.find(x => x.lang === lastUser.langKey);
+    var currentLanguage = languages.find(x => x.lang === (lastUser ? lastUser : {langKey: 'en'}).langKey);
     currentLanguage = currentLanguage ? currentLanguage : languages.find(x => x.lang === 'en');
     return (
       <Dropdown

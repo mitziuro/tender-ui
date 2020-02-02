@@ -14,7 +14,8 @@ import  AlertListingComponent from '../components/AlertListingComponent';
 import  NoticeListingComponent from '../components/NoticeListingComponent';
 
 import { toAbsoluteUrl } from "../../../../../_metronic";
-
+import Price from "../utilities/price";
+import DateFormat from "../utilities/date.format";
 
 import './OfferPage.css';
 
@@ -93,7 +94,7 @@ export default class OfferPage extends React.Component {
             <>
             {this.state.offer.id != null ? this._render_big(this.state.offer) : (<></>)}
             {
-                this._render_offer_content()
+               // this._render_offer_content()
             }
             <div className="row">
                 <div className="col-md-12" style={{display: 'flex'}}>
@@ -362,7 +363,9 @@ export default class OfferPage extends React.Component {
                                 </span>
                                         <div className="kt-widget__label">
                                         <span
-                                            className="btn btn-label-brand btn-sm btn-bold btn-upper">{offer.notice.publicationDate.split('T')[0].replace('-', '.').replace('-', '.')}</span>
+                                            className="btn btn-label-brand btn-sm btn-bold btn-upper">
+                                            <DateFormat value={offer.notice.publicationDate} />
+                                        </span>
                                         </div>
                                     </div>
 
@@ -372,7 +375,7 @@ export default class OfferPage extends React.Component {
                                 </span>
                                         <div className="kt-widget__label">
                                         <span
-                                            className="btn btn-label-danger btn-sm btn-bold btn-upper">{offer.startDate ? offer.startDate.split('T')[0].replace('-', '.').replace('-', '.') : ''}</span>
+                                            className="btn btn-label-danger btn-sm btn-bold btn-upper">{offer.startDate ? <DateFormat value={offer.startDate} /> : ''}</span>
                                         </div>
                                     </div>
 
@@ -404,7 +407,7 @@ export default class OfferPage extends React.Component {
                                     <div className="kt-widget__details">
                                         <span className="kt-widget__subtitle">Budget</span>
                                         <span
-                                            className="kt-widget__value"> <span>RON</span> {offer.notice.estimatedValue} </span>
+                                            className="kt-widget__value"> <span>RON</span> <Price value={offer.notice.estimatedValue} /> </span>
                                     </div>
 
 

@@ -9,7 +9,7 @@
   "MENU.DASHBOARD": "Board",
 
 
-  "MENU.PROFILE": "Profil",
+  "MENU.PROFILE": "Setari cont",
   "MENU.MY_PAGE": "Informatii personale",
   "MENU.MY_ACCOUNT": "Contul meu",
   "MENU.CHANGE_PASSWORD": "Schimbare parola",
@@ -31,6 +31,8 @@
   "MENU.MY_COMPLETED_PROCEDURES": "Proceduri terminate",
   "MENU.MY_DECLINED_PROCEDURES": "Proceduri anulate",
 
+  "MENU.ALERTS_CONFIGURATION" : "Configuratie",
+
   "AUTH.GENERAL.OR": "Or",
   "AUTH.GENERAL.SUBMIT_BUTTON": "Submit",
   "AUTH.GENERAL.NO_ACCOUNT": "Don't have an account?",
@@ -41,7 +43,9 @@
   "AUTH.GENERAL.LEGAL": "Legal",
   "AUTH.GENERAL.CONTACT": "Contact",
   "AUTH.LOGIN.TITLE": "Login Account",
+  "AUTH.NEW.PASSWORD.TITLE" : "New Password",
   "AUTH.LOGIN.BUTTON": "Sign In",
+  "AUTH.LOGIN.EXISTS": "There is already an account with this email.",
   "AUTH.FORGOT.TITLE": "Forgotten Password?",
   "AUTH.FORGOT.DESC": "Enter your email to reset your password",
   "AUTH.FORGOT.SUCCESS": "Your account has been successfully reset.",

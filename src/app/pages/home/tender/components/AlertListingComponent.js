@@ -35,7 +35,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import  NoticeListingComponent from '../components/NoticeListingComponent';
 
 
-import {getMyAlerts, deleteAlerts} from "../../../../crud/tender/alert.crud";
+import {getMyAlerts, deleteAlerts, activateAlerts} from "../../../../crud/tender/alert.crud";
 
 
 export default class AlertListingComponent extends React.Component {
@@ -47,7 +47,7 @@ export default class AlertListingComponent extends React.Component {
 
         this.getAlerts = this.getAlerts.bind(this);
         this.markAlert = this.markAlert.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
+        this.handleAction = this.handleAction.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
 
 
@@ -67,13 +67,33 @@ export default class AlertListingComponent extends React.Component {
         this.setState({alerts: this.state.alerts, all: all});
     }
 
-    handleDelete = () => {
+    handleAction = () => {
 
-        Promise.all([deleteAlerts(this.state.toBeDeleted)]).then(response => {
-            this.getAlerts();
-            this.setState({confirm: false});
-        });
-        ;
+        if(this.state.toBeDeleted != null) {
+            Promise.all([deleteAlerts(this.state.toBeDeleted)]).then(response => {
+                this.getAlerts();
+                this.setState({confirm: false});
+            });
+        }
+
+        if(this.state.toBeActivated != null) {
+            Promise.all([activateAlerts(this.state.toBeActivated)]).then(response => {
+                this.getAlerts();
+                this.setState({confirm: false});
+            });
+        }
+
+        if(this.state.toBeDeactivated != null) {
+            Promise.all([activateAlerts(this.state.toBeDeactivated)]).then(response => {
+                this.getAlerts();
+                this.setState({confirm: false});
+            });
+        }
+
+        this.state.toBeDeleted = null;
+        this.state.toBeActivated = null;
+        this.state.toBeDeactivated = null;
+
     }
 
     getAlerts = () => {
@@ -106,7 +126,7 @@ export default class AlertListingComponent extends React.Component {
                             this.state.alerts.map((alert, index) => {
 
                                 return (
-                                    <TableRow key={alert.id}>
+                                    <TableRow key={alert.id} style={{background: alert.active ? '' : 'lightgray'}}>
                                         <TableCell component="th" scope="row">
                                             <a onClick={() => {this.setState({selectedAlert : alert});this.handleSearch()}}>
                                                 <b style={{fontSize:"15px"}}>
@@ -114,37 +134,65 @@ export default class AlertListingComponent extends React.Component {
                                                 </b>
                                             </a>
                                             <div className="row" style={{position: "relative", top:"10px"}}>
-                                                <div className="">
-                                                    <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Types:</span>
-                                                    <b> {!alert.rfq && !alert.cn && !alert.scn && !alert.ccn && !alert.dccn ? 'All ' : ''} </b>
-                                                    <b>
-                                                        {alert.rfq ? 'Call for tenders (RFQ) ' : ''}  {alert.cn ? 'Contract notice (CN) ' : ''}  {alert.scn ? 'Simplified contract notice (SCN) ' : ''}  {alert.ccn ? 'Concession notice (PC) ' : ''}  {alert.dccn ? 'Design Contest Notice (DC) ' : ''}
-                                                    </b>
-                                                    {alert.name ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Name:</span> <b> {alert.name} </b> </>) : ''}
-                                                    {alert.number ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Number:</span> <b> {alert.number} </b> </>) : ''}
+                                                <div className="col-md-4">
 
-                                                    {alert.pdStart ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Publication Start Date:</span> <b> {alert.pdStart.split('T')[0].replace('-','.').replace('-','.')} </b> </>) : ''}
-                                                    {alert.pdEnd ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Publication End Date:</span> <b> {alert.pdEnd.split('T')[0].replace('-','.').replace('-','.')} </b> </>) : ''}
+                                                    <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Keywords: </span>
+                                                    <strong className="ng-binding ng-scope">{alert.keywords}</strong>
+                                                    <br/>
 
-                                                    {alert.contractingAuthority ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Contracting Authority:</span> <b> {alert.contractingAuthority.name} </b> </>) : ''}
+                                                    <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Type of notice: </span>
+                                                    <strong className="ng-binding">
+                                                        <b> {!alert.rfq && !alert.cn && !alert.scn && !alert.ccn && !alert.dccn ? 'All ' : ''} </b>
+                                                        <b> {alert.rfq && alert.cn && alert.scn && alert.ccn && alert.dccn ? '' : ''} </b>
+                                                        <b>
+                                                            {alert.rfq ? 'Call for tenders (RFQ) ' : ''}  {alert.cn ? 'Contract notice (CN) ' : ''}  {alert.scn ? 'Simplified contract notice (SCN) ' : ''}  {alert.ccn ? 'Concession notice (PC) ' : ''}  {alert.dccn ? 'Design Contest Notice (DC) ' : ''}
+                                                        </b>
+                                                    </strong>
+                                                </div>
+                                                <div className="col-md-4">
 
-                                                    {alert.businessField ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Business Field:</span> <b> {alert.businessField.nameEn} </b> </>) : ''}
+                                                    <i sicap-icon="ContractType" className="fa fa-balance-scale"></i>Contract Name:
+                                                    <strong className="ng-binding">{alert.name}</strong>
 
-                                                    {alert.rdStart ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Receipt Start Date:</span> <b> {alert.rdStart.split('T')[0].replace('-','.').replace('-','.')} </b> </>) : ''}
-                                                    {alert.rdEnd ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Receipt End Date:</span> <b> {alert.rdEnd.split('T')[0].replace('-','.').replace('-','.')} </b> </>) : ''}
+                                                    <br/>
 
-                                                    {alert.cpv ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Business Field:</span> <b> {alert.cpv.nameEn} </b> </>) : ''}
+                                                    <i sicap-icon="CPVCode" className="fa fa-sitemap"></i> Contracting Authority:
+                                                    <strong className="ng-binding">{alert.contractingAuthority ? alert.contractingAuthority.name : ''}</strong>
 
+                                                    <br/>
 
-                                                    {alert.tevStart ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Receipt Start Date:</span> <b> {alert.tevStart} </b> </>) : ''}
-                                                    {alert.tevEnd ? (<><i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Receipt End Date:</span> <b> {alert.tevEnd} </b> </>) : ''}
+                                                    <div className="ng-scope">
+                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Business Field:
+                                                        <strong className="ng-binding">{alert.businessField ? alert.businessField.nameEn : ''}</strong>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-4">
+
+                                                    <i sicap-icon="ContractType" className="fa fa-balance-scale"></i>CPV:
+                                                    <strong className="ng-binding">{alert.cpv ? alert.cpv.nameEn : ''}</strong>
+
+                                                    <br/>
+
+                                                    <i sicap-icon="CPVCode" className="fa fa-sitemap"></i> Location:
+                                                    <strong className="ng-binding">{alert.nuts ? alert.nuts.name: ''}</strong>
+
+                                                    <br/>
+
+                                                    <div className="ng-scope">
+                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Estimated  Value:
+                                                        <strong className="ng-binding">{alert.tevStart} - {alert.tevEnd}</strong>
+                                                    </div>
 
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell align="right">
+                                            <a onClick={() => {if (alert.active) {this.setState({toBeDeactivated: alert.id, confirm: true});} else  {this.setState({toBeActivated: alert.id, confirm: true});}}}>
+                                                <i className="fa fa-check fa-lg"  title="Activate/Deactivate"> </i>
+                                            </a>
+                                            &nbsp;
                                             <Link
-                                                to={`/tender/tender-pages/NoticeSearchPage?alert=${alert.id}`}>
+                                                to={`/tender/tender-pages/AlertsConfigurationPage?alert=${alert.id}`}>
                                                 <i className="fa fa-edit fa-lg" title="Edit"> </i>
                                             </Link>
                                             &nbsp;
@@ -182,15 +230,15 @@ export default class AlertListingComponent extends React.Component {
                 <DialogTitle id="form-dialog-title">Alert</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Are you sure you want to delete the selected alerts ?
+                        Are you sure you want to {this.state.toBeDeleted != null ? 'delete' : (this.state.toBeActivated  ? 'activate' : 'deactivate')} the alert ?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => this.setState({confirm: false})} color="primary">
                         Cancel
                     </Button>
-                    <Button style={{background: 'green'}} onClick={() => this.handleDelete()} color="primary">
-                        <i className="fa fa-trash"> </i> Delete
+                    <Button style={{background: 'green'}} onClick={() => this.handleAction()} color="primary">
+                        <i className="fa fa-trash"> </i> {this.state.toBeDeleted != null ? 'Delete' : (this.state.toBeActivated  ? 'Activate' : 'Deactivate')}
                     </Button>
                 </DialogActions>
             </Dialog>

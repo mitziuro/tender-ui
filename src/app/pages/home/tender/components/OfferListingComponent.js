@@ -32,6 +32,8 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 
+import Price from "../utilities/price";
+import DateFormat from "../utilities/date.format";
 
 export default class OfferListingComponent extends React.Component {
 
@@ -192,12 +194,6 @@ export default class OfferListingComponent extends React.Component {
                             <TableCell>
                                 Contract Name
                             </TableCell>
-                            <TableCell align="left">
-                                State
-                            </TableCell>
-                            <TableCell align="left">
-                                Estimated Value
-                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -213,12 +209,36 @@ export default class OfferListingComponent extends React.Component {
                                                     {offer.notice.name}
                                                 </Link>
                                             </b>
-                                        </TableCell>
-                                        <TableCell component="th" scope="row">
-                                            {offer.state}
-                                        </TableCell>
-                                        <TableCell component="th" scope="row">
-                                            {offer.notice.estimatedValue} RON
+
+                                            <div className="row" style={{position: "relative", top:"10px", left: "10px"}}>
+                                                <div className="col-md-6">
+
+                                                    <i sicap-icon="CPVCode" className="fa fa-sitemap"></i> CPV: <strong className="ng-binding">{offer.notice.cpv ? offer.notice.cpv.nameEn : '-'}</strong><br/>
+
+                                                    <div className="ng-scope">
+                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Contracting authority: <strong className="ng-binding">{offer.notice.contractingAuthority ? offer.notice.contractingAuthority.name : '-'}</strong>
+                                                    </div>
+
+                                                    <i sicap-icon="ContractDate" className="fa fa-calendar"></i> Receipt deadline:
+                                                    <strong className="ng-binding ng-scope"> <DateFormat value={offer.notice.deadline} /> </strong>
+
+                                                </div>
+                                                <div className="col-md-6">
+
+                                                    <i sicap-icon="CPVCode" className="fa fa-sitemap"></i> Estimated Value:
+                                                    <strong className="ng-binding"><Price value={offer.notice.estimatedValue} /> RON</strong><br/>
+
+                                                    <div className="ng-scope">
+                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Status: &nbsp;
+                                                        {offer.state == 1 ? (<><span class="badge badge-success">Started</span></>) : (<></>)}
+                                                        {offer.state == 2 ? (<><span class="badge badge-warning">In Supervision</span></>) : (<></>)}
+                                                        {offer.state == 3 ? (<><span class="badge badge-success">Supervision Ended</span></>) : (<></>)}
+                                                        {offer.state == 10 ? (<><span class="badge badge-danger">Declined</span></>) : (<></>)}
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
                                         </TableCell>
                                     </TableRow>
                                 )

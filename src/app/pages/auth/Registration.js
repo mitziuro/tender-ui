@@ -89,13 +89,13 @@ function Registration(props) {
             )
               .then(({ data: { accessToken } }) => {
                 //props.register(accessToken);
-                window.location = '/';
+                window.location = '/auth/login?account=created';
               })
               .catch(() => {
                 setSubmitting(false);
                 setStatus(
                   intl.formatMessage({
-                    id: "AUTH.VALIDATION.INVALID_LOGIN"
+                    id: "AUTH.LOGIN.EXISTS"
                   })
                 );
               });

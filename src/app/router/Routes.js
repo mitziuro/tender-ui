@@ -44,6 +44,7 @@ export const Routes = withRouter(({ Layout, history }) => {
         )}
 
         <Route path="/auth/registration" component={AuthPage} />
+        <Route path="/auth/new-password" component={AuthPage} />
         <Route path="/auth/forgot-password" component={AuthPage} />
         <Route path="/error" component={ErrorsPage} />
         <Route path="/logout" component={LogoutPage} />

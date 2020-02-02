@@ -31,6 +31,9 @@ import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 
 import DocumentLink from "../utilities/document.link";
+import Price from "../utilities/price";
+import DateFormat from "../utilities/date.format";
+
 
 
 export default class NoticeListingComponent extends React.Component {
@@ -38,7 +41,11 @@ export default class NoticeListingComponent extends React.Component {
     constructor(props) {
 
         super(props);
-        this.state = {notices: [], size: 10, page: 0, total: 0};
+
+        this.expandable = props.expandable;
+
+
+        this.state = {notices: [], size: this.expandable ? 5 : 10, page: 0, total: 0};
 
         this.getNotices = this.getNotices.bind(this);
         this.handleChangePage = this.handleChangePage.bind(this);
@@ -115,10 +122,12 @@ export default class NoticeListingComponent extends React.Component {
                                     <TableRow key={notice.id}>
                                         <TableCell component="th" scope="row">
                                             {notice.number} <br/>
-                                            {notice.publicationDate.split('T')[0].replace('-','.').replace('-','.')}
+                                            <DateFormat value={notice.publicationDate} />
                                         </TableCell>
-                                        <TableCell align="left">
+                                        <TableCell align="left" >
                                             <b style={{fontSize:"15px"}}>
+                                                {(this.expandable && !notice.maximized) ? <i  onClick={(e) => {notice.maximized = !notice.maximized; this.setState({});}} class="fa fa-arrow-down">&nbsp;</i> : <></>}
+                                                {(this.expandable && notice.maximized) ? <i onClick={(e) => {notice.maximized = !notice.maximized; this.setState({});}}  class="fa fa-arrow-up">&nbsp;</i> : <></>}
                                                 <Link
                                                     to={`/tender/tender-pages/NoticePage?id=${notice.id}`}>
                                                     {notice.name}
@@ -128,16 +137,25 @@ export default class NoticeListingComponent extends React.Component {
 
                                             </b>
 
-                                            <div className="row" style={{position: "relative", top:"10px"}}>
-                                                <div className="col-md-4">
+                                            <div className="row" style={{position: "relative", top:"10px", display : (!this.expandable || notice.maximized) ? '' : 'none'}}>
+                                                <div className="col-md-6">
 
                                                     <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Procedure State:</span>
                                                     <strong className="ng-binding ng-scope">In progress</strong>
                                                     <br/>
 
                                                     <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Type of procurement:</span> <strong className="ng-binding">{notice.online ? 'ONLINE' : 'OFFLINE'}</strong>
+                                                    <br/>
+
+                                                    <i sicap-icon="ContractDate" className="fa fa-calendar"></i> Receipt deadline:
+                                                    <strong className="ng-binding ng-scope"> <DateFormat value={notice.deadline} /> </strong>
+
+                                                    <div className="ng-scope">
+                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Location: <strong className="ng-binding">{notice.nuts.name ? notice.nuts.name : '-'}</strong>
+                                                    </div>
+
                                                 </div>
-                                                <div className="col-md-4">
+                                                <div className="col-md-6">
 
                                                     <i sicap-icon="ContractType" className="fa fa-balance-scale"></i>Contract Assigment Type: <strong className="ng-binding">{notice.awardingManner ? notice.awardingManner.nameEn : ''}</strong><br/>
 
@@ -147,19 +165,11 @@ export default class NoticeListingComponent extends React.Component {
                                                         <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Contracting authority: <strong className="ng-binding">{notice.contractingAuthority ? notice.contractingAuthority.name : '-'}</strong>
                                                     </div>
                                                 </div>
-                                                <div className="col-md-4">
 
-                                                    <i sicap-icon="ContractDate" className="fa fa-calendar"></i> Receipt deadline:
-                                                    <strong className="ng-binding ng-scope">{notice.deadline.split('T')[0].replace('-','.').replace('-','.')} </strong>
-
-                                                    <div className="ng-scope">
-                                                        <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Location: <strong className="ng-binding">{notice.nuts.name ? notice.nuts.name : '-'}</strong>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </TableCell>
                                         <TableCell component="th" scope="row" style={{fontSize: "15px", fontStyle: "italic"}}>
-                                            {notice.estimatedValue} RON
+                                            <Price value={notice.estimatedValue} /> RON
                                         </TableCell>
                                     </TableRow>
                                 )

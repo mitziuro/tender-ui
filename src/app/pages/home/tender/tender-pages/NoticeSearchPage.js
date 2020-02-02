@@ -4,9 +4,11 @@ import CodeExample from "../../../../partials/content/CodeExample";
 import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
 import './NoticeSearchPage.css';
 
-import {getCpvs, getContractingAuthorities, getBusinessFields} from "../../../../crud/tender/search.notice.crud";
+import {getCpvs, getContractingAuthorities, getBusinessFields, getNuts} from "../../../../crud/tender/search.notice.crud";
 import {saveAlert, getAlert} from "../../../../crud/tender/alert.crud";
 import { emphasize, makeStyles, useTheme } from "@material-ui/core/styles";
+
+import {searchCpvs, searchContractingAuthorities} from "../../../../crud/tender/search.notice.crud";
 
 import  NoticeListingComponent from '../components/NoticeListingComponent';
 
@@ -42,21 +44,26 @@ export default class NoticeSearchPage extends React.Component {
     constructor(props) {
         super(props);
 
-        this.alertId = this.props.location.search != null && this.props.location.search.split('alert=').length == 2 ? this.props.location.search.split('alert=')[1] : null;
+        if(this.props.location) {
+            this.alertId = this.props.location.search != null && this.props.location.search.split('alert=').length == 2 ? this.props.location.search.split('alert=')[1] : null;
+        }
+
+        if(this.props.alertId) {
+            this.alertId = this.props.alertId;
+        }
+
+        this.isAlert = this.props.isAlert;
 
         this.cas = [];
         this.bfs = [];
         this.cpvs = [];
+        this.nuts = [];
 
 
-        Promise.all([getCpvs(), getContractingAuthorities(), getBusinessFields()]).then(response => {
-            this.cpvs = response[0].data;
-            this.cas = response[1].data;
-            this.bfs = response[2].data;
+        Promise.all([getBusinessFields(), getNuts()]).then(response => {
+            this.bfs = response[0].data;
+            this.nuts = response[1].data;
 
-            this.cpvs.forEach(c => {
-                c.name = c.nameEn;
-            });
             this.bfs.forEach(b => {
                 b.name = b.nameEn;
             });
@@ -68,15 +75,22 @@ export default class NoticeSearchPage extends React.Component {
 
                     var _alert = response[0].data;
 
-
                     if (_alert['contractingAuthority'] != null) {
+                        this.setState({selectedCA : _alert['contractingAuthority']});
                         _alert['contractingAuthority'] = _alert['contractingAuthority'].id;
                     }
+
                     if (_alert['businessField'] != null) {
                         _alert['businessField'] = _alert['businessField'].id;
                     }
+
                     if (_alert['cpv'] != null) {
+                        this.setState({selectedCPV : _alert['cpv']});
                         _alert['cpv'] = _alert['cpv'].id;
+                    }
+
+                    if (_alert['nuts'] != null) {
+                        _alert['nuts'] = _alert['nuts'].id;
                     }
 
                     if (_alert['pdStart'] != null) {
@@ -95,6 +109,7 @@ export default class NoticeSearchPage extends React.Component {
 
 
                     this.setState(_alert);
+
                 });
             }
 
@@ -107,11 +122,11 @@ export default class NoticeSearchPage extends React.Component {
             alertName: '',
             alertDescription: '',
 
-            rfq: false,
-            cn: false,
-            scn: false,
-            ccn: false,
-            dccn: false,
+            rfq: true,
+            cn: true,
+            scn: true,
+            ccn: true,
+            dccn: true,
 
             number: '',
             name: '',
@@ -121,6 +136,7 @@ export default class NoticeSearchPage extends React.Component {
 
             rdStart: '',
             rdEnd: '',
+            nuts: '',
 
             tevStart: '',
             tevEnd: '',
@@ -145,12 +161,192 @@ export default class NoticeSearchPage extends React.Component {
 
         this.getSearchObject = this.getSearchObject.bind(this);
 
+        //console.log(React.useState(false));
+
         this.alertOpen = false;
+
+        this.cpvs = [];
+        this.cas = [];
+
+
+        /*************** CPV  ******/
+        this.renderCPVInput = function (inputProps) {
+            const { InputProps, classes, ref, ...other } = inputProps;
+
+            return (
+                <TextField
+                    onChange={(e) => this.populateCPVS(e.target.value)}
+                    value={this.state.cpvValue}
+                    InputProps={{
+        inputRef: ref,
+        classes: {
+          root: classes.inputRoot,
+          input: classes.inputInput
+        },
+        ...InputProps
+      }}
+                    {...other}
+                />
+            );
+        }
+
+        this.renderCPVSuggestion = function (suggestionProps) {
+            const {
+                suggestion,
+                index,
+                itemProps,
+                highlightedIndex,
+                selectedItem
+                } = suggestionProps;
+            const isHighlighted = highlightedIndex === index;
+            const isSelected = (selectedItem || "").indexOf(suggestion.name) > -1;
+
+            return (
+                <MenuItem
+                    {...itemProps}
+                    key={`suggestion1${suggestion.id}`}
+                    selected={isHighlighted}
+                    component="div"
+                    onClick={(e) => {
+                        this.applySearchState({selectedCPV: suggestion});
+                        }}
+                    style={{fontWeight: isSelected ? 500 : 400, background: "white", opacity: '100%'}}
+                >
+                    {suggestion.nameEn}
+                </MenuItem>
+            );
+        }
+
+
+        this.getCPVSuggestions = function (value, { showEmpty = false } = {}) {
+            const inputValue = deburr(value.trim()).toLowerCase();
+            const inputLength = inputValue.length;
+            let count = 0;
+
+            return inputLength === 0 && !showEmpty
+                ? []
+                : this.cpvs.filter(suggestion => {
+                const keep =
+                    count < 9999 &&
+                    suggestion.nameEn.toLowerCase().indexOf(inputValue.toLowerCase()) >= 0;
+
+                if (keep) {
+                    count += 1;
+                }
+
+                return keep;
+            });
+        }
+
+        this.populateCPVS = (token) => {
+
+            if (!token || token.length < 3 ) {
+                return;
+            }
+
+            Promise.all([searchCpvs(token)]).then(response => {
+                this.cpvs = response[0].data;
+                this.setState({cpvValue:  token + ''});
+            });
+
+        }
+
+
+
+        this.removeCPV = (cpv) => {
+            this.setState({selectedCPV: null});
+        }
+
+        /*************** CPV ******/
+
+        /*************** CA  ******/
+        this.renderCAInput = function (inputProps) {
+            const { InputProps, classes, ref, ...other } = inputProps;
+
+            return (
+                <TextField
+                    onChange={(e) => this.populateCAS(e.target.value)}
+                    value={this.state.caValue}
+                    InputProps={{
+        inputRef: ref,
+        classes: {
+          root: classes.inputRoot,
+          input: classes.inputInput
+        },
+        ...InputProps
+      }}
+                    {...other}
+                />
+            );
+        }
+
+        this.renderCASuggestion = function (suggestionProps) {
+            const {
+                suggestion,
+                index,
+                itemProps,
+                highlightedIndex,
+                selectedItem
+                } = suggestionProps;
+            const isHighlighted = highlightedIndex === index;
+            const isSelected = (selectedItem || "").indexOf(suggestion.name) > -1;
+
+            return (
+                <MenuItem
+                    {...itemProps}
+                    key={`suggestion1${suggestion.id}`}
+                    selected={isHighlighted}
+                    component="div"
+                    onClick={(e) => {
+                        this.applySearchState({selectedCA: suggestion});
+                        }}
+                    style={{fontWeight: isSelected ? 500 : 400, background: "white", opacity: '100%'}}
+                >
+                    {suggestion.name}
+                </MenuItem>
+            );
+        }
+
+
+        this.getCASuggestions = function (value, { showEmpty = false } = {}) {
+            const inputValue = deburr(value.trim()).toLowerCase();
+            const inputLength = inputValue.length;
+            let count = 0;
+
+            return inputLength === 0 && !showEmpty
+                ? []
+                : this.cas.filter(suggestion => {
+                const keep =
+                    count < 9999 &&
+                    suggestion.name.toLowerCase().indexOf(inputValue.toLowerCase()) >= 0;
+
+                if (keep) {
+                    count += 1;
+                }
+
+                return keep;
+            });
+        }
+
+        this.populateCAS = (token) => {
+
+            if (!token || token.length < 3 ) {
+                return;
+            }
+
+            Promise.all([searchContractingAuthorities(token)]).then(response => {
+                this.cas = response[0].data;
+                this.setState({caValue:  token + ''});
+            });
+        }
+
+        this.removeCA = (ca) => {
+            this.setState({selectedCA: null});
+        }
+        /*************** CA ******/
 
     }
 
-
-    //const {alertOpen, setAlertOpen} = React.useState(false);
 
 
     handleOpenSaveAlert = () => {
@@ -160,21 +356,32 @@ export default class NoticeSearchPage extends React.Component {
     getSearchObject = () => {
         let objCopy = Object.assign({}, this.state);
         delete objCopy.alertOpen;
+
+
         Object.keys(objCopy).forEach(key => {
             if (objCopy[key] === '') {
                 objCopy[key] = null;
             }
         });
 
-        if (objCopy['contractingAuthority'] != null) {
-            objCopy['contractingAuthority'] = {id: objCopy['contractingAuthority']};
+        if (objCopy['selectedCA'] != null) {
+            objCopy['contractingAuthority'] = {id: objCopy['selectedCA']['id']};
         }
         if (objCopy['businessField'] != null) {
             objCopy['businessField'] = {id: objCopy['businessField']};
         }
-        if (objCopy['cpv'] != null) {
-            objCopy['cpv'] = {id: objCopy['cpv']};
+        if (objCopy['nuts'] != null) {
+            objCopy['nuts'] = {id: objCopy['nuts']};
         }
+        if (objCopy['selectedCPV'] != null) {
+            objCopy['cpv'] = {id: objCopy['selectedCPV']['id']};
+        }
+
+        delete objCopy.selectedCPV;
+        delete objCopy.cpvValue;
+
+        delete objCopy.selectedCA;
+        delete objCopy.caValue;
 
         return objCopy;
     }
@@ -226,15 +433,14 @@ export default class NoticeSearchPage extends React.Component {
             <>
             <div className="row">
                 <div className="col-md-12" className="noticeSearch">
-                    <Button style={{background: 'green', position: "absolute", right: "30px", top: "10px", zIndex:"999"}} color="green" onClick={this.handleSave}>
-                        <i className="fa fa-save"> </i> Save
-                    </Button>
                     <CodeExample beforeCodeTitle="Notice Search">
                         <div className="kt-section">
-                            <div className="col-md-12" className="noticeSearchContainerCheckboxes">
+                            <div className="col-md-12" style={{display: 'flex'}}>
+                            <div className="col-md-2">
+                            <div className="col-md-12" className="noticeSearchContainerCheckboxes" style={{display: 'block'}}>
                                 <div className="kt-separator kt-separator--dashed">
                                 </div>
-                                <div className="col-md-2">
+                                <div className="col-md-12">
                                     <FormControlLabel control={
                                   <Checkbox
                                     checked={this.state.rfq}
@@ -244,7 +450,7 @@ export default class NoticeSearchPage extends React.Component {
                                   />
                               } label="Call for tenders (RFQ)"/>
                                 </div>
-                                <div className="col-md-2">
+                                <div className="col-md-12">
                                     <FormControlLabel control={
                                     <Checkbox
                               checked={this.state.cn}
@@ -255,7 +461,7 @@ export default class NoticeSearchPage extends React.Component {
                           } label="Contract notice (CN)"/>
                                 </div>
 
-                                <div className="col-md-2">
+                                <div className="col-md-12">
                                     <FormControlLabel control={
                                 <Checkbox
                                     checked={this.state.scn}
@@ -266,7 +472,7 @@ export default class NoticeSearchPage extends React.Component {
                           } label="Simplified contract notice (SCN)"/>
                                 </div>
 
-                                <div className="col-md-2">
+                                <div className="col-md-12">
                                     <FormControlLabel control={
                                 <Checkbox
                             checked={this.state.ccn}
@@ -277,7 +483,7 @@ export default class NoticeSearchPage extends React.Component {
                     } label="Concession notice (PC)"/>
                                 </div>
 
-                                <div className="col-md-2">
+                                <div className="col-md-12">
                                     <FormControlLabel control={
                                 <Checkbox
                             checked={this.state.dccn}
@@ -288,144 +494,284 @@ export default class NoticeSearchPage extends React.Component {
                     } label="Design Contest Notice (DC)"/>
                                 </div>
                             </div>
-                            <div className="noticeSearchContainerTexts">
-                                <div className="col-md-3">
-                                    <TextField label="Notice Number"
-                                               value={this.state.number}
-                                               onChange={(e) => this.applySearchState({number: e.target.value})}
-                                               margin="normal"/>
-                                </div>
-                                <div className="col-md-3">
-                                    <TextField label="Contract Name"
-                                               value={this.state.name}
-                                               onChange={(e) => this.applySearchState({name: e.target.value})}
-                                               margin="normal"/>
-                                </div>
-                                <div className="col-md-6" style={{display: "flex", justifyContent: "center"}}>
-                                    <div className="col-md-2">
-                                        <TextField className="date" label="Publication Date Start" type="date"
-                                                   value={this.state.pdStart}
-                                                   onChange={(e) => this.applySearchState({pdStart: e.target.value})}
-                                                   InputLabelProps={{shrink: true}}/>
-                                    </div>
-                                    <div className="col-md-2">
-                                        <TextField className="date" label="Publication Date End" type="date"
-                                                   value={this.state.pdEnd}
-                                                   onChange={(e) => this.applySearchState({pdEnd: e.target.value})}
-                                                   InputLabelProps={{shrink: true}}/>
-                                    </div>
-                                </div>
                             </div>
-
-
-                            <div className="noticeSearchContainerTexts">
-                                <div className="col-md-3">
-                                    <InputLabel htmlFor="contracting-authority"
-                                                style={{position: 'relative', top: '13px'}}>Contracting
-                                        Authority</InputLabel>
-                                    <Select style={{width: '100%', position: 'relative', top: '13px'}}
-                                            value={this.state.contractingAuthority}
-                                            onChange={(e) => this.applySearchState({contractingAuthority: e.target.value})}
-                                            inputProps={{
-                                    name: "contracting-authority",
-                                    id: "contracting-authority"
+                                <div className="col-md-10">
+                                    <div className="noticeSearchContainerTexts">
+                                        <div className="col-md-6">
+                                            <TextField label="Keywords"
+                                                       value={this.state.keywords}
+                                                       onChange={(e) => this.applySearchState({keywords: e.target.value})}
+                                                       margin="normal"/>
+                                        </div>
+                                        <div className="col-md-6">
+                                            <InputLabel htmlFor="nutsField" style={{position: 'relative', top: '13px'}}>Location</InputLabel>
+                                            <Select style={{width: '100%', position: 'relative', top: '13px'}}
+                                                    value={this.state.nuts}
+                                                    onChange={(e) => this.applySearchState({nuts: e.target.value})}
+                                                    inputProps={{
+                                name: "nuts-field",
+                                    id: "nuts-field"
                             }}
-                                    >
-                                        <MenuItem value="">
-                                            <em></em>
-                                        </MenuItem>
-                                        {this.cas.map(e => (
-                                            <MenuItem value={e.id}>{e.name}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </div>
+                                            >
+                                                <MenuItem value="">
+                                                    <em></em>
+                                                </MenuItem>
+                                                {this.nuts.map(e => (
+                                                    e.id == this.state.nuts ?
+                                                        <MenuItem value={e.id}>{e.name}</MenuItem>
+                                                        :
+                                                        <MenuItem value={e.id}>{e.name}</MenuItem>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                      </div>
+                                    <div className="noticeSearchContainerTexts" style={{height: '90px'}}>
+                                        <div className="col-md-6" style={{position: 'relative', top: '15px', display: 'flex'}}>
+                                            <Downshift id="downshift-simple" className="col-md-6">
+                                                {({
+                                                    getInputProps,
+                                                    getItemProps,
+                                                    getLabelProps,
+                                                    getMenuProps,
+                                                    highlightedIndex,
+                                                    inputValue,
+                                                    isOpen,
+                                                    selectedItem
+                                                    }) => {
+                                                    const { onBlur, onFocus, ...inputProps } = getInputProps({
+                                                        placeholder: "Search for a Contracting Authority"
+                                                    });
 
-                                <div className="col-md-3">
-                                    <InputLabel htmlFor="businessField" style={{position: 'relative', top: '13px'}}>Business
-                                        Field</InputLabel>
-                                    <Select style={{width: '100%', position: 'relative', top: '13px'}}
-                                            value={this.state.businessField}
-                                            onChange={(e) => this.applySearchState({businessField: e.target.value})}
-                                            inputProps={{
+                                                    return (
+                                                        <div>
+                                                            {this.renderCAInput({
+                                                                fullWidth: true,
+                                                                classes: {},
+                                                                label: "Contracting Authorities",
+                                                                InputLabelProps: getLabelProps({ shrink: true }),
+                                                                InputProps: { onBlur, onFocus },
+                                                                inputProps
+                                                            })}
+
+                                                            <div {...getMenuProps()}>
+                                                                {isOpen ? (
+                                                                    <Paper square style={{position: "absolute", background: "white", padding: "10px", zIndex: "999999", maxHeight: '250px', overflow: 'auto' }}>
+                                                                        {this.getCASuggestions(inputValue).map(
+                                                                            (suggestion, index) =>
+                                                                                this.renderCASuggestion({
+                                                                                    suggestion,
+                                                                                    index,
+                                                                                    itemProps: getItemProps({
+                                                                                        item: suggestion.label
+                                                                                    }),
+                                                                                    highlightedIndex,
+                                                                                    selectedItem
+                                                                                })
+                                                                        )}
+                                                                    </Paper>
+                                                                ) : null}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                }}
+                                            </Downshift>
+                                            <div className="col-md-6" style={{position: 'relative', top: '0px', minHeight: '40px', lineHeight: '25px'}}>
+                                                {
+                                                    [this.state.selectedCA].map((d) => {
+
+                                                        if(d == null) {
+                                                            return;
+                                                        }
+
+                                                        return (
+                                                            <span style={{ paddingRight: '20px', paddingBottom: '5px'}}>
+                                                {(
+                                                    <span className="arrow_box" style={{top: '10px', left: '10px'}}> {d.name.substr(0, 50)}  {d.name.length > 50 ? '...' : ''} &nbsp;
+                                                        <i className="fa fa-trash" onClick={(e) => this.removeCA(d)}> </i>
+                                                    </span>)}
+                                            </span>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <TextField label="Notice Number"
+                                                       value={this.state.number}
+                                                       onChange={(e) => this.applySearchState({number: e.target.value})}
+                                                       margin="normal"/>
+                                        </div>
+                                    </div>
+
+
+                                    <div className="noticeSearchContainerTexts" style={{height: '90px'}}>
+                                        <div className="col-md-6" style={{position: 'relative', top: '-20px', display: 'flex'}}>
+                                            <Downshift id="downshift-simple" className="col-md-6">
+                                                {({
+                                                    getInputProps,
+                                                    getItemProps,
+                                                    getLabelProps,
+                                                    getMenuProps,
+                                                    highlightedIndex,
+                                                    inputValue,
+                                                    isOpen,
+                                                    selectedItem
+                                                    }) => {
+                                                    const { onBlur, onFocus, ...inputProps } = getInputProps({
+                                                        placeholder: "Search for a CPV"
+                                                    });
+
+                                                    return (
+                                                        <div>
+                                                            {this.renderCPVInput({
+                                                                fullWidth: true,
+                                                                classes: {},
+                                                                label: "CPVS",
+                                                                InputLabelProps: getLabelProps({ shrink: true }),
+                                                                InputProps: { onBlur, onFocus },
+                                                                inputProps
+                                                            })}
+
+                                                            <div {...getMenuProps()}>
+                                                                {isOpen ? (
+                                                                    <Paper square style={{position: "absolute", background: "white", padding: "10px", zIndex: "999999", maxHeight: '250px', overflow: 'auto' }}>
+                                                                        {this.getCPVSuggestions(inputValue).map(
+                                                                            (suggestion, index) =>
+                                                                                this.renderCPVSuggestion({
+                                                                                    suggestion,
+                                                                                    index,
+                                                                                    itemProps: getItemProps({
+                                                                                        item: suggestion.nameEn
+                                                                                    }),
+                                                                                    highlightedIndex,
+                                                                                    selectedItem
+                                                                                })
+                                                                        )}
+                                                                    </Paper>
+                                                                ) : null}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                }}
+                                            </Downshift>
+                                            <div className="col-md-6" style={{position: 'relative', top: '0px', minHeight: '40px', lineHeight: '25px'}}>
+                                                {
+                                                    [this.state.selectedCPV].map((d) => {
+
+                                                        if(d == null) {
+                                                            return;
+                                                        }
+
+                                                        return (
+                                                            <span style={{ paddingRight: '20px', paddingBottom: '5px'}}>
+                                            {(
+                                                <span className="arrow_box" style={{top: '10px', left: '10px'}}> {d.nameEn.substr(0, 50)}  {d.nameEn.length > 50 ? '...' : ''} &nbsp;
+                                                    <i className="fa fa-trash" onClick={(e) => this.removeCPV(d)}> </i>
+                                                </span>)}
+                                        </span>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className="col-md-6" style={{display: "flex", justifyContent: "right", position: 'relative', top: '-37px'}}>
+                                            <div className="col-md-2">
+                                                <TextField label="Total Estimated Value From" className="date"
+                                                           value={this.state.tevStart}
+                                                           InputLabelProps={{shrink: true}}
+                                                           onChange={(e) => this.applySearchState({tevStart: e.target.value})}
+                                                />
+                                            </div>
+                                            <div className="col-md-2">
+                                                <TextField label="Total Estimated Value To" className="date"
+                                                           value={this.state.tevEnd}
+                                                           InputLabelProps={{shrink: true}}
+                                                           onChange={(e) => this.applySearchState({tevEnd: e.target.value})}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="noticeSearchContainerTexts" style={{position: 'relative', top: '-43px'}}>
+                                        <div className="col-md-6">
+                                            <InputLabel htmlFor="businessField" style={{position: 'relative'}}>Business
+                                                Field</InputLabel>
+                                            <Select style={{width: '100%', position: 'relative'}}
+                                                    value={this.state.businessField}
+                                                    onChange={(e) => this.applySearchState({businessField: e.target.value})}
+                                                    inputProps={{
                                 name: "business-field",
                                     id: "business-field"
                             }}
-                                    >
-                                        <MenuItem value="">
-                                            <em></em>
-                                        </MenuItem>
-                                        {this.bfs.map(e => (
-                                            <MenuItem value={e.id}>{e.name}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </div>
-                                <div className="col-md-6" style={{display: "flex", justifyContent: "center"}}>
-                                    <div className="col-md-2">
-                                        <TextField className="date" label="Receipt Deadline Start" type="date"
-                                                   value={this.state.rdStart}
-                                                   onChange={(e) => this.applySearchState({rdStart: e.target.value})}
-                                                   InputLabelProps={{shrink: true}}/>
+                                            >
+                                                <MenuItem value="">
+                                                    <em></em>
+                                                </MenuItem>
+                                                {this.bfs.map(e => (
+                                                    <MenuItem value={e.id}>{e.name}</MenuItem>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                        {!this.isAlert ? <div className="col-md-6" style={{display: "flex", justifyContent: "right", position: 'relative', top: '-16px'}}>
+                                            <div className="col-md-2">
+                                                <TextField className="date" label="Publication Date Start" type="date"
+                                                           value={this.state.pdStart}
+                                                           onChange={(e) => this.applySearchState({pdStart: e.target.value})}
+                                                           InputLabelProps={{shrink: true}}/>
+                                            </div>
+                                            <div className="col-md-2">
+                                                <TextField className="date" label="Publication Date End" type="date"
+                                                           value={this.state.pdEnd}
+                                                           onChange={(e) => this.applySearchState({pdEnd: e.target.value})}
+                                                           InputLabelProps={{shrink: true}}/>
+                                            </div>
+                                        </div> : <></>}
                                     </div>
-                                    <div className="col-md-2">
-                                        <TextField className="date" label="Receipt Deadline End" type="date"
-                                                   value={this.state.rdEnd}
-                                                   onChange={(e) => this.applySearchState({rdEnd: e.target.value})}
-                                                   InputLabelProps={{shrink: true}}/>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div className="noticeSearchContainerTexts">
-                                <div className="col-md-3">
-                                    <InputLabel htmlFor="contracting-authority"
-                                                style={{position: 'relative', top: '13px'}}>CPV</InputLabel>
-                                    <Select style={{width: '100%', position: 'relative', top: '13px'}}
-                                            value={this.state.cpv}
-                                            onChange={(e) => this.applySearchState({cpv: e.target.value})}
-                                            inputProps={{
-                                name: "cpv",
-                                    id: "cpv"
-                            }}
-                                    >
-                                        <MenuItem value="">
-                                            <em></em>
-                                        </MenuItem>
-                                        {this.cpvs.map(e => (
-                                            <MenuItem value={e.id}>{e.name}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </div>
-                                <div className="col-md-3" ></div>
-                                <div className="col-md-6" style={{display: "flex", justifyContent: "center"}}>
-                                    <div className="col-md-2">
-                                        <TextField label="Total Estimated Value From" className="date"
-                                                   value={this.state.tevStart}
-                                                   InputLabelProps={{shrink: true}}
-                                                   onChange={(e) => this.applySearchState({tevStart: e.target.value})}
-                                        />
-                                    </div>
-                                    <div className="col-md-2">
-                                        <TextField label="Total Estimated Value To" className="date"
-                                                   value={this.state.tevEnd}
-                                                   InputLabelProps={{shrink: true}}
-                                                   onChange={(e) => this.applySearchState({tevEnd: e.target.value})}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                                <div className="noticeSearchContainerTexts" style={{position: 'relative', top: '-43px'}}>
 
-                            <div className="noticeSearchContainerButtons">
+                                    <div className="col-md-6">
+                                        <TextField label="Contract Name"
+                                                   value={this.state.name}
+                                                   onChange={(e) => this.applySearchState({name: e.target.value})}
+                                                   margin="normal"/>
+                                    </div>
+                                    {!this.isAlert ? <div className="col-md-6" style={{display: "flex", justifyContent: "right", position: 'relative', top: '-2px'}}>
+                                        <div className="col-md-2">
+                                            <TextField className="date" label="Receipt Deadline Start" type="date"
+                                                       value={this.state.rdStart}
+                                                       onChange={(e) => this.applySearchState({rdStart: e.target.value})}
+                                                       InputLabelProps={{shrink: true}}/>
+                                        </div>
+                                        <div className="col-md-2">
+                                            <TextField className="date" label="Receipt Deadline End" type="date"
+                                                       value={this.state.rdEnd}
+                                                       onChange={(e) => this.applySearchState({rdEnd: e.target.value})}
+                                                       InputLabelProps={{shrink: true}}/>
+                                        </div>
+                                    </div> : <></>}
+                                </div>
+
+</div>
+                                </div>
+
+                            <div className="noticeSearchContainerButtons" >
                                 <div className="col-md-3">
                                     <Button color="primary" onClick={this.handleSearch}> <i
                                         className="fa fa-search"> </i> Search </Button>
                                     <Button color="secondary" style={{background: "gray"}} onClick={this.handleClear}> <i
-                                        className="fa fa-trash"> </i> Clear </Button>
-
+                                        className="fa fa-trash"> </i> Clear Filters</Button>
+                                    {this.isAlert ? <Button style={{background: 'green'}} color="green" onClick={this.handleSave}>
+                                        <i className="fa fa-save"> </i> Save Alert
+                                    </Button> : <></>}
                                 </div>
                             </div>
 
                         </div>
                     </CodeExample>
+
+
                 </div>
             </div>
             <div className="row">

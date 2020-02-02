@@ -10,37 +10,24 @@ export default {
     items: [
       { section: "Tender",  role: "ROLE_TENDER" },
       {
-        title: "Profile",
+        title: "Search",
         root: true,
         bullet: "dot",
         role: "ROLE_TENDER",
-        translate: "MENU.PROFILE",
-        icon: "flaticon2-architecture-and-city",
-        submenu: [
-          {
-            title: "Personal Info",
-            icon: "flaticon2-expand",
-            page: "builder",
-            translate: "MENU.MY_PAGE",
-            page: "tender/tender-pages/PersonalPage"
-          },
-          {
-            title: "My Account",
-            icon: "flaticon2-expand",
-            page: "builder",
-            translate: "MENU.MY_ACCOUNT",
-            page: "tender/tender-pages/MyAccountPage"
-          },
-          {
-            title: "Change Password",
-            icon: "flaticon2-expand",
-            page: "builder",
-            translate: "MENU.CHANGE_PASSWORD",
-            page: "tender/tender-pages/ChangePasswordPage"
-          }
-        ]
+        translate: "MENU.DASHBOARD",
+        icon: "flaticon2-expand",
+        page: "tender/tender-pages/TenderDashboardPage"
       },
       {
+        title: "Search",
+        root: true,
+        bullet: "dot",
+        role: "ROLE_TENDER",
+        translate: "MENU.SEARCH",
+        icon: "flaticon2-expand",
+        page: "tender/tender-pages/NoticeSearchPage"
+      },
+      /*{
         title: "Search",
         root: true,
         bullet: "dot",
@@ -72,21 +59,30 @@ export default {
             page: "tender/tender-pages/ComparisonDashboardPage"
           }
         ]
-      },
+      },*/
       {
         title: "Alerts",
         root: true,
         alignment: "left",
+        icon: "flaticon2-expand",
         role: "ROLE_TENDER",
         toggle: "click",
         translate: "MENU.ALERTS",
         submenu: [
+
           {
             title: "My Alerts",
             icon: "flaticon2-expand",
             page: "builder",
             translate: "MENU.MY_ALERTS",
             page: "tender/tender-pages/AlertsPage"
+          },
+          {
+            title: "Configuration",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.ALERTS_CONFIGURATION",
+            page: "tender/tender-pages/AlertsConfigurationPage"
           },
           {
             title: "My Notifications",
@@ -98,6 +94,37 @@ export default {
         ]
       },
       {
+        title: "Account Settings",
+        root: true,
+        bullet: "dot",
+        role: "ROLE_TENDER",
+        translate: "MENU.PROFILE",
+        icon: "flaticon2-architecture-and-city",
+        submenu: [
+          {
+            title: "Personal Info",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.MY_PAGE",
+            page: "tender/tender-pages/PersonalPage"
+          },
+          {
+            title: "My Account",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.MY_ACCOUNT",
+            page: "tender/tender-pages/MyAccountPage"
+          },
+          {
+            title: "Change Password",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.CHANGE_PASSWORD",
+            page: "tender/tender-pages/ChangePasswordPage"
+          }
+        ]
+      },
+      /*{
         title: "Procedures",
         root: true,
         alignment: "left",
@@ -127,7 +154,7 @@ export default {
             page: "tender/tender-pages/MyDeclinedOffersPage"
           }
         ]
-      },
+      },*/
       { section: "Supervisor",
         role: "ROLE_SUPERVISOR"
       },

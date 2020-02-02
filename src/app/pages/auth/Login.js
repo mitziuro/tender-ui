@@ -6,7 +6,8 @@ import { FormattedMessage, injectIntl } from "react-intl";
 import { TextField } from "@material-ui/core";
 import clsx from "clsx";
 import * as auth from "../../store/ducks/auth.duck";
-import { login } from "../../crud/auth.crud";
+import { login, activateAccount } from "../../crud/auth.crud";
+import addNotification from "../../widgets/NotificationWidget";
 
 function Login(props) {
   const { intl } = props;
@@ -25,7 +26,39 @@ function Login(props) {
     setLoadingButtonStyle({ paddingRight: "2.5rem" });
   };
 
+  let tootltipShowed:boolean = false;
+
+  let passwordParam:boolean = props.location.search.indexOf('password=requested') >= 0;
+  if(passwordParam && !tootltipShowed) {
+    addNotification("Password reset", "An email has been sent to your email address", 'success');
+    tootltipShowed = true;
+  }
+
+  passwordParam = props.location.search.indexOf('password=reset') >= 0;
+  if(passwordParam && !tootltipShowed) {
+    addNotification("Password reset", "The password has been reset. Please try to login again", 'success');
+    tootltipShowed = true;
+  }
+
+  let accountParam:boolean = props.location.search.indexOf('account=created') >= 0;
+  if(accountParam && !tootltipShowed) {
+    addNotification("Account created", "You need to validate the account in order to continue. Please check your email", 'success');
+    tootltipShowed = true;
+  }
+
+  let keyParam = props.location.search.split('key=');
+  if(keyParam.length > 1 && !tootltipShowed) {
+    Promise.all([activateAccount(keyParam[1])])
+        .then(response => {
+          addNotification("Account verified", "The account was verified. You can now login", 'success');
+        })
+        .catch(() => {
+          addNotification("Error", "The key could not be validated", 'danger');
+        });tootltipShowed = true;
+  }
+
   return (
+
     <>
       <div className="kt-login__head">
         <span className="kt-login__signup-label">

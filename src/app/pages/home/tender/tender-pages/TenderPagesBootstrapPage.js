@@ -7,6 +7,7 @@ import NoticePage from './NoticePage';
 import OfferPage from './OfferPage';
 
 import AlertsPage from './alerts/AlertsPage';
+import AlertsConfigurationPage from './alerts/AlertsConfigurationPage';
 import NoticesPage from './alerts/NoticesPage';
 
 import MyOpenOffersPage from './offers/MyOpenOffersPage'
@@ -62,6 +63,11 @@ export default function TenderPagesBootstrapPage() {
             <Route
                 path="/tender/tender-pages/AlertsPage"
                 component={AlertsPage}
+            />
+
+            <Route
+                path="/tender/tender-pages/AlertsConfigurationPage"
+                component={AlertsConfigurationPage}
             />
 
             <Route

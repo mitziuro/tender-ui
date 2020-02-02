@@ -78,6 +78,7 @@ export default class AlertsPage extends React.Component {
             <div className="kt-grid__item kt-grid__item--fluid kt-app__content">
                 <div className="row">
                     <div className="col-xl-12">
+
                         <div className="kt-portlet">
                             <div className="kt-portlet__head">
                                 <div className="kt-portlet__head-label">
@@ -151,9 +152,9 @@ export default class AlertsPage extends React.Component {
                                                                 <i className="fa fa-pen"></i>
                                                             </label>
                                                         </a>
-                                                <span className="kt-avatar__cancel" data-toggle="kt-tooltip" title="" data-original-title="Cancel avatar">
-                                                    <i className="fa fa-times"></i>
-                                                </span>
+                                                        <span className="kt-avatar__cancel" data-toggle="kt-tooltip" title="" data-original-title="Cancel avatar">
+                                                            <i className="fa fa-times"></i>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>

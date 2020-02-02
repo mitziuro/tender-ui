@@ -21,3 +21,7 @@ export function getMyAlerts() {
 export function deleteAlerts(id) {
     return axios.delete(ALERT_DELETE_URL + '/' + id);
 }
+
+export function activateAlerts(id) {
+    return axios.delete(ALERT_DELETE_URL + '/activate/' + id);
+}

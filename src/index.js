@@ -9,10 +9,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import store, { persistor } from "./app/store/store";
 import { mockAxios, setupAxios } from "./_metronic";
+
 import App from "./App";
 import "./index.scss"; // Standard version
 // import "./sass/style.react.rtl.css"; // RTL version
 import "socicon/css/socicon.css";
+import 'react-notifications-component/dist/theme.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./_metronic/_assets/plugins/line-awesome/css/line-awesome.css";
 import "./_metronic/_assets/plugins/flaticon/flaticon.css";

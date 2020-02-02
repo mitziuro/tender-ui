@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, Redirect, Route, Switch } from "react-router-dom";
 import Registration from "./Registration";
+import NewPassword from "./NewPassword";
 import ForgotPassword from "./ForgotPassword";
 import Login from "./Login";
 import { Helmet } from "react-helmet";
@@ -71,6 +72,7 @@ export default function AuthPage() {
 
                 <Route path="/auth/login" component={Login} />
                 <Route path="/auth/registration" component={Registration} />
+                <Route path="/auth/new-password" component={NewPassword} />
                 <Route
                   path="/auth/forgot-password"
                   component={ForgotPassword}
