@@ -83,14 +83,14 @@ export default {
             page: "builder",
             translate: "MENU.ALERTS_CONFIGURATION",
             page: "tender/tender-pages/AlertsConfigurationPage"
-          },
+          }/*,
           {
             title: "My Notifications",
             icon: "flaticon2-expand",
             page: "builder",
             translate: "MENU.MY_NOTIFICATIONS",
             page: "tender/tender-pages/NoticesPage"
-          }
+          }*/
         ]
       },
       {

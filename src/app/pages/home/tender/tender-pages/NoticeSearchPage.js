@@ -121,6 +121,7 @@ export default class NoticeSearchPage extends React.Component {
             id: '',
             alertName: '',
             alertDescription: '',
+            keywords: '',
 
             rfq: true,
             cn: true,

@@ -126,7 +126,7 @@ export default class NoticePage extends React.Component {
                                                                 <div className="u-displayfield s-row">
 
                                                                     {
-                                                                        this.state.documents.map((d) => {
+                                                                        this.state.documents.filter(d => d.type === 1).map((d) => {
 
                                                                             return (
                                                                                 <div style={{float: "left"}}>
@@ -149,6 +149,40 @@ export default class NoticePage extends React.Component {
                                                         </div>
                                                     </div>
                                                 </div>
+
+                                                <div className="widget-body " style={{minHeight: "50px"}}>
+
+                                                    <div className="row ng-scope">
+                                                        <div className="col-md-12">
+                                                            <h4>DUAE Files: </h4>
+                                                            <div className="c-df-notice__box">
+                                                                <div className="u-displayfield s-row">
+
+                                                                    { this.state.documents.filter(d => d.type === 1).length > 0 ?
+                                                                        this.state.documents.filter(d => d.type === 2).map((d) => {
+
+                                                                            return (
+                                                                                <div style={{float: "left"}}>
+                                                                                    {d.fileName.indexOf('.pdf') >= 0 ? (
+                                                                                        <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
+                                                                                            <i style={{color: "red"}} class="fa fa-file-pdf"> </i>
+                                                                                            <span> {d.fileName} </span>
+                                                                                        </a>) : ( <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
+                                                                                        <i style={{color: "red"}} class="fa fa-file"> </i>
+                                                                                        <span> {d.fileName} </span>
+                                                                                    </a>)
+                                                                                    }
+                                                                                </div>
+                                                                            )
+                                                                        }) : <></>
+                                                                    }
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
                                         :
