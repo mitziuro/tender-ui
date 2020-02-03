@@ -148,6 +148,7 @@ export default class NoticeSearchPage extends React.Component {
 
             alertOpen: false,
             showErrors: false
+
         };
 
         this.state = this.initialState;
@@ -169,25 +170,41 @@ export default class NoticeSearchPage extends React.Component {
         this.cpvs = [];
         this.cas = [];
 
+        this.resetCPV = function(suggestion) {
+            if(!suggestion) { this.setState({selectedCPV: {nameEn : ''}});}
+            setTimeout(() => this.setState({selectedCPV: suggestion}), 0);
+        }
+
+        this.resetCA = function(suggestion) {
+            if(!suggestion) {this.setState({selectedCA: {name : ''}});}
+            setTimeout(() => this.setState({selectedCA: suggestion}), 0);
+        }
+
 
         /*************** CPV  ******/
         this.renderCPVInput = function (inputProps) {
             const { InputProps, classes, ref, ...other } = inputProps;
 
             return (
-                <TextField
-                    onChange={(e) => this.populateCPVS(e.target.value)}
-                    value={this.state.cpvValue}
-                    InputProps={{
-        inputRef: ref,
-        classes: {
-          root: classes.inputRoot,
-          input: classes.inputInput
-        },
-        ...InputProps
-      }}
-                    {...other}
-                />
+                <>
+                    <TextField
+                        onChange={(e) => this.populateCPVS(e.target.value)}
+                        InputProps={{
+            inputRef: ref,
+            classes: {
+              root: classes.inputRoot,
+              input: classes.inputInput
+            },
+            ...InputProps
+          }}
+                        {...other}
+                    />
+
+                {this.state.selectedCPV ?
+                    <i className="fa fa-times-circle" onClick={() => this.resetCPV()} style={{float: 'right', top: '-19px', position: 'relative', right: '10px', cursor: 'pointer'}}></i>
+                :
+                   <></>}
+                </>
             );
         }
 
@@ -209,6 +226,7 @@ export default class NoticeSearchPage extends React.Component {
                     selected={isHighlighted}
                     component="div"
                     onClick={(e) => {
+                        this.resetCPV(suggestion);
                         this.applySearchState({selectedCPV: suggestion});
                         }}
                     style={{fontWeight: isSelected ? 500 : 400, background: "white", opacity: '100%'}}
@@ -265,19 +283,24 @@ export default class NoticeSearchPage extends React.Component {
             const { InputProps, classes, ref, ...other } = inputProps;
 
             return (
-                <TextField
-                    onChange={(e) => this.populateCAS(e.target.value)}
-                    value={this.state.caValue}
-                    InputProps={{
-        inputRef: ref,
-        classes: {
-          root: classes.inputRoot,
-          input: classes.inputInput
-        },
-        ...InputProps
-      }}
-                    {...other}
-                />
+                <>
+                    <TextField
+                        onChange={(e) => this.populateCAS(e.target.value)}
+                        InputProps={{
+            inputRef: ref,
+            classes: {
+              root: classes.inputRoot,
+              input: classes.inputInput
+            },
+            ...InputProps
+          }}
+                        {...other}
+                    />
+                {this.state.selectedCA ?
+                    <i className="fa fa-times-circle" onClick={() => this.resetCA()}  style={{float: 'right', top: '-19px', position: 'relative', right: '10px', cursor: 'pointer'}}></i>
+                    :
+                    <></>}
+                </>
             );
         }
 
@@ -299,6 +322,7 @@ export default class NoticeSearchPage extends React.Component {
                     selected={isHighlighted}
                     component="div"
                     onClick={(e) => {
+                        this.resetCA(suggestion);
                         this.applySearchState({selectedCA: suggestion});
                         }}
                     style={{fontWeight: isSelected ? 500 : 400, background: "white", opacity: '100%'}}
@@ -411,6 +435,8 @@ export default class NoticeSearchPage extends React.Component {
 
 
     handleClear = () => {
+        this.resetCPV();
+        this.resetCA();
         this.setState(this.initialState);
     }
 
@@ -524,11 +550,15 @@ export default class NoticeSearchPage extends React.Component {
                                                         <MenuItem value={e.id}>{e.name}</MenuItem>
                                                 ))}
                                             </Select>
+                                            {this.state.nuts ?
+                                                <i className="fa fa-times-circle" onClick={() => this.setState({nuts: null})} style={{float: 'right', top: '-9px', position: 'relative', right: '20px', cursor: 'pointer'}}></i>
+                                                :
+                                                <></>}
                                         </div>
                                       </div>
                                     <div className="noticeSearchContainerTexts" style={{height: '90px'}}>
-                                        <div className="col-md-6" style={{position: 'relative', top: '15px', display: 'flex'}}>
-                                            <Downshift id="downshift-simple" className="col-md-6">
+                                        <div className="col-md-6" style={{position: 'relative', top: '15px'}}>
+                                            <Downshift id="downshift-simple">
                                                 {({
                                                     getInputProps,
                                                     getItemProps,
@@ -540,7 +570,9 @@ export default class NoticeSearchPage extends React.Component {
                                                     selectedItem
                                                     }) => {
                                                     const { onBlur, onFocus, ...inputProps } = getInputProps({
-                                                        placeholder: "Search for a Contracting Authority"
+                                                        placeholder: "Search for a Contracting Authority",
+                                                        value: this.state.selectedCA ? this.state.selectedCA.name : null
+
                                                     });
 
                                                     return (
@@ -548,7 +580,7 @@ export default class NoticeSearchPage extends React.Component {
                                                             {this.renderCAInput({
                                                                 fullWidth: true,
                                                                 classes: {},
-                                                                label: "Contracting Authorities",
+                                                                label: "Contracting Authority",
                                                                 InputLabelProps: getLabelProps({ shrink: true }),
                                                                 InputProps: { onBlur, onFocus },
                                                                 inputProps
@@ -576,39 +608,20 @@ export default class NoticeSearchPage extends React.Component {
                                                     );
                                                 }}
                                             </Downshift>
-                                            <div className="col-md-6" style={{position: 'relative', top: '0px', minHeight: '40px', lineHeight: '25px'}}>
-                                                {
-                                                    [this.state.selectedCA].map((d) => {
-
-                                                        if(d == null) {
-                                                            return;
-                                                        }
-
-                                                        return (
-                                                            <span style={{ paddingRight: '20px', paddingBottom: '5px'}}>
-                                                {(
-                                                    <span className="arrow_box" style={{top: '10px', left: '10px'}}> {d.name.substr(0, 50)}  {d.name.length > 50 ? '...' : ''} &nbsp;
-                                                        <i className="fa fa-trash" onClick={(e) => this.removeCA(d)}> </i>
-                                                    </span>)}
-                                            </span>
-                                                        )
-                                                    })
-                                                }
-                                            </div>
                                         </div>
 
-                                        <div className="col-md-6">
+                                        {!this.isAlert ? <div className="col-md-6">
                                             <TextField label="Notice Number"
                                                        value={this.state.number}
                                                        onChange={(e) => this.applySearchState({number: e.target.value})}
                                                        margin="normal"/>
-                                        </div>
+                                        </div> : <></> }
                                     </div>
 
 
                                     <div className="noticeSearchContainerTexts" style={{height: '90px'}}>
-                                        <div className="col-md-6" style={{position: 'relative', top: '-20px', display: 'flex'}}>
-                                            <Downshift id="downshift-simple" className="col-md-6">
+                                        <div className="col-md-6" style={{position: 'relative', top: '-20px'}}>
+                                            <Downshift id="downshift-simple">
                                                 {({
                                                     getInputProps,
                                                     getItemProps,
@@ -620,15 +633,17 @@ export default class NoticeSearchPage extends React.Component {
                                                     selectedItem
                                                     }) => {
                                                     const { onBlur, onFocus, ...inputProps } = getInputProps({
-                                                        placeholder: "Search for a CPV"
-                                                    });
+                                                        placeholder: "Search for a CPV",
+                                                        value: this.state.selectedCPV ? this.state.selectedCPV.nameEn : null
+
+                                                });
 
                                                     return (
                                                         <div>
                                                             {this.renderCPVInput({
                                                                 fullWidth: true,
                                                                 classes: {},
-                                                                label: "CPVS",
+                                                                label: "CPV",
                                                                 InputLabelProps: getLabelProps({ shrink: true }),
                                                                 InputProps: { onBlur, onFocus },
                                                                 inputProps
@@ -656,35 +671,16 @@ export default class NoticeSearchPage extends React.Component {
                                                     );
                                                 }}
                                             </Downshift>
-                                            <div className="col-md-6" style={{position: 'relative', top: '0px', minHeight: '40px', lineHeight: '25px'}}>
-                                                {
-                                                    [this.state.selectedCPV].map((d) => {
-
-                                                        if(d == null) {
-                                                            return;
-                                                        }
-
-                                                        return (
-                                                            <span style={{ paddingRight: '20px', paddingBottom: '5px'}}>
-                                            {(
-                                                <span className="arrow_box" style={{top: '10px', left: '10px'}}> {d.nameEn.substr(0, 50)}  {d.nameEn.length > 50 ? '...' : ''} &nbsp;
-                                                    <i className="fa fa-trash" onClick={(e) => this.removeCPV(d)}> </i>
-                                                </span>)}
-                                        </span>
-                                                        )
-                                                    })
-                                                }
-                                            </div>
                                         </div>
-                                        <div className="col-md-6" style={{display: "flex", justifyContent: "right", position: 'relative', top: '-37px'}}>
-                                            <div className="col-md-2">
+                                        <div className="col-md-6" style={{display: "flex", justifyContent: "space-around", position: 'relative', top: this.isAlert ? '-91px' : '-37px'}}>
+                                            <div className="col-md-3">
                                                 <TextField label="Total Estimated Value From" className="date"
                                                            value={this.state.tevStart}
                                                            InputLabelProps={{shrink: true}}
                                                            onChange={(e) => this.applySearchState({tevStart: e.target.value})}
                                                 />
                                             </div>
-                                            <div className="col-md-2">
+                                            <div className="col-md-3">
                                                 <TextField label="Total Estimated Value To" className="date"
                                                            value={this.state.tevEnd}
                                                            InputLabelProps={{shrink: true}}
@@ -713,15 +709,19 @@ export default class NoticeSearchPage extends React.Component {
                                                     <MenuItem value={e.id}>{e.name}</MenuItem>
                                                 ))}
                                             </Select>
+                                            {this.state.businessField ?
+                                                <i className="fa fa-times-circle" onClick={() => this.setState({businessField: null})} style={{float: 'right', top: '-22px', position: 'relative', right: '20px', cursor: 'pointer'}}></i>
+                                                :
+                                                <></>}
                                         </div>
-                                        {!this.isAlert ? <div className="col-md-6" style={{display: "flex", justifyContent: "right", position: 'relative', top: '-16px'}}>
-                                            <div className="col-md-2">
+                                        {!this.isAlert ? <div className="col-md-6" style={{display: "flex", justifyContent: "space-around", position: 'relative', top: '-16px'}}>
+                                            <div className="col-md-3">
                                                 <TextField className="date" label="Publication Date Start" type="date"
                                                            value={this.state.pdStart}
                                                            onChange={(e) => this.applySearchState({pdStart: e.target.value})}
                                                            InputLabelProps={{shrink: true}}/>
                                             </div>
-                                            <div className="col-md-2">
+                                            <div className="col-md-3">
                                                 <TextField className="date" label="Publication Date End" type="date"
                                                            value={this.state.pdEnd}
                                                            onChange={(e) => this.applySearchState({pdEnd: e.target.value})}
@@ -738,14 +738,14 @@ export default class NoticeSearchPage extends React.Component {
                                                    onChange={(e) => this.applySearchState({name: e.target.value})}
                                                    margin="normal"/>
                                     </div>
-                                    {!this.isAlert ? <div className="col-md-6" style={{display: "flex", justifyContent: "right", position: 'relative', top: '-2px'}}>
-                                        <div className="col-md-2">
+                                    {!this.isAlert ? <div className="col-md-6" style={{display: "flex", justifyContent: "space-around", position: 'relative', top: '-2px'}}>
+                                        <div className="col-md-3">
                                             <TextField className="date" label="Receipt Deadline Start" type="date"
                                                        value={this.state.rdStart}
                                                        onChange={(e) => this.applySearchState({rdStart: e.target.value})}
                                                        InputLabelProps={{shrink: true}}/>
                                         </div>
-                                        <div className="col-md-2">
+                                        <div className="col-md-3">
                                             <TextField className="date" label="Receipt Deadline End" type="date"
                                                        value={this.state.rdEnd}
                                                        onChange={(e) => this.applySearchState({rdEnd: e.target.value})}
@@ -758,7 +758,7 @@ export default class NoticeSearchPage extends React.Component {
                                 </div>
 
                             <div className="noticeSearchContainerButtons" >
-                                <div className="col-md-3">
+                                <div>
                                     <Button color="primary" onClick={this.handleSearch}> <i
                                         className="fa fa-search"> </i> Search </Button>
                                     <Button color="secondary" style={{background: "gray"}} onClick={this.handleClear}> <i

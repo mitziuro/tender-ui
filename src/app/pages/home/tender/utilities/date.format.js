@@ -15,20 +15,24 @@ export default class DateFormat extends React.Component {
     }
 
     compute(value) {
+
         if (value == null) {
             return '';
         }
 
-        let elements = value.split('T')[0].split('-');
-        let ret =  elements[2] + '.' + elements[1] + '.' + elements[0];
+        let d = new Date(value);
+        let datestring = this.applyPrefix(d.getDate())  + "." + this.applyPrefix(d.getMonth()+1) + "." + d.getFullYear();
 
         if(this.state.withTime) {
-            ret = ret + ' ' + value.split('T')[1].split(':')[0] + ':' + value.split('T')[1].split(':')[1];
+            datestring = datestring + " " + this.applyPrefix(d.getHours()) + ":" + this.applyPrefix(d.getMinutes());
         }
 
-        return ret;
+        return datestring;
 
+    }
 
+    applyPrefix(x:string) {
+        return (x + '').length === 1 ? ('0' + x) : ('' + x);
     }
 
     render() {

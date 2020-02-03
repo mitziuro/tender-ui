@@ -13,8 +13,9 @@ function NewPassword(props) {
 
 
     let keyParam = props.location.search.split('key=');
-    if (keyParam.length <= 1) {
+    if (!window.tooltip && keyParam.length <= 1) {
         addNotification("Error", "The key could not be found", 'danger');
+        window.tooltip = true;
     }
 
     return (

@@ -29,25 +29,29 @@ function Login(props) {
   let tootltipShowed:boolean = false;
 
   let passwordParam:boolean = props.location.search.indexOf('password=requested') >= 0;
-  if(passwordParam && !tootltipShowed) {
+  if(!window.tooltip && passwordParam && !tootltipShowed) {
     addNotification("Password reset", "An email has been sent to your email address", 'success');
+    window.tooltip = true;
     tootltipShowed = true;
   }
 
   passwordParam = props.location.search.indexOf('password=reset') >= 0;
-  if(passwordParam && !tootltipShowed) {
+  if(!window.tooltip && passwordParam && !tootltipShowed) {
     addNotification("Password reset", "The password has been reset. Please try to login again", 'success');
+    window.tooltip = true;
     tootltipShowed = true;
   }
 
   let accountParam:boolean = props.location.search.indexOf('account=created') >= 0;
-  if(accountParam && !tootltipShowed) {
+  if(!window.tooltip && accountParam && !tootltipShowed) {
     addNotification("Account created", "You need to validate the account in order to continue. Please check your email", 'success');
+    window.tooltip = true;
     tootltipShowed = true;
   }
 
   let keyParam = props.location.search.split('key=');
-  if(keyParam.length > 1 && !tootltipShowed) {
+  if(!window.tooltip && keyParam.length > 1 && !tootltipShowed) {
+    window.tooltip = true;
     Promise.all([activateAccount(keyParam[1])])
         .then(response => {
           addNotification("Account verified", "The account was verified. You can now login", 'success');

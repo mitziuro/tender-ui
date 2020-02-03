@@ -61,7 +61,38 @@ class UserProfile extends React.Component {
             )}
           </div>
         </Dropdown.Toggle>
-
+        <Dropdown.Menu className="dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-top-unround dropdown-menu-xl">
+          {/** ClassName should be 'dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-top-unround dropdown-menu-xl' */}
+          <div
+            className="kt-user-card kt-user-card--skin-dark kt-notification-item-padding-x"
+            style={{
+              backgroundImage: `url(${toAbsoluteUrl("/media/misc/bg-1.jpg")})`
+            }}
+          >
+            <div className="kt-user-card__avatar">
+              <img alt="Pic" className="kt-hidden" src={user.pic} />
+              <span className="kt-badge kt-badge--lg kt-badge--rounded kt-badge--bold kt-font-success">
+                {user.firstName[0]}
+              </span>
+            </div>
+            <div className="kt-user-card__name">{user.fullname}</div>
+            <div className="kt-user-card__badge">
+              <span className="btn btn-success btn-sm btn-bold btn-font-md">
+                No messages
+              </span>
+            </div>
+          </div>
+          <div className="kt-notification">
+            <div className="kt-notification__custom">
+              <Link
+                to="/logout"
+                className="btn btn-label-brand btn-sm btn-bold"
+              >
+                Sign Out
+              </Link>
+            </div>
+          </div>
+        </Dropdown.Menu>
       </Dropdown>
     );
   }

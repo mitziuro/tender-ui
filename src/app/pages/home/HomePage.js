@@ -21,7 +21,7 @@ export default function HomePage() {
       <Switch>
         {
           /* Redirect from root URL to /dashboard. */
-          <Redirect exact from="/" to="/tender/tender-pages/NoticesPage" />
+          <Redirect exact from="/" to="/tender/tender-pages/TenderDashboardPage" />
         }
         <Route path="/builder" component={Builder} />
         <Route path="/dashboard" component={Dashboard} />

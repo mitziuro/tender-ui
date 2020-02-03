@@ -102,10 +102,8 @@ export default class AlertListingComponent extends React.Component {
         });
     }
 
-    handleSearch = () => {
-        if(this.child) {
-            this.child.getNotices(this.state.selectedAlert);
-        }
+    handleSearch = (alert) => {
+        this.child.getNotices(alert ? alert : this.state.selectedAlert);
     }
 
 
@@ -128,11 +126,13 @@ export default class AlertListingComponent extends React.Component {
                                 return (
                                     <TableRow key={alert.id} style={{background: alert.active ? '' : 'lightgray'}}>
                                         <TableCell component="th" scope="row">
-                                            <a onClick={() => {this.setState({selectedAlert : alert});this.handleSearch()}}>
-                                                <b style={{fontSize:"15px"}}>
-                                                    {alert.alertName}
-                                                </b>
-                                            </a>
+
+
+                                            <b onClick={() => {this.setState({selectedAlert : alert}); setTimeout(this.handleSearch(alert), 0);}} style={{cursor: 'pointer', color: "#5867dd", textDecoration: "underline", fontSize:"15px"}}>
+                                                {alert.alertName}
+                                            </b>
+
+
                                             <div className="row" style={{position: "relative", top:"10px"}}>
                                                 <div className="col-md-4">
 
@@ -143,10 +143,14 @@ export default class AlertListingComponent extends React.Component {
                                                     <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Type of notice: </span>
                                                     <strong className="ng-binding">
                                                         <b> {!alert.rfq && !alert.cn && !alert.scn && !alert.ccn && !alert.dccn ? 'All ' : ''} </b>
-                                                        <b> {alert.rfq && alert.cn && alert.scn && alert.ccn && alert.dccn ? '' : ''} </b>
+                                                        <b> {alert.rfq && alert.cn && alert.scn && alert.ccn && alert.dccn ? 'All' : ''} </b>
+                                                        { !(alert.rfq && alert.cn && alert.scn && alert.ccn && alert.dccn) ?
                                                         <b>
                                                             {alert.rfq ? 'Call for tenders (RFQ) ' : ''}  {alert.cn ? 'Contract notice (CN) ' : ''}  {alert.scn ? 'Simplified contract notice (SCN) ' : ''}  {alert.ccn ? 'Concession notice (PC) ' : ''}  {alert.dccn ? 'Design Contest Notice (DC) ' : ''}
                                                         </b>
+                                                            :
+                                                            <></>
+                                                        }
                                                     </strong>
                                                 </div>
                                                 <div className="col-md-4">
@@ -187,18 +191,20 @@ export default class AlertListingComponent extends React.Component {
                                             </div>
                                         </TableCell>
                                         <TableCell align="right">
-                                            <a onClick={() => {if (alert.active) {this.setState({toBeDeactivated: alert.id, confirm: true});} else  {this.setState({toBeActivated: alert.id, confirm: true});}}}>
-                                                <i className="fa fa-check fa-lg"  title="Activate/Deactivate"> </i>
-                                            </a>
-                                            &nbsp;
-                                            <Link
-                                                to={`/tender/tender-pages/AlertsConfigurationPage?alert=${alert.id}`}>
-                                                <i className="fa fa-edit fa-lg" title="Edit"> </i>
-                                            </Link>
-                                            &nbsp;
-                                            <a onClick={() => this.setState({toBeDeleted: alert.id, confirm: true})}>
-                                                <i className="fa fa-trash fa-lg"  title="Delete"> </i>
-                                            </a>
+                                            <div style={{width: '70px', color: 'gray'}}>
+                                                <a  style={{color: !alert.active ? '' : 'green'}} onClick={() => {if (alert.active) {this.setState({toBeDeactivated: alert.id, confirm: true});} else  {this.setState({toBeActivated: alert.id, confirm: true});}}}>
+                                                    <i className={!alert.active ? 'fa fa-times fa-lg' : 'fa fa-check fa-lg'}  title={ !alert.active ? 'Activate' : 'Deactivate'}> </i>
+                                                </a>
+                                                &nbsp;
+                                                <Link style={{color: 'gray'}}
+                                                    to={`/tender/tender-pages/AlertsConfigurationPage?alert=${alert.id}`}>
+                                                    <i className="fa fa-edit fa-lg" title="Edit"> </i>
+                                                </Link>
+                                                &nbsp;
+                                                <a onClick={() => this.setState({toBeDeleted: alert.id, confirm: true})}>
+                                                    <i className="fa fa-trash fa-lg"  title="Delete"> </i>
+                                                </a>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                          
@@ -209,7 +215,7 @@ export default class AlertListingComponent extends React.Component {
             </Paper>
 
             {
-                (<div className="row" style={{display : this.child != null && this.state.selectedAlert != null ? '' : 'none',position: 'relative', top: '10px',left: '10px', width: '100%'}}>
+                (<div className="row" style={{height : this.state.selectedAlert != null ? '' : '0', visibility : this.state.selectedAlert != null ? '' : 'hidden',position: 'relative', top: '10px',left: '10px', width: '100%'}}>
                 <div class="col-md-12" className="noticeResults">
                     <CodeExample beforeCodeTitle="Search Results">
                         <div className="kt-section">
@@ -238,7 +244,7 @@ export default class AlertListingComponent extends React.Component {
                         Cancel
                     </Button>
                     <Button style={{background: 'green'}} onClick={() => this.handleAction()} color="primary">
-                        <i className="fa fa-trash"> </i> {this.state.toBeDeleted != null ? 'Delete' : (this.state.toBeActivated  ? 'Activate' : 'Deactivate')}
+                        <i className={this.state.toBeDeleted ? 'fa fa-trash' : (this.state.toBeActivated ? 'fa fa-check' : 'fa fa-times')}> </i> {this.state.toBeDeleted != null ? 'Delete' : (this.state.toBeActivated  ? 'Activate' : 'Deactivate')}
                     </Button>
                 </DialogActions>
             </Dialog>
