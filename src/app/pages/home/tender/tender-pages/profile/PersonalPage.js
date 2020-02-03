@@ -257,6 +257,15 @@ export default class AlertsPage extends React.Component {
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div className="form-group form-group-last row">
+                                                <label className="col-xl-3 col-lg-3 col-form-label">User Type</label>
+                                                <div className="">
+                                                    <select style={{position: "relative", top: "8px", left: "10px"}} value={this.state.user.type} onChange={(e) => this.applyUserProp('type' , e.target.value)}>
+                                                        <option  value="1">Bidder</option>
+                                                        <option  value="2">Expert</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 

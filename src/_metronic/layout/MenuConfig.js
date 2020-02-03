@@ -108,13 +108,13 @@ export default {
             translate: "MENU.MY_PAGE",
             page: "tender/tender-pages/PersonalPage"
           },
-          {
+         /* {
             title: "My Account",
             icon: "flaticon2-expand",
             page: "builder",
             translate: "MENU.MY_ACCOUNT",
             page: "tender/tender-pages/MyAccountPage"
-          },
+          },*/
           {
             title: "Change Password",
             icon: "flaticon2-expand",

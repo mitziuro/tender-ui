@@ -125,7 +125,7 @@ export default class UsersPage extends React.Component {
                     <div className="alertsResults">
                         <CodeExample beforeCodeTitle="Users">
                             <div className="kt-section">
-                                {this.state.importing ?
+                                /*{this.state.importing ?
                                     <Button disabled style={{position: "relative",top: "-49px", left: "100px"}}
                                             onClick={() => {this.handleImport();}} color="primary">
                                         Importing...
@@ -134,7 +134,7 @@ export default class UsersPage extends React.Component {
                                             onClick={() => {this.handleImport();}} color="primary">
                                         Import
                                     </Button>
-                                }
+                                }*/
                                 <div className="col-md-12" >
                                     <div className="kt-section__content">
             <Paper>
