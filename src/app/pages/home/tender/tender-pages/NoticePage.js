@@ -204,7 +204,7 @@ export default class NoticePage extends React.Component {
 
                                         {this.state.notice.contractingAuthority ?
                                             ( <Link style={{position:'relative',left: '10px'}}
-                                                to={`/tender/tender-pages/HistoryDashboardPage?caId=${this.state.notice.contractingAuthority.id}&cpvId=${this.state.notice.cpv.id}`}>
+                                                to={`/tender/tender-pages/ComparisonDashboardPage?caId=${this.state.notice.contractingAuthority.id}&cpvId=${this.state.notice.cpv.id}&nuts=${this.state.notice.nuts.id}`}>
                                                 <Button color="primary">
                                                     Contract Notice Analysis
                                                 </Button>
