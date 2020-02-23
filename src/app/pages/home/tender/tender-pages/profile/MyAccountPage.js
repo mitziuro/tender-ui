@@ -60,7 +60,17 @@ export default class MyAccountPage extends React.Component {
                 Promise.all([getUser(this.state.s1.id)]).then(response => {
                     let s2  = {
                         invFirstName : response[0].data.invFirstName,
-                        invLastName : response[0].data.invLastName
+                        invLastName : response[0].data.invLastName,
+                        invPhone : response[0].data.invPhone,
+                        invCnp : response[0].data.invCnp,
+                        invAddress : response[0].data.invAddress,
+
+                        invCompanyName : response[0].data.invCompanyName,
+                        invVat : response[0].data.invVat,
+                        invRegistrationNumber : response[0].data.invRegistrationNumber,
+                        invBankName : response[0].data.invBankName,
+                        invBankAccount : response[0].data.invBankAccount,
+                        invCompanyAddress : response[0].data.invCompanyAddress
                     };
 
                     let s3  = {
@@ -111,6 +121,16 @@ export default class MyAccountPage extends React.Component {
 
         userDetails.invFirstName = this.state.s2.invFirstName;
         userDetails.invLastName = this.state.s2.invLastName;
+        userDetails.invPhone = this.state.s2.invPhone;
+        userDetails.invCnp = this.state.s2.invCnp;
+        userDetails.invAddress = this.state.s2.invAddress;
+
+        userDetails.invCompanyName = this.state.s2.invCompanyName;
+        userDetails.invVat = this.state.s2.invVat;
+        userDetails.invRegistrationNumber = this.state.s2.invRegistrationNumber;
+        userDetails.invBankName = this.state.s2.invBankName;
+        userDetails.invBankAccount = this.state.s2.invBankAccount;
+        userDetails.invCompanyAddress = this.state.s2.invCompanyAddress;
 
         userDetails.country = this.state.s3.country;
         userDetails.county = this.state.s3.county;
@@ -150,7 +170,7 @@ export default class MyAccountPage extends React.Component {
         }
 
         if(activeState == 's2') {
-            return ['invFirstName', 'invLastName'];
+            return ['invFirstName', 'invLastName', 'invPhone', 'invCnp', 'invAddress', 'invCompanyName', 'invVat', 'invRegistrationNumber', 'invBankName', 'invBankAccount', 'invCompanyAddress'];
         }
 
         if(activeState == 's3') {
@@ -532,6 +552,199 @@ export default class MyAccountPage extends React.Component {
 
                                                                                                     />
                                                                                                     {(this.state.s2.invLastName == null || this.state.s2.invLastName.length == 0) && this.state.invLastNameDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                </InputGroup>
+                                                                                            </div>
+
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Contact Phone</label>
+                                                                                                <InputGroup className="col-xl-3 col-lg-3"
+
+                                                                                                >
+                                                                                                    <FormControl
+                                                                                                        placeholder="Phone"
+                                                                                                        aria-label="Contact Phone"
+                                                                                                        aria-describedby="basic-addon2"
+                                                                                                        style={{width: '100%'}}
+
+                                                                                                        value={this.state.s2.invPhone} onChange={(e) => this.applyUserProp('invPhone' , e.target.value, 's2')}
+                                                                                                        onBlur={(e) => this.setState({invPhoneDirty : true})}
+
+                                                                                                    />
+                                                                                                    {(this.state.s2.invPhone == null || this.state.s2.invPhone.length == 0) && this.state.invPhoneDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                </InputGroup>
+                                                                                            </div>
+
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Personal Identification Number (CNP)</label>
+                                                                                                <InputGroup className="col-xl-3 col-lg-3"
+
+                                                                                                >
+                                                                                                    <FormControl
+                                                                                                        placeholder="CNP"
+                                                                                                        aria-label="CNP"
+                                                                                                        aria-describedby="basic-addon2"
+                                                                                                        style={{width: '100%'}}
+
+                                                                                                        value={this.state.s2.invCnp} onChange={(e) => this.applyUserProp('invCnp' , e.target.value, 's2')}
+                                                                                                        onBlur={(e) => this.setState({invCnpDirty : true})}
+
+                                                                                                    />
+                                                                                                    {(this.state.s2.invCnp == null || this.state.s2.invCnp.length == 0) && this.state.invLCnpDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                </InputGroup>
+                                                                                            </div>
+
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Invoicing address</label>
+                                                                                                <InputGroup className="col-xl-3 col-lg-3"
+
+                                                                                                >
+                                                                                                    <FormControl
+                                                                                                        placeholder="Address"
+                                                                                                        aria-label="Address"
+                                                                                                        aria-describedby="basic-addon2"
+                                                                                                        style={{width: '100%'}}
+
+                                                                                                        value={this.state.s2.invAddress} onChange={(e) => this.applyUserProp('invAddress' , e.target.value, 's2')}
+                                                                                                        onBlur={(e) => this.setState({invAddressDirty : true})}
+
+                                                                                                    />
+                                                                                                    {(this.state.s2.invAddress == null || this.state.s2.invAddress.length == 0) && this.state.invLAddressDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                </InputGroup>
+                                                                                            </div>
+
+                                                                                            <div className="form-group row">
+                                                                                                <div className="col-lg-9 col-xl-6">
+                                                                                                    <h3 className="kt-section__title kt-section__title-md">Company</h3>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Company Name</label>
+                                                                                                <InputGroup className="col-xl-3 col-lg-3"
+
+                                                                                                >
+                                                                                                    <FormControl
+                                                                                                        placeholder="Company Name"
+                                                                                                        aria-label="Company Name"
+                                                                                                        aria-describedby="basic-addon2"
+                                                                                                        style={{width: '100%'}}
+
+                                                                                                        value={this.state.s2.invCompanyName} onChange={(e) => this.applyUserProp('invCompanyName' , e.target.value, 's2')}
+                                                                                                        onBlur={(e) => this.setState({invCompanyNameDirty : true})}
+
+
+                                                                                                    />
+                                                                                                    {(this.state.s2.invCompanyName == null || this.state.s2.invCompanyName.length == 0) && this.state.invCompanyNameDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                </InputGroup>
+                                                                                            </div>
+
+
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">VAT Code</label>
+                                                                                                <InputGroup className="col-xl-3 col-lg-3"
+
+                                                                                                >
+                                                                                                    <FormControl
+                                                                                                        placeholder="VAT"
+                                                                                                        aria-label="VAT Code"
+                                                                                                        aria-describedby="basic-addon2"
+                                                                                                        style={{width: '100%'}}
+
+                                                                                                        value={this.state.s2.invVat} onChange={(e) => this.applyUserProp('invVat' , e.target.value, 's2')}
+                                                                                                        onBlur={(e) => this.setState({invVatDirty : true})}
+
+
+                                                                                                    />
+                                                                                                    {(this.state.s2.invVat == null || this.state.s2.invVat.length == 0) && this.state.invVatDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                </InputGroup>
+                                                                                            </div>
+
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Registration Number</label>
+                                                                                                <InputGroup className="col-xl-3 col-lg-3"
+
+                                                                                                >
+                                                                                                    <FormControl
+                                                                                                        placeholder="Registration Number"
+                                                                                                        aria-label="Registration Number"
+                                                                                                        aria-describedby="basic-addon2"
+                                                                                                        style={{width: '100%'}}
+
+                                                                                                        value={this.state.s2.invRegistrationNumber} onChange={(e) => this.applyUserProp('invRegistrationNumber' , e.target.value, 's2')}
+                                                                                                        onBlur={(e) => this.setState({invRegistrationNumberDirty : true})}
+
+
+                                                                                                    />
+                                                                                                    {(this.state.s2.invRegistrationNumber == null || this.state.s2.invRegistrationNumber.length == 0) && this.state.invRegistrationNumberDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                </InputGroup>
+                                                                                            </div>
+
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Bank Name</label>
+                                                                                                <InputGroup className="col-xl-3 col-lg-3"
+
+                                                                                                >
+                                                                                                    <FormControl
+                                                                                                        placeholder="Bank Name"
+                                                                                                        aria-label="Bank Name"
+                                                                                                        aria-describedby="basic-addon2"
+                                                                                                        style={{width: '100%'}}
+
+                                                                                                        value={this.state.s2.invBankName} onChange={(e) => this.applyUserProp('invBankName' , e.target.value, 's2')}
+                                                                                                        onBlur={(e) => this.setState({invBankNameDirty : true})}
+
+
+                                                                                                    />
+                                                                                                    {(this.state.s2.invBankName == null || this.state.s2.invBankName.length == 0) && this.state.invBankNameDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                </InputGroup>
+                                                                                            </div>
+
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Bank Account</label>
+                                                                                                <InputGroup className="col-xl-3 col-lg-3"
+
+                                                                                                >
+                                                                                                    <FormControl
+                                                                                                        placeholder="Bank Account"
+                                                                                                        aria-label="Bank Account"
+                                                                                                        aria-describedby="basic-addon2"
+                                                                                                        style={{width: '100%'}}
+
+                                                                                                        value={this.state.s2.invBankAccount} onChange={(e) => this.applyUserProp('invBankAccount' , e.target.value, 's2')}
+                                                                                                        onBlur={(e) => this.setState({invBankAccountDirty : true})}
+
+
+                                                                                                    />
+                                                                                                    {(this.state.s2.invBankAccount == null || this.state.s2.invBankAccount.length == 0) && this.state.invBankAccountDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                </InputGroup>
+                                                                                            </div>
+
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Company Address</label>
+                                                                                                <InputGroup className="col-xl-3 col-lg-3"
+
+                                                                                                >
+                                                                                                    <FormControl
+                                                                                                        placeholder="Company Address"
+                                                                                                        aria-label="Company Address"
+                                                                                                        aria-describedby="basic-addon2"
+                                                                                                        style={{width: '100%'}}
+
+                                                                                                        value={this.state.s2.invCompanyAddress} onChange={(e) => this.applyUserProp('invCompanyAddress' , e.target.value, 's2')}
+                                                                                                        onBlur={(e) => this.setState({invCompanyAddressDirty : true})}
+
+
+                                                                                                    />
+                                                                                                    {(this.state.s2.invCompanyAddress == null || this.state.s2.invCompanyAddress.length == 0) && this.state.invCompanyAddressDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
