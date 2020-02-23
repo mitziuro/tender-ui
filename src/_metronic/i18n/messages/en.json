@@ -9,7 +9,11 @@
   "MENU.DASHBOARD": "Dashboard",
 
   "MENU.PROFILE": "Account Settings",
-  "MENU.MY_PAGE": "Personal Info",
+  "MENU.MY_PAGE": "Profile",
+  "MENU.INVOICE": "Invoice Details",
+  "MENU.MAIL": "Mailing Address",
+  "MENU.SERVICES": "Services / Subscriptions",
+  "MENU.NOTIFICATIONS": "Notifications Settings",
   "MENU.MY_ACCOUNT": "My Account",
   "MENU.CHANGE_PASSWORD": "Change Password",
 

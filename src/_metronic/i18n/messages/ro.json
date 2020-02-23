@@ -10,7 +10,11 @@
 
 
   "MENU.PROFILE": "Setari cont",
-  "MENU.MY_PAGE": "Informatii personale",
+  "MENU.MY_PAGE": "Profile",
+  "MENU.INVOICE": "Detalii Invoice",
+  "MENU.MAIL": "Adresa postala",
+  "MENU.SERVICES": "Servicii / Subscriptii",
+  "MENU.NOTIFICATIONS": "Setari Notificari",
   "MENU.MY_ACCOUNT": "Contul meu",
   "MENU.CHANGE_PASSWORD": "Schimbare parola",
 

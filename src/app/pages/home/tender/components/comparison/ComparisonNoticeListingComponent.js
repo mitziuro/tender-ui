@@ -131,7 +131,9 @@ export default class ComparisonNoticeListingComponent extends React.Component {
                     <TableHead>
                         <TableRow>
                             <TableCell>
-                               Winning Company
+                                {
+                                    this.winners ? 'Winning Company' : 'Participating Company'
+                                }
                             </TableCell>
                             {
                                 this.winners ? (

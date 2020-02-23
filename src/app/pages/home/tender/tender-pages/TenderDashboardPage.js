@@ -60,7 +60,7 @@ export default class TenderDashboardPage extends React.Component {
                             </div>
                         </div>
 
-                        <div className="col-md-6">
+                        <div className="col-md-6" style={{minHeight: '400px'}}>
                             <div className="offersResults">
                                 <CodeExample beforeCodeTitle="Recent Activity">
                                     <div className="kt-section">
@@ -88,6 +88,21 @@ export default class TenderDashboardPage extends React.Component {
                                 </CodeExample>
                             </div>
                         </div>
+
+                        <div className="col-md-6">
+                            <div className="offersResults">
+                                <CodeExample beforeCodeTitle="Recently Active Experts">
+                                    <div className="kt-section">
+                                        <div className="col-md-12">
+                                            <div className="kt-separator kt-separator--dashed" style={{textAlign: 'center', paddingTop: '22px',minHeight: '123px'}}>
+                                                <b>No Results</b>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CodeExample>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </>

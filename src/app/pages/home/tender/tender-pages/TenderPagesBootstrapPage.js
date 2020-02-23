@@ -101,6 +101,16 @@ export default function TenderPagesBootstrapPage() {
                 component={MyAccountPage}
             />
 
+            <Route
+                path="/tender/tender-pages/MyInvoicePage"
+                component={MyAccountPage}
+            />
+
+            <Route
+                path="/tender/tender-pages/MyMailPage"
+                component={MyAccountPage}
+            />
+
 
             <Route
                 path="/tender/tender-pages/ChangePasswordPage"

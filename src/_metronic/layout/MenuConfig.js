@@ -102,24 +102,54 @@ export default {
         icon: "flaticon2-architecture-and-city",
         submenu: [
           {
-            title: "Personal Info",
-            icon: "flaticon2-expand",
-            page: "builder",
-            translate: "MENU.MY_PAGE",
-            page: "tender/tender-pages/PersonalPage"
-          },
-         /* {
             title: "My Account",
+            bullet: "dot",
             icon: "flaticon2-expand",
             page: "builder",
             translate: "MENU.MY_ACCOUNT",
-            page: "tender/tender-pages/MyAccountPage"
-          },*/
+            submenu: [
+              {
+                title: "Personal Info",
+                icon: "flaticon2-expand",
+                page: "builder",
+                translate: "MENU.MY_PAGE",
+                page: "tender/tender-pages/MyAccountPage"
+              },
+              {
+                title: "My Account",
+                icon: "flaticon2-expand",
+                page: "builder",
+                translate: "MENU.INVOICE",
+                page: "tender/tender-pages/MyInvoicePage"
+              },
+              {
+                title: "Change Password",
+                icon: "flaticon2-expand",
+                page: "builder",
+                translate: "MENU.MAIL",
+                page: "tender/tender-pages/MyMailPage"
+              }
+            ]
+          },
           {
             title: "Change Password",
             icon: "flaticon2-expand",
             page: "builder",
             translate: "MENU.CHANGE_PASSWORD",
+            page: "tender/tender-pages/ChangePasswordPage"
+          },
+          {
+            title: "Change Password",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.SERVICES",
+            page: "tender/tender-pages/ChangePasswordPage"
+          },
+          {
+            title: "Change Password",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.NOTIFICATIONS",
             page: "tender/tender-pages/ChangePasswordPage"
           }
         ]
