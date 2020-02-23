@@ -70,7 +70,9 @@ export default class MyAccountPage extends React.Component {
                         invRegistrationNumber : response[0].data.invRegistrationNumber,
                         invBankName : response[0].data.invBankName,
                         invBankAccount : response[0].data.invBankAccount,
-                        invCompanyAddress : response[0].data.invCompanyAddress
+                        invCompanyAddress : response[0].data.invCompanyAddress,
+
+                        invPaymentType: response[0].data.invPaymentType
                     };
 
                     let s3  = {
@@ -132,6 +134,8 @@ export default class MyAccountPage extends React.Component {
         userDetails.invBankAccount = this.state.s2.invBankAccount;
         userDetails.invCompanyAddress = this.state.s2.invCompanyAddress;
 
+        userDetails.invPaymentType = this.state.s2.invPaymentType;
+
         userDetails.country = this.state.s3.country;
         userDetails.county = this.state.s3.county;
         userDetails.city = this.state.s3.city;
@@ -170,7 +174,7 @@ export default class MyAccountPage extends React.Component {
         }
 
         if(activeState == 's2') {
-            return ['invFirstName', 'invLastName', 'invPhone', 'invCnp', 'invAddress', 'invCompanyName', 'invVat', 'invRegistrationNumber', 'invBankName', 'invBankAccount', 'invCompanyAddress'];
+            return ['invFirstName', 'invLastName', 'invPhone', 'invCnp', 'invAddress', 'invCompanyName', 'invVat', 'invRegistrationNumber', 'invBankName', 'invBankAccount', 'invCompanyAddress', 'invPaymentType'];
         }
 
         if(activeState == 's3') {
@@ -488,10 +492,11 @@ export default class MyAccountPage extends React.Component {
                                                                                                     <select style={{position: "relative", top: "8px", left: "10px", width: '100%'}} value={this.state.s1.type} onChange={(e) => this.applyUserProp('type' , e.target.value)}    onBlur={(e) => this.setState({typeDirty : true})}
 
                                                                                                     >
-                                                                                                        <option  value="1">Bidder</option>
-                                                                                                        <option  value="2">Expert</option>
+                                                                                                        <option  value=""> Select </option>
+                                                                                                        <option  value="1"> Bidder </option>
+                                                                                                        <option  value="2"> Expert </option>
                                                                                                     </select>
-                                                                                                    {this.state.s1.type == null && this.state.typeDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s1.type == null || this.state.s1.type == '') && this.state.typeDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </div>
                                                                                             </div>
@@ -747,6 +752,23 @@ export default class MyAccountPage extends React.Component {
                                                                                                     {(this.state.s2.invCompanyAddress == null || this.state.s2.invCompanyAddress.length == 0) && this.state.invCompanyAddressDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
+                                                                                            </div>
+
+                                                                                            <div className="form-group form-group-last row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Payment Type</label>
+                                                                                                <div className="">
+                                                                                                    <select style={{position: "relative", top: "8px", left: "10px", width: '100%'}} value={this.state.s2.invPaymentType} onChange={(e) => this.applyUserProp('invPaymentType' , e.target.value, 's2')}    onBlur={(e) => this.setState({invPaymentTypeDirty : true})}
+
+                                                                                                    >
+                                                                                                        <option value=""> Select </option>
+                                                                                                        <option  value="1"> Credit / debit card </option>
+                                                                                                        <option  value="2"> Bank Transfer </option>
+                                                                                                        <option  value="3"> Payment Order </option>
+
+                                                                                                    </select>
+                                                                                                    {(this.state.s2.invPaymentType == null || this.state.s2.invPaymentType == '') && this.state.invPaymentTypeDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                </div>
                                                                                             </div>
 
 
@@ -1400,12 +1422,35 @@ export default class MyAccountPage extends React.Component {
                                                                                 </div>
                                                                                 <div className="kt-wizard-v4__review-item">
                                                                                     <div className="kt-wizard-v4__review-title">
-                                                                                        Detalii de facturare
+                                                                                        Invoice Details (Individual Person)
                                                                                     </div>
                                                                                     <div className="kt-wizard-v4__review-content">
-                                                                                        Cont Bancar: xxxx xxxx xxxx xxxx 1111
-                                                                                        <br/> Banca: Banca Banca
-                                                                                            <br/> Titular de Cont: Ana Banana
+                                                                                        {this.state.s2.invFirstName} {this.state.s2.invLastName}
+                                                                                        <br/> Phone: {this.state.s2.invPhone}
+                                                                                        <br/> Address: {this.state.s2.invAddress}
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="kt-wizard-v4__review-item">
+                                                                                    <div className="kt-wizard-v4__review-title">
+                                                                                        Invoice Details (Company)
+                                                                                    </div>
+                                                                                    <div className="kt-wizard-v4__review-content">
+                                                                                        {this.state.s2.invCompanyName}
+                                                                                        <br/> VAT Code: {this.state.s2.invVat}
+                                                                                        <br/> Registration Number: {this.state.s2.invRegistrationNumber}
+                                                                                        <br/> Bank Name: {this.state.s2.invBankName}
+                                                                                        <br/> Bank Account: {this.state.s2.invBankAccount}
+                                                                                        <br/> Address: {this.state.s2.invCompanyAddress}
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="kt-wizard-v4__review-item">
+                                                                                    <div className="kt-wizard-v4__review-title">
+                                                                                        Payment Type
+                                                                                    </div>
+                                                                                    <div className="kt-wizard-v4__review-content">
+                                                                                        {
+                                                                                            this.state.s2.invPaymentType == 1 ? 'Credit / debit card' : this.state.s2.invPaymentType == 2 ? 'Bank Transfer' : 'Payment Order'
+                                                                                         }
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
