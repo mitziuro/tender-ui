@@ -62,7 +62,7 @@ export default class NoticeSearchPage extends React.Component {
 
         Promise.all([getBusinessFields(), getNuts()]).then(response => {
             this.bfs = response[0].data;
-            this.nuts = response[1].data;
+            this.nuts = response[1].data.sort((a, b) => a.name > b.name ? 1 : -1);
 
             this.bfs.forEach(b => {
                 b.name = b.nameEn;

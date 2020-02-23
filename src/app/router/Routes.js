@@ -21,10 +21,11 @@ import * as routerHelpers from "../router/RouterHelpers";
 export const Routes = withRouter(({ Layout, history }) => {
   const lastLocation = useLastLocation();
   routerHelpers.saveLastLocation(lastLocation);
-  const { isAuthorized, menuConfig, userLastLocation } = useSelector(
+  const { isAuthorized, menuConfig, userLastLocation, hasPhone } = useSelector(
     ({ auth, urls, builder: { menuConfig } }) => ({
       menuConfig,
       isAuthorized: auth.user != null,
+      hasPhone: auth.user != null && auth.user.phone != null,
       userLastLocation: routerHelpers.getLastLocation()
     }),
     shallowEqual
@@ -38,9 +39,11 @@ export const Routes = withRouter(({ Layout, history }) => {
         {!isAuthorized ? (
           /* Render auth page when user at `/auth` and not authorized. */
           <Route path="/auth/login" component={AuthPage} />
-        ) : (
+        ) : !hasPhone ? (
           /* Otherwise redirect to root page (`/`) */
-          <Redirect from="/auth" to={userLastLocation} />
+          <Redirect from="/auth" to="/tender/tender-pages/MyAccountPage" />
+        ) : (
+            <Redirect from="/auth" to={userLastLocation} />
         )}
 
         <Route path="/auth/registration" component={AuthPage} />
