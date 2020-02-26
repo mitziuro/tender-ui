@@ -596,7 +596,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                         onBlur={(e) => this.setState({invCnpDirty : true})}
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invCnp == null || this.state.s2.invCnp.length == 0) && this.state.invLCnpDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invCnp == null || this.state.s2.invCnp.length == 0) && this.state.invCnpDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -616,7 +616,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                         onBlur={(e) => this.setState({invAddressDirty : true})}
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invAddress == null || this.state.s2.invAddress.length == 0) && this.state.invLAddressDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invAddress == null || this.state.s2.invAddress.length == 0) && this.state.invAddressDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
