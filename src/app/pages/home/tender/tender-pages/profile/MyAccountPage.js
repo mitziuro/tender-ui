@@ -110,6 +110,7 @@ export default class MyAccountPage extends React.Component {
         if(props.location.pathname.split('/')[props.location.pathname.split('/').length - 1] == 'MyInvoicePage'){
             this.moveToState('s2');
         } else if(props.location.pathname.split('/')[props.location.pathname.split('/').length - 1] == 'MyMailPage'){
+            this.moveToState('s2');
             this.moveToState('s3');
         } else {
             //s1
