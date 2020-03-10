@@ -18,8 +18,12 @@ export default class Price extends React.Component {
             return '';
         }
 
+
         return numeral(value).format('0.0,0')
-            .replace(',', 'T').replace(',', 'T').replace('.', ',').replace('T', '.').replace('T', '.');
+            .replace(',', 'T').replace(',', 'T')
+                .replace('.', ',').replace('T', '.').replace('T', '.')
+                .replace('.', ',').replace('T', '.').replace('T', '.')
+                .replace('.', ',').replace('T', '.').replace('T', '.');
 
 
     }
