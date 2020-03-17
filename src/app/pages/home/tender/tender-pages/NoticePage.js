@@ -7,7 +7,7 @@ import CodeExample from "../../../../partials/content/CodeExample";
 import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
 import './NoticeSearchPage.css';
 
-import {getNotice, getNoticeContent, getNoticeDocuments, getNoticeDocumentContentURI} from "../../../../crud/tender/search.notice.crud";
+import {getNotice, getNoticeContent, getNoticeDocuments, getNoticeDocumentContentURI, getNoticeDocumentOriginalContentURI} from "../../../../crud/tender/search.notice.crud";
 import {getMyOfferForNotice, putMyOfferForNotice} from "../../../../crud/tender/offer.crud";
 
 
@@ -46,6 +46,7 @@ export default class NoticePage extends React.Component {
 
         this.handleCreateOffer = this.handleCreateOffer.bind(this);
         this.handleGetNoticeDocumentContentURI = this.handleGetNoticeDocumentContentURI.bind(this);
+        this.handleGetNoticeDocumentOriginalContentURI = this.handleGetNoticeDocumentOriginalContentURI.bind(this);
 
 
         Promise.all([getNotice(this.noticeId), getMyOfferForNotice(this.noticeId)]).then(response => {
@@ -76,6 +77,10 @@ export default class NoticePage extends React.Component {
 
     handleGetNoticeDocumentContentURI = (id, filename) => {
         return getNoticeDocumentContentURI(id, filename);
+    }
+
+    handleGetNoticeDocumentOriginalContentURI = (id, filename) => {
+        return getNoticeDocumentOriginalContentURI(id, filename);
     }
 
     handleCreateOffer = () => {
@@ -130,13 +135,20 @@ export default class NoticePage extends React.Component {
 
                                                                             return (
                                                                                 <div style={{float: "left"}}>
-                                                                                    {d.fileName.indexOf('.pdf') >= 0 ? (
-                                                                                        <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
-                                                                                        <i style={{color: "red"}} class="fa fa-file-pdf"> </i>
-                                                                                        <span> {d.fileName} </span>
-                                                                                    </a>) : ( <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
+                                                                                    {d.fileName.toLowerCase().indexOf('.pdf') >= 0 && d.fileName.toLowerCase().indexOf('.p7m') >= 0 ? (
+                                                                                        <a target="_blank" href={this.handleGetNoticeDocumentOriginalContentURI(d.id, d.fileName.replace('.p7m', ''))}>
                                                                                         <i style={{color: "red"}} class="fa fa-file"> </i>
+
+                                                                                            <span> {d.fileName} </span>
+
+                                                                                            <i class="fa fa-download" style={{color: 'red'}} download={d.fileName} href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}> </i>
+
+                                                                                        </a>) : ( <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
+                                                                                        <i style={{color: "red"}} class="fa fa-file-pdf"> </i>
+
                                                                                         <span> {d.fileName} </span>
+
+
                                                                                     </a>)
                                                                                     }
                                                                                 </div>
@@ -166,10 +178,14 @@ export default class NoticePage extends React.Component {
                                                                                     {d.fileName.indexOf('.pdf') >= 0 ? (
                                                                                         <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
                                                                                             <i style={{color: "red"}} class="fa fa-file-pdf"> </i>
+
                                                                                             <span> {d.fileName} </span>
                                                                                         </a>) : ( <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
                                                                                         <i style={{color: "red"}} class="fa fa-file"> </i>
+
                                                                                         <span> {d.fileName} </span>
+
+
                                                                                     </a>)
                                                                                     }
                                                                                 </div>

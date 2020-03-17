@@ -70,3 +70,7 @@ export function getNoticeDocuments(noticeId) {
 export function getNoticeDocumentContentURI(id, filename) {
     return NOTIFICATION_EXTERNAL_DOCUMENTS  + '/notice/content/'  + filename + '?id=' + id;
 }
+
+export function getNoticeDocumentOriginalContentURI(id, filename) {
+    return NOTIFICATION_EXTERNAL_DOCUMENTS  + '/original/notice/content/'  + filename + '?id=' + id;
+}
