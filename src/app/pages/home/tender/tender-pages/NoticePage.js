@@ -135,21 +135,29 @@ export default class NoticePage extends React.Component {
 
                                                                             return (
                                                                                 <div style={{float: "left"}}>
-                                                                                    {d.fileName.toLowerCase().indexOf('.pdf') >= 0 && d.fileName.toLowerCase().indexOf('.p7m') >= 0 ? (
-                                                                                        <a target="_blank" href={this.handleGetNoticeDocumentOriginalContentURI(d.id, d.fileName.replace('.p7m', ''))}>
-                                                                                        <i style={{color: "red"}} class="fa fa-file"> </i>
+                                                                                    {d.fileName.toLowerCase().indexOf('.pdf') >= 0 && (d.fileName.toLowerCase().indexOf('.p7m') >= 0 || d.fileName.toLowerCase().indexOf('.p7s') >= 0) ? (
+                                                                                        <>
+                                                                                            <a target="_blank" href={this.handleGetNoticeDocumentOriginalContentURI(d.id, d.fileName.replace('.p7m', '').replace('.p7s', ''))}>
+                                                                                            <i style={{color: "red"}} class="fa fa-file"> </i>
 
-                                                                                            <span> {d.fileName} </span>
-
-                                                                                            <i class="fa fa-download" style={{color: 'red'}} download={d.fileName} href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}> </i>
-
-                                                                                        </a>) : ( <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
-                                                                                        <i style={{color: "red"}} class="fa fa-file-pdf"> </i>
-
-                                                                                        <span> {d.fileName} </span>
+                                                                                                <span> {d.fileName} </span>
 
 
-                                                                                    </a>)
+                                                                                            </a>
+                                                                                            <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)} download={d.fileName} >
+                                                                                                <i class="fa fa-download" style={{color: 'red', cursor: 'pointer'}}> </i>
+                                                                                            </a>
+                                                                                        </>
+                                                                                        ) : (
+                                                                                        <>
+                                                                                            <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
+                                                                                                <i style={{color: "red"}} class="fa fa-file-pdf"> </i>
+                                                                                                <span> {d.fileName} </span>
+
+                                                                                            </a>
+
+                                                                                        </>
+                                                                                    )
                                                                                     }
                                                                                 </div>
                                                                             )
