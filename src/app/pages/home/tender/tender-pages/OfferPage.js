@@ -6,7 +6,7 @@ import CodeExample from "../../../../partials/content/CodeExample";
 import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
 import './NoticeSearchPage.css';
 
-import {takeOffer, closeOffer, getOffer, declineOffer} from "../../../../crud/tender/offer.crud";
+import {takeOffer, closeOffer, getOffer, declineOffer, uploadTemplate, getTemplateURI} from "../../../../crud/tender/offer.crud";
 
 import {getUserByToken} from "../../../../crud/auth.crud";
 
@@ -17,10 +17,21 @@ import { toAbsoluteUrl } from "../../../../../_metronic";
 import Price from "../utilities/price";
 import DateFormat from "../utilities/date.format";
 
+import DocumentLink from "../utilities/document.link";
+
+import Dropzone from 'react-dropzone';
+import FileIcon, { defaultStyles } from 'react-file-icon';
+
 import './OfferPage.css';
 
-
 import {
+
+Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+
     Checkbox,
     FormControlLabel,
     TextField,
@@ -42,11 +53,19 @@ export default class OfferPage extends React.Component {
     constructor(props) {
         super(props);
 
-
         this.state = {
-            offer: {id: null, notice: {id: null}, tender: {id: null}},
+            offer: {id: null, notice: {id: null}, tender: {id: null}, clarificationDeadline : null, contestationDeadline: null},
             declineOpen: false, declineReason: null, user:{},
-            content: [], contentSelected: {}, contentEditOpen: false
+            content: [], contentSelected: {}, contentEditOpen: false,
+
+            chapters: [
+                {name: 'Section 1',  chapters: [
+                    {name: 'Section 2.1',  chapters: [{name: 'Section 2.1',  chapters: []}]}
+                ]},
+
+                {name: 'Section 2',  chapters: [{name: 'Section 1.2',  chapters: [
+                {name: 'Section 2.1',  chapters: []}]}]}
+            ]
         }
 
         ;
@@ -54,6 +73,11 @@ export default class OfferPage extends React.Component {
 
         this.handleTakeOffer = this.handleTakeOffer.bind(this);
         this.handleCloseOffer = this.handleCloseOffer.bind(this);
+        this.uuidv4 = this.uuidv4.bind(this);
+        this.applyUuid = this.applyUuid.bind(this);
+        this.deleteUuid = this.deleteUuid.bind(this);
+        this.addUuid = this.addUuid.bind(this);
+        this.editUuid = this.editUuid.bind(this);
 
         Promise.all([getOffer(this.offerId), getUserByToken()]).then(response => {
             this.setState({offer: response[0].data, user: response[1].data});
@@ -62,9 +86,58 @@ export default class OfferPage extends React.Component {
         this.handleCloseDecline= this.handleCloseDecline.bind(this);
 
 
-        this.handleContentAddSection = this.handleContentAddSection.bind(this);
+        this.applyUuid(this.state.chapters);
 
 
+    }
+
+    deleteUuid = (uuid: string, chapters) => {
+
+        let ch = chapters.filter(c => c.id == uuid);
+        if(ch.length > 0) {
+            return chapters.filter(c => c.id != uuid);
+        }  else {
+            chapters.forEach(c => c.chapters = this.deleteUuid(uuid, c.chapters));
+            return chapters
+        }
+
+    }
+
+    addUuid = (uuid: string, chapters) => {
+
+        if(uuid == null) {
+            chapters.push({name: 'New Section', chapters: [], id: this.uuidv4()});
+            return chapters;
+        }
+
+        let ch = chapters.filter(c => c.id == uuid);
+        if(ch.length > 0) {
+            ch[0].chapters.push({name: 'New Chapter', chapters: [], id: this.uuidv4()});
+            return chapters;
+        }  else {
+            chapters.forEach(c => c.chapters = this.addUuid(uuid, c.chapters));
+            return chapters;
+        }
+
+    }
+
+    editUuid = (uuid: string) => {
+        this.setState({selectedEditUuid: uuid});
+    }
+
+
+    applyUuid = (chapters) => {
+        chapters.forEach(c => {
+            c.id = this.uuidv4();
+            this.applyUuid(c.chapters);
+        });
+    }
+
+    uuidv4 = () => {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
     }
 
     handleTakeOffer = () => {
@@ -94,7 +167,6 @@ export default class OfferPage extends React.Component {
             <>
             {this.state.offer.id != null ? this._render_big(this.state.offer) : (<></>)}
             {
-               // this._render_offer_content()
             }
             <div className="row">
                 <div className="col-md-12" style={{display: 'flex'}}>
@@ -173,165 +245,104 @@ export default class OfferPage extends React.Component {
         )
     }
 
-    handleContentAddSection = () => {
-        this.state.content.push({chapters: [{}]});
-        this.setState({content: this.state.content});
-    }
-
-
-    _render_table_structure_component() {
-        return (
-
-            <>
-            <div className="row contentTable">
-                <div className="col-md-12" style={{display: 'flex'}}>
-                    <Button onClick={this.handleContentAddSection} style={{marginLeft: "10px"}} color="primary"
-                            type="button">
-                        Add Section
-                    </Button>
-                </div>
-                <div className="col-md-12" style={{display: 'flex'}}>
-                    <table>
-                        <tr>
-
-                            <th>Section</th>
-                            <th>Chapter</th>
-                            <th>Description</th>
-                            <th>Files</th>
-                        </tr>
-                        { this.state.content.map((section, index1) => {
-                            return (<>
-                            {section.chapters.map((chapter, index2) => {
-                                return (
-                                    <tr>
-                                        { index2 == 0 ? (<td rowSpan={section.chapters.length}>
-                                            <div className="col-md-12" style={{display: "flex"}}>
-                                                <div className="col-md-10" style={{}}>
-                                                    {section.name}
-                                                </div>
-                                                <div className="col-md-2" style={{}}>
-                                                    { index1 != 0 ?( <i className="fa fa-arrow-up"
-                                                       onClick={() => { var index = this.state.content.indexOf(section); this.state.content[index] = this.state.content[index-1];  this.state.content[index-1] = section;  this.setState({content: this.state.content});}}></i>
-                                                        ) :(<></>)
-                                                    }
-                                                    <i className="fa fa-edit"
-                                                       onClick={() => {this.setState({contentSelected: section, contentEditOpen : true}); }}></i>
-                                                    <i className="fa fa-trash"
-                                                       onClick={() => this.setState({content: this.state.content.filter(s => s != section)})}></i>
-
-                                                </div>
-                                            </div>
-                                        </td>) : (<></>)
-                                        }
-
-                                        <td>
-                                            <div className="col-md-12" style={{display: "flex"}}>
-                                                <div className="col-md-10" style={{}}>
-                                                    {chapter.name}
-                                                </div>
-                                                <div className="col-md-2" style={{}}>
-                                                    { index2 != 0 ?( <i className="fa fa-arrow-up"
-                                                                        onClick={() => { var index = section.chapters.indexOf(chapter); section.chapters[index] = section.chapters[index-1];  section.chapters[index-1] = chapter;  this.setState({content: this.state.content});}}></i>
-                                                    ) :(<></>)
-                                                    }
-                                                    <i className="fa fa-edit"
-                                                       onClick={() => {this.setState({contentSelected: chapter, contentEditOpen : true}); }}></i>
-                                                    { section.chapters.length > 1 ? (<i className="fa fa-trash"
-                                                                                        onClick={() => {section.chapters = section.chapters.filter(c => c != chapter); this.setState({content: this.state.content});}}></i>) :
-                                                        (<></>) }
-                                                    {index2 == section.chapters.length - 1 ? (<i className="fa fa-plus"
-                                                                                                 onClick={() => {section.chapters.push({}); this.setState({content: this.state.content});}}></i>) : (<></>)
-                                                    }
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-
-                                        </td>
-                                        <td>
-
-                                        </td>
-
-                                    </tr>
-                                )
-                            })}
-                            </>)
-                        })
-                        }
-                    </table>
-                </div>
-            </div>
-            { this.state.content == null || this.state.content.length == 0 ?
-                <div className="noResults col-md-12" style={{display: 'flex'}}>
-                    There are no results
-                </div> : <></>}
-            <Dialog
-                open={this.state.contentEditOpen}
-                onClose={() => this.setState({contentSelected: {}, contentEditOpen: false})}
-                aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Alert</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Modify the name of the entry
-                    </DialogContentText>
-                    <TextField
-                        color="red"
-                        autoFocus
-                        margin="dense"
-                        id="name"
-                        value={this.state.contentSelected.name}
-                        onChange={(e) => {this.state.contentSelected.name = e.target.value; this.setState({contentSelected: this.state.contentSelected});}}
-                        label="Name"
-                        type="text"
-                        fullWidth
-                    />
-
-                </DialogContent>
-                <DialogActions>
-
-                    <Button style={{background: 'green'}}
-                            onClick={() => {this.setState({contentSelected: {}, contentEditOpen: false});}}
-                            color="primary">
-                        <i className="fa fa-save"> </i> Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            </>
-        )
-    }
-
-    _render_offer_content() {
-        return (
-
-            <>
-            <div className="row">
-                <div className="col-md-12" style={{display: 'flex'}}>
-                    <div className="offerResult">
-                        <CodeExample beforeCodeTitle="Content">
-                            <div className="kt-section">
-                                <div className="col-md-12">
-                                    <div className="kt-section__content">
-                                        {this._render_table_structure_component(this.state.offer.content)}
-                                    </div>
-                                    <div className="kt-section__content" style={{textAlign: 'center'}}>
-
-                                        <Button style={{marginLeft: "10px"}} color="primary" type="button">Save Structure</Button>
-                                        <Button style={{marginLeft: "10px"}} color="primary" type="button">Cancel</Button>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </CodeExample>
-                    </div>
-                </div>
-            </div>
-            </>
-        )
-    }
-
     _render_big(offer) {
         return (
             <>
+            <div className="row">
+                 <div className="col-md-12">
+                    <div className="kt-portlet kt-portlet--height-fluid">
+                        <div className="kt-portlet__body kt-portlet__body--fit">
+                            <div className="kt-widget kt-widget--project-1">
+                                <div className="kt-widget__head">
+                                    <div className="kt-widget__label">
+                                        <div className="kt-widget__media">
+                                             <TableRow key={offer.notice.id}>
+                                                <TableCell component="th" scope="row">
+                                                    {offer.notice.number} <br/>
+                                                    <DateFormat value={offer.notice.publicationDate} />
+                                                </TableCell>
+                                                <TableCell align="left" >
+
+                                                    <b style={{fontSize:"15px"}}>
+                                                         <Link
+                                                            to={`/tender/tender-pages/NoticePage?id=${offer.notice.id}`}>
+                                                            {offer.notice.name}
+
+                                                        </Link>
+                                                        <DocumentLink noName={true} name={offer.notice.name} noticeId={offer.notice.noticeId} type={offer.notice.type.toString()} />
+
+                                                    </b>
+
+                                                    <div className="row" style={{position: "relative", top:"10px"}}>
+                                                        <div className="col-md-3">
+
+                                                            <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Procedure State:</span>
+                                                            <strong className="ng-binding ng-scope">In progress</strong>
+                                                            <br/>
+
+                                                            <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Type of procurement:</span> <strong className="ng-binding">{offer.notice.online ? 'ONLINE' : 'OFFLINE'}</strong>
+                                                            <br/>
+
+                                                            <i sicap-icon="ContractDate" className="fa fa-calendar"></i> Receipt deadline:
+                                                            <strong className="ng-binding ng-scope"> <DateFormat value={offer.notice.deadline} /> </strong>
+
+                                                            <div className="ng-scope">
+                                                                <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Location: <strong className="ng-binding">{offer.notice.nuts.name ? offer.notice.nuts.name : '-'}</strong>
+                                                            </div>
+
+                                                        </div>
+                                                        <div className="col-md-3">
+
+                                                            <i sicap-icon="ProcedureState" className="fa fa-cogs"></i> <span>Procedure State:</span>
+                                                            <strong className="ng-binding ng-scope">In progress</strong>
+                                                            <br/>
+
+                                                        </div>
+                                                        <div>
+                                                            <i sicap-icon="ContractType" className="fa fa-balance-scale"></i>Contract Assigment Type: <strong className="ng-binding">{offer.notice.awardingManner ? offer.notice.awardingManner.nameEn : ''}</strong><br/>
+
+                                                            <i sicap-icon="CPVCode" className="fa fa-sitemap"></i> CPV: <strong className="ng-binding">{offer.notice.cpv ? offer.notice.cpv.nameEn : '-'}</strong><br/>
+
+                                                            <div className="ng-scope">
+                                                                <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Contracting authority: <strong className="ng-binding">{offer.notice.contractingAuthority ? offer.notice.contractingAuthority.name : '-'}</strong>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </TableCell>
+                                                <TableCell align="left" >
+
+                                                        <div className="col-md-3">
+                                                            <div>
+                                                                 <TextField className="date" label="Clarification Deadline" type="date"
+                                                                            value={this.state.offer.clarificationDeadline}
+                                                                            onChange={(e) => {this.state.offer.clarificationDeadline = e.target.value; this.setState({offer: offer})}}
+                                                                            InputLabelProps={{shrink: true}}/>
+                                                            </div>
+
+                                                            <div>
+                                                                 <TextField className="date" label="Contestation Deadline" type="date"
+                                                                            value={this.state.offer.contestationDeadline}
+                                                                            onChange={(e) => {this.state.offer.contestationDeadline = e.target.value; this.setState({offer: offer})}}
+                                                                            InputLabelProps={{shrink: true}}/>
+                                                            </div>
+                                                        </div>
+
+                                                </TableCell>
+                                                <TableCell component="th" scope="row" style={{fontSize: "15px", fontStyle: "italic"}}>
+                                                    <Price value={offer.notice.estimatedValue} /> RON
+                                                </TableCell>
+                                            </TableRow>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div className="col-md-12">
                 <div className="kt-portlet kt-portlet--height-fluid">
                     <div className="kt-portlet__body kt-portlet__body--fit">
@@ -339,101 +350,174 @@ export default class OfferPage extends React.Component {
                             <div className="kt-widget__head">
                                 <div className="kt-widget__label">
                                     <div className="kt-widget__media">
-                                <span className="kt-media kt-media--lg kt-media--circle">
-                                    <img src={toAbsoluteUrl("/media/logos/tender_logo.png")} alt="image"/>
 
-                                </span>
-                                    </div>
-                                    <div className="kt-widget__info kt-margin-t-5">
-                                        <a className="kt-widget__title">
-                                            {offer.notice.contractingAuthority ? offer.notice.contractingAuthority.name : ''}
-                                        </a>
-                                <span className="kt-widget__desc">
-                                    {offer.notice.name ? offer.notice.name : ''}
-                                </span>
+                                        {
+                                            this.state.chapters.map((chapter, index) => {
+                                               return (
+                                                  <div style={{marginTop: '40px'}}>
+                                                     {
+                                                        this.state.selectedEditUuid  == null || this.state.selectedEditUuid != chapter.id ?
+                                                        (<h1 style={{float: "left"}} >{chapter.name}</h1>) :
+                                                        <div style={{float: "left"}}>
+                                                            <TextField label="Name"
+                                                                  value={chapter.name}
+                                                                  onChange={(e) => { chapter.name = e.target.value; this.setState({});}}
+                                                                  onBlur={(e) => {  this.editUuid(null); this.setState({});}}
+                                                                  margin="normal"/>
+                                                        </div>
+
+                                                     }
+                                                     <div style={{float: "left", fontSize:'24px'}}>
+                                                        <i style={{cursor: 'pointer',marginLeft: '10px', color: "blue"}} class="fa fa-edit" onClick={() => {this.editUuid(chapter.id); this.setState({});}}></i>
+                                                        <i style={{cursor: 'pointer',marginLeft: '10px', color: "red"}} class="fa fa-trash" onClick={() => this.setState({chapters: this.deleteUuid(chapter.id, this.state.chapters)})}></i>
+                                                        <i style={{cursor: 'pointer',marginLeft: '10px',color: "green"}} class="fa fa-plus" onClick={() => this.setState({chapters: this.addUuid(chapter.id, this.state.chapters)})}></i>
+                                                     </div>
+                                                     <br/><br/><br/>
+
+                                                       {
+                                                           chapter.chapters.map((ch, index) => {
+                                                                return (
+                                                                    <div style={{marginLeft: '20px'}} >
+                                                                         {
+                                                                            this.state.selectedEditUuid  == null || this.state.selectedEditUuid != ch.id ?
+                                                                            (<h3 style={{float: "left"}} >{ch.name}</h3>) :
+                                                                             <div style={{float: "left"}}>
+                                                                                <TextField label="Name"
+                                                                                  value={ch.name}
+                                                                                  onChange={(e) => { ch.name = e.target.value; this.setState({});}}
+                                                                                  onBlur={(e) => {  this.editUuid(null); this.setState({});}}
+                                                                                  margin="normal"/>
+                                                                             </div>
+
+                                                                         }
+                                                                        <div style={{float: "left", fontSize:'16px', position:'relative', top: '19px'}}>
+                                                                            <i style={{cursor: 'pointer', marginLeft: '10px', color: "blue"}} class="fa fa-edit" onClick={() => {this.editUuid(ch.id); this.setState({});}}></i>
+                                                                            <i style={{cursor: 'pointer',marginLeft: '10px', color: "red"}} class="fa fa-trash" onClick={() => this.setState({chapters: this.deleteUuid(ch.id, this.state.chapters)})}></i>
+                                                                            <i style={{cursor: 'pointer',marginLeft: '10px',color: "green"}} class="fa fa-plus" onClick={() => this.setState({chapters: this.addUuid(ch.id, this.state.chapters)})}></i>
+                                                                         </div>
+                                                                         <br/><br/><br/>
+
+                                                                            <div style={{marginLeft: '40px'}}>
+                                                                                <Table >
+                                                                                    <TableHead>
+                                                                                        <TableRow>
+                                                                                            <TableCell>
+                                                                                               Subchapter
+                                                                                            </TableCell>
+                                                                                            <TableCell align="left">
+                                                                                                Template File
+                                                                                            </TableCell>
+                                                                                            <TableCell align="left">
+                                                                                                Uploaded File
+                                                                                            </TableCell>
+                                                                                            <TableCell align="left">
+                                                                                                Expert Type
+                                                                                            </TableCell>
+                                                                                            <TableCell align="left">
+                                                                                                Expert Name
+                                                                                            </TableCell>
+                                                                                            <TableCell align="left">
+                                                                                                Status
+                                                                                            </TableCell>
+                                                                                        </TableRow>
+                                                                                    </TableHead>
+                                                                                        {
+                                                                                            ch.chapters.map((c, index) => {
+                                                                                        return (
+
+
+
+                                                                                                    <TableRow>
+                                                                                                        <TableCell component="th" scope="row">
+                                                                                                           {
+                                                                                                               this.state.selectedEditUuid  == null || this.state.selectedEditUuid != c.id ?
+                                                                                                               (<span style={{float: "left"}} >{c.name}</span>) :
+                                                                                                                <div style={{float: "left"}}>
+                                                                                                                   <TextField label="Name"
+                                                                                                                     value={c.name}
+                                                                                                                     onChange={(e) => { c.name = e.target.value; this.setState({});}}
+                                                                                                                     onBlur={(e) => {  this.editUuid(null); this.setState({});}}
+                                                                                                                     margin="normal"/>
+                                                                                                                </div>
+
+                                                                                                            }
+                                                                                                        </TableCell>
+                                                                                                        <TableCell align="left" >
+                                                                                                            <Dropzone onDrop={acceptedFiles => {
+
+                                                                                                                        acceptedFiles.forEach(f => {
+                                                                                                                            var formData = new FormData();
+                                                                                                                            formData.append("file", f);
+                                                                                                                            Promise.all([uploadTemplate(formData)]).then(response => {
+                                                                                                                                if(c.files == null) {
+                                                                                                                                    c.files = [];
+                                                                                                                                }
+                                                                                                                                c.files.push({fileId: response[0].data, fileName: f.name});
+                                                                                                                                this.setState({});
+                                                                                                                            });
+                                                                                                                        });
+
+
+                                                                                                                  }}>
+                                                                                                              {({getRootProps, getInputProps}) => (
+                                                                                                                <section>
+                                                                                                                  <div {...getRootProps()}>
+                                                                                                                    <input {...getInputProps()} />
+                                                                                                                    <p style={{color: 'gray'}}><i>Drag 'n' drop some files here, or click to select files</i></p>
+                                                                                                                  </div>
+                                                                                                                  {
+                                                                                                                    c.files != null ?
+                                                                                                                    c.files.map((f, index) => {
+                                                                                                                        return (
+                                                                                                                        <>
+                                                                                                                            <a target="_blank" href={getTemplateURI(f.fileId, f.fileName)}>
+                                                                                                                                <FileIcon size="25" extension={f.fileName.split('.')[f.fileName.split('.').length-1]} {...defaultStyles.docx} /> {f.fileName}
+                                                                                                                            </a>
+                                                                                                                            <i onClick={() => {c.files = c.files.filter(e => e.fileId != f.fileId); this.setState({});}} class="fa fa-trash" style={{color:'red', cursor: 'pointer', marginLeft: '5px'}}></i>
+                                                                                                                        </>
+                                                                                                                        );
+                                                                                                                    }) : <></>
+
+                                                                                                                  }
+
+                                                                                                                </section>
+                                                                                                              )}
+                                                                                                            </Dropzone>
+                                                                                                        </TableCell>
+                                                                                                        <TableCell align="left" ></TableCell>
+                                                                                                        <TableCell align="left" ></TableCell>
+                                                                                                        <TableCell align="left" ></TableCell>
+                                                                                                        <TableCell align="left" ></TableCell>
+
+                                                                                                        <TableCell>
+                                                                                                            <div style={{float: "left", fontSize:'14px', position:'relative'}}>
+                                                                                                                <i style={{cursor: 'pointer', marginLeft: '10px', color: "blue"}} class="fa fa-edit" onClick={() => {this.editUuid(c.id); this.setState({});}}></i>
+                                                                                                                <i style={{cursor: 'pointer',marginLeft: '10px', color: "red"}} class="fa fa-trash" onClick={() => this.setState({chapters: this.deleteUuid(c.id, this.state.chapters)})}></i>
+                                                                                                             </div>
+                                                                                                        </TableCell>
+                                                                                                     </TableRow>
+
+
+                                                                                        )})
+
+                                                                                    }
+                                                                                </Table>
+                                                                          </div>
+                                                                    </div>
+                                                                    )
+                                                            })
+                                                        }
+                                                  </div>
+                                               )
+                                            })
+                                        }
+
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="kt-widget__body">
-                                <div className="kt-widget__stats">
-                                    <div className="kt-widget__item">
-                                <span className="kt-widget__date">
-                                    Notice Date
-                                </span>
-                                        <div className="kt-widget__label">
-                                        <span
-                                            className="btn btn-label-brand btn-sm btn-bold btn-upper">
-                                            <DateFormat value={offer.notice.publicationDate} />
-                                        </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="kt-widget__item">
-                                <span className="kt-widget__date">
-                                    Start Date
-                                </span>
-                                        <div className="kt-widget__label">
-                                        <span
-                                            className="btn btn-label-danger btn-sm btn-bold btn-upper">{offer.startDate ? <DateFormat value={offer.startDate} /> : ''}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="kt-widget__item flex-fill">
-                                        <span className="kt-widget__subtitel">Status</span>
-                                        <div className="kt-widget__progress d-flex  align-items-center">
-
-                                    <span className="kt-widget__stat">
-                                        {offer.state == 1 ? (<><span class="badge badge-success">Started</span>
-                                        </>) : (<></>)}
-                                        {offer.state == 2 ? (<><span class="badge badge-warning">In Supervision</span>
-                                        </>) : (<></>)}
-                                        {offer.state == 3 ? (<><span
-                                            class="badge badge-success">Supervision Ended</span></>) : (<></>)}
-                                        {offer.state == 10 ? (<><span
-                                            class="badge badge-danger">Declined</span></>) : (<></>)}
-
-                                    </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                        <span className="kt-widget__text">
-                            <i> {offer.state == 10 ? (<><span
-                                style={{color: "red"}}>Offer Declined: {offer.declineReason}</span></>) : (<></>)} </i>
-                        </span>
-
-                                <div className="kt-widget__content" style={{justifyContent: "space-between"}}>
-                                    <div className="kt-widget__details">
-                                        <span className="kt-widget__subtitle">Budget</span>
-                                        <span
-                                            className="kt-widget__value"> <span>RON</span> <Price value={offer.notice.estimatedValue} /> </span>
-                                    </div>
-
-
-                                    <div className="kt-widget__details">
-                                        <span className="kt-widget__subtitle">Team</span>
-                                        <div className="kt-media-group" style={{margin: "1px"}}>
-                                            <i sicap-icon="ProcedureState" className="fa fa-cogs"></i>
-                                            <span>Tender:</span> &nbsp;&nbsp;&nbsp; {offer.tender.firstName} {offer.tender.lastName}
-                                        </div>
-                                        <div className="kt-media-group" style={{margin: "1px"}}>
-                                            <i sicap-icon="ProcedureState" className="fa fa-cogs"></i>
-                                            <span>Supervisor:</span> {offer.supervisor ? (<> &nbsp;&nbsp;&nbsp; {offer.supervisor.firstName} {offer.supervisor.lastName} </>) : ''}
-                                        </div>
-                                        <div className="kt-media-group" style={{margin: "1px"}}>
-                                            <i sicap-icon="ProcedureState" className="fa fa-cogs"></i>
-                                            <span>Expert:</span> {offer.expert ? (<> &nbsp;&nbsp;&nbsp; {offer.expert.firstName} {offer.expert.lastName} </>) : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
+                         </div>
                     </div>
-                </div>
-
+                 </div>
             </div>
 
             </>

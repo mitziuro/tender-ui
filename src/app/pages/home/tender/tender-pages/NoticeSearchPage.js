@@ -12,6 +12,8 @@ import {searchCpvs, searchContractingAuthorities} from "../../../../crud/tender/
 
 import  NoticeListingComponent from '../components/NoticeListingComponent';
 
+import addNotification from "../../../../widgets/NotificationWidget";
+
 import {
     Checkbox,
     FormControlLabel,
@@ -157,8 +159,6 @@ export default class NoticeSearchPage extends React.Component {
         this.handleSave = this.handleSave.bind(this);
         this.applySearchState = this.applySearchState.bind(this);
 
-        this.handleOpenSaveAlert = this.handleOpenSaveAlert.bind(this);
-        this.handleCloseSaveAlert = this.handleCloseSaveAlert.bind(this);
         this.handleSaveAlert = this.handleSaveAlert.bind(this);
 
         this.getSearchObject = this.getSearchObject.bind(this);
@@ -373,11 +373,6 @@ export default class NoticeSearchPage extends React.Component {
     }
 
 
-
-    handleOpenSaveAlert = () => {
-        this.setState({alertOpen: true});
-    }
-
     getSearchObject = () => {
         let objCopy = Object.assign({}, this.state);
         delete objCopy.alertOpen;
@@ -422,15 +417,13 @@ export default class NoticeSearchPage extends React.Component {
 
         saveAlert(value).then(response => {
             this.setState({id: response.data.id});
+            addNotification("Alert saved", "The alert has been saved", 'success');
+        }).catch(() => {
+          addNotification("Error", "The alert could not be saved", 'danger');
         });
 
         this.setState({showErrors: false});
-        this.handleCloseSaveAlert();
 
-    }
-
-    handleCloseSaveAlert = () => {
-        this.setState({alertOpen: false, showErrors: false});
     }
 
 
@@ -441,7 +434,13 @@ export default class NoticeSearchPage extends React.Component {
     }
 
     handleSave = () => {
-        this.handleOpenSaveAlert();
+        if(this.state.alertName == null || this.state.alertName.length == 0) {
+            this.setState({alertNameDirty: true});
+            return;
+        }
+
+        this.setState({alertNameDirty: false});
+        this.handleSaveAlert();
     }
 
     applySearchState = (s) => {
@@ -453,12 +452,18 @@ export default class NoticeSearchPage extends React.Component {
         this.setState({});
     }
 
+    handleKeyPress = (event) => {
+      if(event.key === 'Enter'){
+        this.handleSearch();
+      }
+    }
+
     render() {
 
 
         return (
             <>
-            <div className="row">
+            <div className="row" onKeyPress={this.handleKeyPress}>
                 <div className="col-md-12" className="noticeSearch">
                     <CodeExample beforeCodeTitle="Notice Search">
                         <div className="kt-section">
@@ -610,12 +615,24 @@ export default class NoticeSearchPage extends React.Component {
                                             </Downshift>
                                         </div>
 
-                                        {!this.isAlert ? <div className="col-md-6">
-                                            <TextField label="Notice Number"
-                                                       value={this.state.number}
-                                                       onChange={(e) => this.applySearchState({number: e.target.value})}
-                                                       margin="normal"/>
-                                        </div> : <></> }
+                                        {!this.isAlert ?
+                                            <div className="col-md-6">
+                                                <TextField label="Notice Number"
+                                                           value={this.state.number}
+                                                           onChange={(e) => this.applySearchState({number: e.target.value})}
+                                                           margin="normal"/>
+                                            </div>
+                                            :
+                                            <>
+                                                <div className="col-md-6" style={{position:"relative", top:"50px"}}>
+                                                    <TextField label="Alert Name"
+                                                               value={this.state.alertName}
+                                                               onChange={(e) => this.applySearchState({alertName: e.target.value})}
+                                                               margin="normal"/>
+                                                    {this.state.alertNameDirty ? <p style={{left: '0'}} className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                </div>
+                                            </>
+                                        }
                                     </div>
 
 
@@ -789,40 +806,6 @@ export default class NoticeSearchPage extends React.Component {
                 </div>
             </div>
 
-            <Dialog
-                open={this.state.alertOpen}
-                onClose={this.handleCloseSaveAlert}
-                aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Alert</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Save the search as an alert in order to receive an emai with the latest notices.
-                    </DialogContentText>
-                    <TextField
-                        color="red"
-                        autoFocus
-                        margin="dense"
-                        id="name"
-                        value={this.state.alertName}
-                        onChange={(e) => this.applySearchState({alertName: e.target.value})}
-                        label="Name"
-                        type="text"
-                        fullWidth
-                    />
-                    <p style={{fontSize: "10px", position: 'absolute', left: '22px', float: 'left', display : this.state.showErrors == true && (this.state.alertName == null || this.state.alertName.length === 0) ? 'block' : 'none', color: 'red'}}>
-                        The name must not be null
-                    </p>
-                </DialogContent>
-                <DialogActions>
-
-                    <Button onClick={this.handleCloseSaveAlert} color="primary">
-                        Cancel
-                    </Button>
-                    <Button style={{background: 'green'}} onClick={this.handleSaveAlert} color="primary">
-                        <i className="fa fa-save"> </i> Save
-                    </Button>
-                </DialogActions>
-            </Dialog>
             </>
         );
     }

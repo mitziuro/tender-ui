@@ -27,6 +27,8 @@ import { getUser, saveUser } from '../../../../../crud/tender/user.details.crud'
 
 import './wizard.css';
 
+import $ from 'jquery';
+import 'jquery-ui-bundle';
 
 import {
     Checkbox,
@@ -205,6 +207,8 @@ export default class MyAccountPage extends React.Component {
 
         if(this.state.active == 's3') {
             this.setState({active: 's4'});
+            console.log($('#country'));
+            $('#country_inline').html($('#country option:selected').text());
         }
 
         return 's1';
@@ -404,7 +408,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                                     />
-                                                                                                    {(this.state.s1.firstName == null || this.state.s1.firstName.length == 0) && this.state.firstNameDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s1.firstName == null || this.state.s1.firstName.length == 0) && this.state.firstNameDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -423,7 +427,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                         onBlur={(e) => this.setState({lastNameDirty : true})}
 
                                                                                                     />
-                                                                                                    {(this.state.s1.lastName == null || this.state.s1.lastName.length == 0) && this.state.lastNameDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s1.lastName == null || this.state.s1.lastName.length == 0) && this.state.lastNameDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -442,7 +446,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                         onBlur={(e) => this.setState({companyDirty : true})}
 
                                                                                                     />
-                                                                                                    {(this.state.s1.company == null || this.state.s1.company.length == 0) && this.state.companDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s1.company == null || this.state.s1.company.length == 0) && this.state.companyDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -461,7 +465,7 @@ export default class MyAccountPage extends React.Component {
 
                                                                                                         />
                                                                                                     </InputGroup>
-                                                                                                    {(this.state.s1.phone == null || this.state.s1.phone.length == 0) && this.state.phoneDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s1.phone == null || this.state.s1.phone.length == 0) && this.state.phoneDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
                                                                                                 </div>
                                                                                             </div>
 
@@ -481,7 +485,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                             onBlur={(e) => this.setState({emailDirty : true})}
 
                                                                                                         />
-                                                                                                        {(this.state.s1.email == null || this.state.s1.email.length == 0) && this.state.emailDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                        {(this.state.s1.email == null || this.state.s1.email.length == 0) && this.state.emailDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                     </InputGroup>
                                                                                                 </div>
@@ -497,7 +501,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                         <option  value="1"> Bidder </option>
                                                                                                         <option  value="2"> Expert </option>
                                                                                                     </select>
-                                                                                                    {(this.state.s1.type == null || this.state.s1.type == '') && this.state.typeDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s1.type == null || this.state.s1.type == '') && this.state.typeDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </div>
                                                                                             </div>
@@ -538,7 +542,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invFirstName == null || this.state.s2.invFirstName.length == 0) && this.state.invFirstNameDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invFirstName == null || this.state.s2.invFirstName.length == 0) && this.state.invFirstNameDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -557,7 +561,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                         onBlur={(e) => this.setState({invLastNameDirty : true})}
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invLastName == null || this.state.s2.invLastName.length == 0) && this.state.invLastNameDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invLastName == null || this.state.s2.invLastName.length == 0) && this.state.invLastNameDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -577,7 +581,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                         onBlur={(e) => this.setState({invPhoneDirty : true})}
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invPhone == null || this.state.s2.invPhone.length == 0) && this.state.invPhoneDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invPhone == null || this.state.s2.invPhone.length == 0) && this.state.invPhoneDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -597,7 +601,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                         onBlur={(e) => this.setState({invCnpDirty : true})}
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invCnp == null || this.state.s2.invCnp.length == 0) && this.state.invCnpDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invCnp == null || this.state.s2.invCnp.length == 0) && this.state.invCnpDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -617,7 +621,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                         onBlur={(e) => this.setState({invAddressDirty : true})}
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invAddress == null || this.state.s2.invAddress.length == 0) && this.state.invAddressDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invAddress == null || this.state.s2.invAddress.length == 0) && this.state.invAddressDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -644,7 +648,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invCompanyName == null || this.state.s2.invCompanyName.length == 0) && this.state.invCompanyNameDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invCompanyName == null || this.state.s2.invCompanyName.length == 0) && this.state.invCompanyNameDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -666,7 +670,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invVat == null || this.state.s2.invVat.length == 0) && this.state.invVatDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invVat == null || this.state.s2.invVat.length == 0) && this.state.invVatDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -687,7 +691,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invRegistrationNumber == null || this.state.s2.invRegistrationNumber.length == 0) && this.state.invRegistrationNumberDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invRegistrationNumber == null || this.state.s2.invRegistrationNumber.length == 0) && this.state.invRegistrationNumberDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -708,7 +712,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invBankName == null || this.state.s2.invBankName.length == 0) && this.state.invBankNameDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invBankName == null || this.state.s2.invBankName.length == 0) && this.state.invBankNameDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -729,7 +733,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invBankAccount == null || this.state.s2.invBankAccount.length == 0) && this.state.invBankAccountDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invBankAccount == null || this.state.s2.invBankAccount.length == 0) && this.state.invBankAccountDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -750,7 +754,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                                     />
-                                                                                                    {(this.state.s2.invCompanyAddress == null || this.state.s2.invCompanyAddress.length == 0) && this.state.invCompanyAddressDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invCompanyAddress == null || this.state.s2.invCompanyAddress.length == 0) && this.state.invCompanyAddressDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </InputGroup>
                                                                                             </div>
@@ -767,7 +771,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                         <option  value="3"> Payment Order </option>
 
                                                                                                     </select>
-                                                                                                    {(this.state.s2.invPaymentType == null || this.state.s2.invPaymentType == '') && this.state.invPaymentTypeDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                    {(this.state.s2.invPaymentType == null || this.state.s2.invPaymentType == '') && this.state.invPaymentTypeDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </div>
                                                                                             </div>
@@ -1042,7 +1046,7 @@ export default class MyAccountPage extends React.Component {
                                                                                             <option value="ZM">Zambia</option>
                                                                                             <option value="ZW">Zimbabwe</option>
                                                                                         </select>
-                                                                                            {(this.state.s3.country == null || this.state.s3.country == '') && this.state.countryDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                            {(this.state.s3.country == null || this.state.s3.country == '') && this.state.countryDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                         </div>
                                                                                     </div>
@@ -1067,7 +1071,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                         />
-                                                                                        {(this.state.s3.county == null || this.state.s3.county.length == 0) && this.state.countyDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                        {(this.state.s3.county == null || this.state.s3.county.length == 0) && this.state.countyDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                     </InputGroup>
                                                                                 </div>
@@ -1088,7 +1092,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                         />
-                                                                                        {(this.state.s3.city == null || this.state.s3.city.length == 0) && this.state.cityDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                        {(this.state.s3.city == null || this.state.s3.city.length == 0) && this.state.cityDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                     </InputGroup>
                                                                                 </div>
@@ -1109,7 +1113,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                         />
-                                                                                        {(this.state.s3.address == null || this.state.s3.address.length == 0) && this.state.addressDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                        {(this.state.s3.address == null || this.state.s3.address.length == 0) && this.state.addressDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                     </InputGroup>
                                                                                 </div>
@@ -1130,7 +1134,7 @@ export default class MyAccountPage extends React.Component {
 
 
                                                                                         />
-                                                                                        {(this.state.s3.postalCode == null || this.state.s3.postalCode.length == 0) && this.state.postalCodeDirty ? <p class="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                        {(this.state.s3.postalCode == null || this.state.s3.postalCode.length == 0) && this.state.postalCodeDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                     </InputGroup>
                                                                                 </div>
@@ -1164,8 +1168,9 @@ export default class MyAccountPage extends React.Component {
                                                                                     </div>
                                                                                     <div className="kt-wizard-v4__review-content">
                                                                                         {this.state.s3.address}
-                                                                                        <br/> {this.state.s3.county}, {this.state.s3.city},
-                                                                                        <select style={{position: "relative"}}  name="country" disabled="disabled"
+                                                                                        <br/> {this.state.s3.county}, {this.state.s3.city}, &nbsp;
+                                                                                        <span id="country_inline"></span>
+                                                                                        <select style={{position: "relative", display:'none'}} id="country" name="country" disabled="disabled"
                                                                                                 value={this.state.s3.country}>
                                                                                             <option value="">Select</option>
                                                                                             <option value="AF">Afghanistan</option>

@@ -137,7 +137,7 @@ export default class NoticePage extends React.Component {
                                                                                 <div style={{float: "left"}}>
                                                                                     {d.fileName.toLowerCase().indexOf('.pdf') >= 0 && (d.fileName.toLowerCase().indexOf('.p7m') >= 0 || d.fileName.toLowerCase().indexOf('.p7s') >= 0) ? (
                                                                                         <>
-                                                                                            <a target="_blank" href={this.handleGetNoticeDocumentOriginalContentURI(d.id, d.fileName.replace('.p7m', '').replace('.p7s', ''))}>
+                                                                                            <a target="_blank" style={{marginLeft: '5px'}} href={this.handleGetNoticeDocumentOriginalContentURI(d.id, d.fileName.replace('.p7m', '').replace('.p7s', ''))}>
                                                                                             <i style={{color: "red"}} class="fa fa-file"> </i>
 
                                                                                                 <span> {d.fileName} </span>

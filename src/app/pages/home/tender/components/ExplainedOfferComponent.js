@@ -47,7 +47,7 @@ export default class ExplainedOfferComponent extends React.Component {
     }
 
     handleApplyData = (data) => {
-        this.setState({cans: data});;
+        this.setState({cans: data});
     }
 
 
