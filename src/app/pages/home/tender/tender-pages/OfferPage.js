@@ -6,7 +6,7 @@ import CodeExample from "../../../../partials/content/CodeExample";
 import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
 import './NoticeSearchPage.css';
 
-import {takeOffer, closeOffer, getOffer, saveOffer, declineOffer, uploadTemplate, getTemplateURI, getStructuresSupervisor} from "../../../../crud/tender/offer.crud";
+import {takeOffer, getChaptersForOffer, closeOffer, getOffer, saveOffer, declineOffer, uploadTemplate, getTemplateURI, getStructuresSupervisor} from "../../../../crud/tender/offer.crud";
 
 import {getUserByToken} from "../../../../crud/auth.crud";
 import {expertsInternal} from "../../../../crud/tender/user.details.crud";
@@ -21,6 +21,7 @@ import Price from "../utilities/price";
 import DateFormat from "../utilities/date.format";
 
 import UserDisplay from "../utilities/user.display";
+import PercentageDisplay from "../utilities/percentage.display";
 
 import DocumentLink from "../utilities/document.link";
 
@@ -62,7 +63,7 @@ export default class OfferPage extends React.Component {
             offer: {id: null, notice: {id: null}, tender: {id: null}, clarificationDeadline : null, contestationDeadline: null},
             declineOpen: false, declineReason: null, user:{}, structures: [],
             content: [], contentSelected: {}, contentEditOpen: false, internalExperts : [],
-            chapters: []
+            chapters: [], chaptersData: {}
         }
 
         ;
@@ -92,6 +93,7 @@ export default class OfferPage extends React.Component {
             this.setState({offer: response[0].data, user: response[1].data, chapters: this.state.chapters});
             this.getStructures();
             this.getExpertsInternal();
+            this.getChaptersData();
 
         });
 
@@ -129,6 +131,19 @@ export default class OfferPage extends React.Component {
             this.setState({structures: response[0].data});
         });
 
+    }
+
+    getChaptersData = () => {
+
+        if(this.state.offer.state < 5) {
+            return;
+        }
+
+        this.state.chaptersData = {};
+        Promise.all([getChaptersForOffer(this.state.offer.id)]).then(response => {
+             response[0].data.forEach(c => this.state.chaptersData[c.uuid] = c);
+             this.setState({chaptersData : this.state.chaptersData});
+        })
     }
 
     getExpertsInternal = () => {
@@ -242,7 +257,9 @@ export default class OfferPage extends React.Component {
 
 
     render() {
- console.log(this.state.user);
+     console.log(this.state.offer);
+
+ console.log(this.state.chaptersData);
 
         return (
             <>
@@ -823,7 +840,10 @@ export default class OfferPage extends React.Component {
                                                                                                                 </div>
                                                                                                             }
                                                                                                         </TableCell>
-                                                                                                        <TableCell align="left" ></TableCell>
+                                                                                                        <TableCell align="left" >
+                                                                                                            { this.state.chaptersData[c.id] ? <PercentageDisplay value={this.state.chaptersData[c.id].percentage} /> : ''}
+
+                                                                                                        </TableCell>
 
                                                                                                         {
                                                                                                             this.state.offer.state == 2 && this.state.offer.supervisor.id == this.state.user.id ?

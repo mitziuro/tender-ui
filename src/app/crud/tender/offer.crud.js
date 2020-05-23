@@ -4,6 +4,7 @@ import { SERVER_URL } from './search.notice.crud';
 
 export const OFFER_URL = SERVER_URL + "/api/offers";
 export const STRUCTURE_URL = SERVER_URL + "/api/chapter-structures";
+export const CHAPTERS_URL = SERVER_URL + "/api/chapters";
 
 export function getOffer(id) {
     return axios.get(OFFER_URL + '/' + id);
@@ -51,4 +52,8 @@ export function getTemplateURI(fileId, fileName) {
 
 export function getStructuresSupervisor(e) {
     return axios.get(STRUCTURE_URL);
+}
+
+export function getChaptersForOffer(id) {
+    return axios.get(CHAPTERS_URL + '/offer/' + id);
 }

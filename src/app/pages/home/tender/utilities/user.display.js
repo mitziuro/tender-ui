@@ -34,7 +34,7 @@ export default class UserDisplay extends React.Component {
                             <img style={{height: '30px'}} alt="Pic" src={this.state.img} />
                         </div>
 
-                        <div>
+                        <div style={{marginLeft: '5px'}}>
                             <div> {this.state.user.firstName}  {this.state.user.lastName} </div>
                             <div>
                                 <a href={ 'mailto:' + this.state.user.login}>
