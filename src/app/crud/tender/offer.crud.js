@@ -3,6 +3,7 @@ import axios from "axios";
 import { SERVER_URL } from './search.notice.crud';
 
 export const OFFER_URL = SERVER_URL + "/api/offers";
+export const STRUCTURE_URL = SERVER_URL + "/api/chapter-structures";
 
 export function getOffer(id) {
     return axios.get(OFFER_URL + '/' + id);
@@ -14,6 +15,10 @@ export function getMyOfferForNotice(noticeId) {
 
 export function putMyOfferForNotice(noticeId) {
     return axios.put(OFFER_URL + '/me/' + noticeId);
+}
+
+export function saveOffer(id, offer, state) {
+    return axios.post(OFFER_URL + '/me/save/' + id + (state != null ? '?state=' + state : ''), offer);
 }
 
 export function takeOffer(id) {
@@ -42,4 +47,8 @@ export function uploadTemplate(file) {
 
 export function getTemplateURI(fileId, fileName) {
     return OFFER_URL  + '/documents/templates/' + fileId + '/' + fileName;
+}
+
+export function getStructuresSupervisor(e) {
+    return axios.get(STRUCTURE_URL);
 }

@@ -68,10 +68,6 @@ export default class NoticePage extends React.Component {
                 this.setState({documents: response[0].data});
             });
 
-
-
-
-
         });
     }
 
