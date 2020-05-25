@@ -55,7 +55,8 @@ export default class MessagesListingComponent extends React.Component {
         this.state = {messages: [], offer: this.props.offer, message: {message: ''}};
 
         Promise.all([getMessages(this.state.offer)]).then(response => {
-            this.setState({messages: response[0].data});
+            let mess = response[0].data.sort((m1,m2) => { return new Date(m1.date).getTime() - new Date(m2.date).getTime();});
+            this.setState({messages: mess});
         });
 
     }
@@ -71,8 +72,8 @@ export default class MessagesListingComponent extends React.Component {
          Promise.all([saveMessage(this.state.message)]).then(rq => {
              addNotification("Success", "The message has been saved", 'success');
              Promise.all([getMessages(this.state.offer)]).then(response => {
-                        let mess = response[0].data.sort((m1,m2) => m1.data > m2.date);
-                        this.setState({messages: response[0].data, message: {message: ''}});
+                let mess = response[0].data.sort((m1,m2) => { return new Date(m1.date).getTime() - new Date(m2.date).getTime();});
+                this.setState({messages: mess, message: {message: ''}});
               });
          });
     }
