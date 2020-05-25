@@ -38,3 +38,19 @@
 .offer_header .MuiTableCell-root {
     border-bottom: 0px;
 }
+
+.tab {
+    background: lightgray;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-left: 20px;
+    border-radius: 10px 10px 0px 0px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    cursor: pointer;
+}
+
+.tabs {
+    position: relative;
+    left: -10px;
+}

@@ -6,13 +6,15 @@ import CodeExample from "../../../../partials/content/CodeExample";
 import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
 import './NoticeSearchPage.css';
 
-import {takeOffer, getChaptersForOffer, closeOffer, getOffer, saveOffer, declineOffer, uploadTemplate, getTemplateURI, getStructuresSupervisor} from "../../../../crud/tender/offer.crud";
+import {takeOffer, getChaptersContent, saveChapters, saveChaptersContent, getChaptersForOffer, closeOffer, getOffer, saveOffer, declineOffer, uploadTemplate, getTemplateURI, getStructuresSupervisor} from "../../../../crud/tender/offer.crud";
 
 import {getUserByToken} from "../../../../crud/auth.crud";
 import {expertsInternal} from "../../../../crud/tender/user.details.crud";
 
 import  AlertListingComponent from '../components/AlertListingComponent';
 import  NoticeListingComponent from '../components/NoticeListingComponent';
+import  MessagesListingComponent from '../components/MessagesListingComponent';
+import  UserActivityComponent from '../components/UserActivityComponent';
 
 import addNotification from "../../../../widgets/NotificationWidget";
 
@@ -21,7 +23,9 @@ import Price from "../utilities/price";
 import DateFormat from "../utilities/date.format";
 
 import UserDisplay from "../utilities/user.display";
-import PercentageDisplay from "../utilities/percentage.display";
+
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 import DocumentLink from "../utilities/document.link";
 
@@ -29,6 +33,9 @@ import Dropzone from 'react-dropzone';
 import FileIcon, { defaultStyles } from 'react-file-icon';
 
 import './OfferPage.css';
+
+import CKEditor from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 import {
 
@@ -63,10 +70,12 @@ export default class OfferPage extends React.Component {
             offer: {id: null, notice: {id: null}, tender: {id: null}, clarificationDeadline : null, contestationDeadline: null},
             declineOpen: false, declineReason: null, user:{}, structures: [],
             content: [], contentSelected: {}, contentEditOpen: false, internalExperts : [],
-            chapters: [], chaptersData: {}
-        }
+            chapters: [], chaptersData: {}, selectedSection : null, selectedContent: null,
 
-        ;
+            activeTab: 1
+        };
+
+        this.messagesComponent = null;
         this.offerId = this.props.location.search != null && this.props.location.search.split('id=').length == 2 ? this.props.location.search.split('id=')[1] : null;
 
         this.handleTakeOffer = this.handleTakeOffer.bind(this);
@@ -198,6 +207,22 @@ export default class OfferPage extends React.Component {
         });
     }
 
+    handleSelect = (c) => {
+
+        if(this.state.offer.state < 5) {
+            return;
+        }
+
+        this.setState({selectedContent: {uuid: c.id, content: ''}});
+
+        Promise.all([getChaptersContent(c.id)]).then(response => {
+            this.setState({selectedContent: response[0].data});
+        });
+
+        this.setState({selectedSection: c});
+
+    }
+
     uuidv4 = () => {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -230,6 +255,16 @@ export default class OfferPage extends React.Component {
         });
     }
 
+    handleSaveProgress = () => {
+         Promise.all([
+            saveChapters(this.state.chaptersData[this.state.selectedContent.uuid]),
+            saveChaptersContent(this.state.selectedContent)]).then(response => {
+                  addNotification("Success", "The offer progress has been saved", 'success');
+                  this.setState({});
+            });
+
+    }
+
     handleCloseOffer = () => {
         Promise.all([closeOffer(this.offerId)]).then(response => {
             this.setState({offer: response[0].data});
@@ -253,6 +288,20 @@ export default class OfferPage extends React.Component {
 
         let days =  new Date(date).getDate() - new Date().getDate();
         return days > 0 ? days : 0;
+    }
+
+    filterChapters = () => {
+
+        if(this.state.offer.tender.id == this.state.user.id) {
+             return this.state.chapters;
+        }
+
+        if(this.state.offer.supervisor && this.state.offer.supervisor.id == this.state.user.id) {
+             return this.state.chapters;
+        }
+
+        //TODO
+        return this.state.chapters;
     }
 
 
@@ -287,6 +336,26 @@ export default class OfferPage extends React.Component {
                                                 disabled={this.state.chapters == null || this.state.chapters.length == []}
                                             >
                                                 Save Offer
+                                            </Button>
+                                            : <span></span>
+                                        }
+
+                                        { this.state.offer.state == 5 && this.state.selectedSection && this.state.selectedSection.assignee == this.state.user.id ?
+
+                                            <Button style={{marginLeft: "10px"}}  onClick={() => this.handleSaveProgress()} color="primary"
+
+                                            >
+                                                Save Progress
+                                            </Button>
+                                            : <span></span>
+                                        }
+
+                                        { this.state.offer.state == 5 && this.state.offer.tender.id == this.state.user.id ?
+
+                                            <Button style={{marginLeft: "10px"}}  onClick={() => this.handleSaveOffer(11)} color="primary"
+                                                disabled={Object.keys(this.state.chaptersData).filter(k => this.state.chaptersData[k].percentage < 100).length > 0}
+                                            >
+                                               Close Offer
                                             </Button>
                                             : <span></span>
                                         }
@@ -327,7 +396,7 @@ export default class OfferPage extends React.Component {
                                                 Notice</Button>
                                         </Link>
 
-                                        {this.state.offer.state != -1 && this.state.offer.tender.id == this.state.user.id ?
+                                        {this.state.offer.state < 10  && this.state.offer.tender.id == this.state.user.id ?
                                             <Button style={{marginLeft: "10px", background: "red", border: "1px solid red"}} onClick={() => this.setState({declineOpen: true})} color="red">
                                                 Decline
                                             </Button>
@@ -528,7 +597,16 @@ export default class OfferPage extends React.Component {
                                                             <i sicap-icon="ContractingAuthority" className="fa fa-user"></i>
                                                             &nbsp; Tender &nbsp;
                                                         </span>
-                                                        <UserDisplay id={this.state.offer.tender.id} />
+                                                        <div style={{display: 'flex'}}>
+                                                            <div>
+                                                                <UserDisplay id={this.state.offer.tender.id} />
+                                                            </div>
+                                                            <div>
+                                                                 <a href="#post">
+                                                                    <i class="fa fa-envelope" onClick={() => {this.messagesComponent.setTo(this.state.offer.tender.id); this.setState({activeTab : 5}); }}></i>
+                                                                 </a>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
@@ -539,7 +617,17 @@ export default class OfferPage extends React.Component {
                                                                     <i sicap-icon="ContractingAuthority" className="fa fa-user"></i>
                                                                     &nbsp; Supervisor &nbsp;
                                                                 </span>
-                                                                <UserDisplay id={this.state.offer.supervisor.id} />
+                                                                 <div style={{display: 'flex'}}>
+                                                                    <div>
+                                                                        <UserDisplay id={this.state.offer.supervisor.id} />
+                                                                    </div>
+                                                                    <div>
+                                                                         <a href="#post">
+                                                                            <i class="fa fa-envelope" onClick={() => {this.messagesComponent.setTo(this.state.offer.supervisor.id); this.setState({activeTab : 5}); }}></i>
+                                                                         </a>
+                                                                    </div>
+                                                                </div>
+
                                                             </div> :
                                                             <span></span>
                                                     }
@@ -554,7 +642,77 @@ export default class OfferPage extends React.Component {
                 </div>
             </div>
 
-            { this.state.offer.state > 1 ?
+            <div className="tabs" style={{display: 'flex'}}>
+                <div onClick={() => this.setState({activeTab: 2})} style={{background: this.state.activeTab == 2 ? 'white' : ''}} className="tab">Partnerships</div>
+                <div onClick={() => this.setState({activeTab: 3})} style={{background: this.state.activeTab == 3 ? 'white' : ''}} className="tab">External attributions</div>
+                <div onClick={() => this.setState({activeTab: 1})} style={{background: this.state.activeTab == 1 ? 'white' : ''}} className="tab">Offer Content</div>
+                <div onClick={() => this.setState({activeTab: 4})} style={{background: this.state.activeTab == 4 ? 'white' : ''}} className="tab">Alerts</div>
+                <div onClick={() => this.setState({activeTab: 5})} style={{background: this.state.activeTab == 5 ? 'white' : ''}} className="tab">Messages</div>
+            </div>
+
+
+            { (this.state.offer.state <= 1 && this.state.activeTab == 1) ||
+                    (this.state.activeTab != 1 && this.state.activeTab != 5 && this.state.activeTab != 4) ?
+                <div className="col-md-12">
+                    <div className="kt-portlet kt-portlet--height-fluid">
+                        <div className="kt-portlet__body kt-portlet__body--fit">
+                            <div className="kt-widget kt-widget--project-1">
+                                <div className="kt-widget__head">
+                                    <div className="kt-widget__label" style={{width: '100%'}}>
+                                        <div className="kt-widget__media" style={{width: '100%'}}>
+                                            <div style={{textAlign: 'center', position: 'relative', top: '22px'}}><i>No Results</i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                : <span></span>
+            }
+
+
+            <div className="col-md-12" style={{display: this.state.activeTab == 5 ? '' : 'none'}}>
+                <div className="kt-portlet kt-portlet--height-fluid">
+                    <div className="kt-portlet__body kt-portlet__body--fit">
+                        <div className="kt-widget kt-widget--project-1">
+                            <div className="kt-widget__head">
+                                <div className="kt-widget__label" style={{width: '100%'}}>
+                                    <div className="kt-widget__media" style={{width: '100%'}}>
+                                        <MessagesListingComponent onRef={ref => {this.messagesComponent = ref;}} offer={this.state.offer.id}/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+              { (this.state.activeTab == 4) ?
+                                 <div className="col-md-12">
+                                     <div className="kt-portlet kt-portlet--height-fluid">
+                                         <div className="kt-portlet__body kt-portlet__body--fit">
+                                             <div className="kt-widget kt-widget--project-1">
+                                                 <div className="kt-widget__head">
+                                                     <div className="kt-widget__label" style={{width: '100%'}}>
+                                                         <div className="kt-widget__media" style={{width: '100%'}}>
+                                                             <UserActivityComponent offer={this.state.offer.id}/>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 : <span></span>
+                  }
+
+            { this.state.offer.state > 1  && this.state.activeTab == 1 ?
 
             <div className="col-md-12">
                 <div className="kt-portlet kt-portlet--height-fluid">
@@ -601,7 +759,7 @@ export default class OfferPage extends React.Component {
                                         }
 
                                         {
-                                            this.state.chapters.map((chapter, index) => {
+                                            this.filterChapters().map((chapter, index) => {
                                                return (
                                                   <div style={{marginTop: '40px'}}>
                                                      {
@@ -694,7 +852,7 @@ export default class OfferPage extends React.Component {
                                                                                             ch.chapters.map((c, index) => {
                                                                                         return (
 
-                                                                                                    <TableRow>
+                                                                                                    <TableRow key={c.id} onClick={() => this.handleSelect(c)} style={{background: this.state.selectedSection && this.state.selectedSection.id == c.id ? 'lightgray' : ''}}>
                                                                                                         <TableCell component="th" scope="row">
                                                                                                            {
 
@@ -835,13 +993,28 @@ export default class OfferPage extends React.Component {
                                                                                                                    </div>
                                                                                                                : <div>
                                                                                                                 {
-                                                                                                                   c.assignee ? <UserDisplay id={c.assignee}/> : ''
+                                                                                                                   c.assignee ?
+
+                                                                                                                     <div style={{display: 'flex'}}>
+                                                                                                                        <div>
+                                                                                                                            <UserDisplay id={c.assignee} />
+                                                                                                                        </div>
+                                                                                                                        <div>
+                                                                                                                             <a href="#post">
+                                                                                                                                <i class="fa fa-envelope" onClick={() => {this.messagesComponent.setTo(c.assignee); this.setState({activeTab : 5}); }}></i>
+                                                                                                                             </a>
+                                                                                                                        </div>
+                                                                                                                    </div>
+
+
+
+                                                                                                                    : ''
                                                                                                                 }
                                                                                                                 </div>
                                                                                                             }
                                                                                                         </TableCell>
                                                                                                         <TableCell align="left" >
-                                                                                                            { this.state.chaptersData[c.id] ? <PercentageDisplay value={this.state.chaptersData[c.id].percentage} /> : ''}
+                                                                                                            { this.state.chaptersData[c.id] != null ? <div style={{height: '31px', width: '37px'}}> <CircularProgressbar styles={buildStyles({textSize: '32px'})} value={this.state.chaptersData[c.id].percentage} text={this.state.chaptersData[c.id].percentage + '%'} /> </div>   : ''}
 
                                                                                                         </TableCell>
 
@@ -895,6 +1068,91 @@ export default class OfferPage extends React.Component {
                                                               }
                                                     </div>
                                             : <div></div>
+                                        }
+
+                                        {
+                                            this.state.selectedSection ?
+                                                this.state.offer.state == 5 && this.state.selectedSection.assignee == this.state.user.id ?
+
+                                                <div>
+                                                    <div className="Editor">
+
+                                                        <div style={{display: 'flex'}}>
+                                                            <h2>{this.state.selectedSection.name}</h2>
+
+                                                            <div>
+                                                                <span style={{position: 'relative', top: '20px', left: '10px'}}> Progress &nbsp; </span>
+                                                                <Select style={{width: '80px', position: 'relative', top: '20px', left: '10px'}}
+                                                                                    value={this.state.chaptersData[this.state.selectedContent.uuid].percentage}
+                                                                                    onChange={(e) => {
+                                                                                       this.state.chaptersData[this.state.selectedContent.uuid].percentage = e.target.value;
+                                                                                       this.setState({chaptersData: this.state.chaptersData});
+                                                                                    }}
+                                                                                    inputProps={{
+                                                                name: "progress",
+                                                                id: "progress"
+                                                                }}
+                                                                >
+
+                                                                   {
+                                                                        Array.from(Array(11).keys()).map(e => (
+                                                                            <MenuItem value={e*10}>{e*10}</MenuItem>
+                                                                            )
+                                                                        )
+
+                                                                    }
+                                                                </Select>
+
+                                                                <span style={{position: 'relative', top: '20px', left: '10px'}}> &nbsp; % </span>
+                                                             </div>
+                                                         </div>
+
+                                                        <CKEditor
+                                                            editor={ ClassicEditor }
+                                                            data={this.state.selectedContent.content}
+                                                            onInit={ editor => {
+                                                                // You can store the "editor" and use when it is needed.
+                                                                console.log( 'Editor is ready to use!', editor );
+                                                            } }
+                                                            onChange={ ( event, editor ) => {
+                                                                const data = editor.getData();
+                                                                this.state.selectedContent.content = data;
+                                                                console.log( { event, editor, data } );
+                                                            } }
+                                                            onBlur={ ( event, editor ) => {
+                                                                console.log( 'Blur.', editor );
+                                                            } }
+                                                            onFocus={ ( event, editor ) => {
+                                                                console.log( 'Focus.', editor );
+                                                            } }
+                                                        />
+                                                    </div>
+                                                </div> :
+                                                <div>
+                                                    <div className="Editor">
+                                                    <h2>{this.state.selectedSection.name}</h2>
+                                                    <CKEditor disabled="true"
+                                                        editor={ ClassicEditor }
+                                                        data={this.state.selectedContent.content}
+                                                        onInit={ editor => {
+                                                            // You can store the "editor" and use when it is needed.
+                                                            console.log( 'Editor is ready to use!', editor );
+                                                        } }
+                                                        onChange={ ( event, editor ) => {
+                                                            const data = editor.getData();
+                                                            console.log( { event, editor, data } );
+                                                        } }
+                                                        onBlur={ ( event, editor ) => {
+                                                            console.log( 'Blur.', editor );
+                                                        } }
+                                                        onFocus={ ( event, editor ) => {
+                                                            console.log( 'Focus.', editor );
+                                                        } }
+                                                    />
+                                                  </div>
+                                                 </div>
+
+                                             : <span></span>
                                         }
 
                                     </div>
