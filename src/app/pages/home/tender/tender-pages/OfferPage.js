@@ -6,7 +6,7 @@ import CodeExample from "../../../../partials/content/CodeExample";
 import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
 import './NoticeSearchPage.css';
 
-import {takeOffer, getChaptersContent, saveChapters, saveChaptersContent, getChaptersForOffer, closeOffer, getOffer, saveOffer, declineOffer, uploadTemplate, getTemplateURI, getStructuresSupervisor} from "../../../../crud/tender/offer.crud";
+import {takeOffer, getChaptersContent, saveChapters, getSectionURI, saveChaptersContent, getChaptersForOffer, closeOffer, getOffer, saveOffer, declineOffer, uploadTemplate, getTemplateURI, getStructuresSupervisor} from "../../../../crud/tender/offer.crud";
 
 import {getUserByToken} from "../../../../crud/auth.crud";
 import {expertsInternal} from "../../../../crud/tender/user.details.crud";
@@ -396,6 +396,17 @@ export default class OfferPage extends React.Component {
                                                 Notice</Button>
                                         </Link>
 
+                                        {
+                                            this.state.offer.state >= 5 ?
+
+
+                                            <a style={{position: 'relative', left: '6px'}} target="_blank" href={getSectionURI(this.state.offer.id)}>
+                                                <FileIcon size="30" extension={'pdf'} {...defaultStyles.docx} />
+                                            </a>
+                                            :
+                                            <span></span>
+                                         }
+
                                         {this.state.offer.state < 10  && this.state.offer.tender.id == this.state.user.id ?
                                             <Button style={{marginLeft: "10px", background: "red", border: "1px solid red"}} onClick={() => this.setState({declineOpen: true})} color="red">
                                                 Decline
@@ -774,6 +785,16 @@ export default class OfferPage extends React.Component {
                                                                       margin="normal"/>
                                                             </div>
 
+                                                     }
+                                                     {
+                                                        this.state.offer.state >= 5 ?
+
+
+                                                        <a style={{position: 'relative', left: '6px', top: '6px'}} target="_blank" href={getSectionURI(this.state.offer.id, chapter.id)}>
+                                                            <FileIcon size="25" extension={'pdf'} {...defaultStyles.docx} />
+                                                        </a>
+                                                        :
+                                                        <span></span>
                                                      }
                                                      {
                                                         this.state.offer.state == 2 && this.state.offer.supervisor.id == this.state.user.id ?

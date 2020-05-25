@@ -52,6 +52,10 @@ export function getTemplateURI(fileId, fileName) {
     return OFFER_URL  + '/documents/templates/' + fileId + '/' + fileName;
 }
 
+export function getSectionURI(id, section) {
+    return OFFER_URL  + '/content/' + id +  ( section != null ? '?section=' + section : '');
+}
+
 export function getStructuresSupervisor(e) {
     return axios.get(STRUCTURE_URL);
 }
