@@ -197,6 +197,59 @@ export default {
         icon: "flaticon2-architecture-and-city",
         page: "tender/tender-pages/SupervisorDashboardPage",
       },
+
+       {section: "Expert",
+              role: "ROLE_EXECUTOR"
+        },
+        {
+          title: "Dashboard",
+          root: true,
+          role: "ROLE_EXECUTOR",
+          bullet: "dot",
+          translate: "MENU.DASHBOARD",
+          icon: "flaticon2-architecture-and-city",
+          page: "tender/tender-pages/ExpertDashboardPage",
+        },
+      {
+        title: "Account Settings",
+        root: true,
+        bullet: "dot",
+        role: "ROLE_EXECUTOR",
+        translate: "MENU.PROFILE",
+        icon: "flaticon2-architecture-and-city",
+        submenu: [
+          {
+            title: "My Account",
+            bullet: "dot",
+            icon: "flaticon2-expand",
+            page: "builder",
+            translate: "MENU.MY_ACCOUNT",
+            submenu: [
+              {
+                title: "Personal Info",
+                icon: "flaticon2-expand",
+                page: "builder",
+                translate: "MENU.MY_PAGE",
+                page: "tender/tender-pages/MyAccountPage"
+              },
+              {
+                title: "My Account",
+                icon: "flaticon2-expand",
+                page: "builder",
+                translate: "MENU.INVOICE",
+                page: "tender/tender-pages/MyInvoicePage"
+              },
+              {
+                title: "Change Password",
+                icon: "flaticon2-expand",
+                page: "builder",
+                translate: "MENU.MAIL",
+                page: "tender/tender-pages/MyMailPage"
+              }
+            ]
+          },
+      ]},
+
       { section: "Admin",
         role: "ROLE_ADMIN"
       },

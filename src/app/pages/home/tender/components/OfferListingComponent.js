@@ -25,7 +25,7 @@ import {
 } from "@material-ui/core";
 
 
-import {getOffersForTender, getOffersForSupervisor} from "../../../../crud/tender/offer.crud";
+import {getOffersForTender, getOffersForSupervisor, getOffersForExpert} from "../../../../crud/tender/offer.crud";
 
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -49,7 +49,13 @@ export default class OfferListingComponent extends React.Component {
     }
 
     getOffers = (user, states) => {
-        Promise.all([this.state.user == 'supervisor' ? getOffersForSupervisor(this.state.states, this.state.page, this.state.size) : getOffersForTender(this.state.states, this.state.page, this.state.size)]).then(response => {
+        let _promise =
+            this.state.user == 'supervisor' ?
+            getOffersForSupervisor(this.state.states, this.state.page, this.state.size) :
+            this.state.user == 'expert' ?
+              getOffersForExpert(this.state.states, this.state.page, this.state.size)
+            : getOffersForTender(this.state.states, this.state.page, this.state.size);
+        Promise.all([_promise]).then(response => {
             this.setState({offers: response[0].data, total: response[0].headers['x-total-count']});
         });
     }
@@ -119,8 +125,12 @@ export default class OfferListingComponent extends React.Component {
                                     <span className="kt-widget__stat">
                                         {offer.state == 1 ? (<><span class="badge badge-success">Started</span></>) : (<></>)}
                                         {offer.state == 2 ? (<><span class="badge badge-warning">In Supervision</span></>) : (<></>)}
-                                        {offer.state == 3 ? (<><span class="badge badge-success">Supervision Ended</span></>) : (<></>)}
+                                        {offer.state == 3 ? (<><span class="badge badge-success">Supervision Ended (Back to Tender)</span></>) : (<></>)}
+                                        {offer.state == 4 ? (<><span class="badge badge-success">External Experts Auction</span></>) : (<></>)}
+                                        {offer.state == 5 ? (<><span class="badge badge-success">Experts Working</span></>) : (<></>)}
+
                                         {offer.state == 10 ? (<><span class="badge badge-danger">Declined</span></>) : (<></>)}
+                                        {offer.state == 11 ? (<><span class="badge badge-danger">Completed</span></>) : (<></>)}
                                     </span>
                                                     </div>
                                                 </div>
@@ -232,8 +242,13 @@ export default class OfferListingComponent extends React.Component {
                                                         <i sicap-icon="ContractingAuthority" className="fa fa-briefcase"></i> Status: &nbsp;
                                                         {offer.state == 1 ? (<><span class="badge badge-success">Started</span></>) : (<></>)}
                                                         {offer.state == 2 ? (<><span class="badge badge-warning">In Supervision</span></>) : (<></>)}
-                                                        {offer.state == 3 ? (<><span class="badge badge-success">Supervision Ended</span></>) : (<></>)}
+                                                        {offer.state == 3 ? (<><span class="badge badge-success">Supervision Ended (Back to Tender)</span></>) : (<></>)}
+                                                        {offer.state == 4 ? (<><span class="badge badge-success">External Experts Auction</span></>) : (<></>)}
+                                                        {offer.state == 5 ? (<><span class="badge badge-success">Experts Working</span></>) : (<></>)}
+
                                                         {offer.state == 10 ? (<><span class="badge badge-danger">Declined</span></>) : (<></>)}
+                                                        {offer.state == 11 ? (<><span class="badge badge-danger">Completed</span></>) : (<></>)}
+
                                                     </div>
 
                                                 </div>

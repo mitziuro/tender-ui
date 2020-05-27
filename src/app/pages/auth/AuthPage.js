@@ -9,6 +9,7 @@ import { toAbsoluteUrl } from "../../../_metronic";
 import "../../../_metronic/_assets/sass/pages/login/login-1.scss";
 
 export default function AuthPage() {
+
   return (
     <>
       {/* https://github.com/nfl/react-helmet */}
@@ -50,7 +51,12 @@ export default function AuthPage() {
                 </Link>
               </div>
               <div className="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
-                <div className="kt-grid__item kt-grid__item--middle">
+                <div id="expert_type" className="kt-grid__item kt-grid__item--middle" style={{display: 'none'}}>
+                    <a onClick={() => {document.getElementById('normal_logo').style.display = ''}}>
+                        <h1 className="kt-login__title">Are you an Expert ? </h1>
+                    </a>
+                </div>
+                <div id="normal_logo" className="kt-grid__item kt-grid__item--middle">
                   <h3 className="kt-login__title">Welcome to tEnDeR!</h3>
                   <h4 className="kt-login__subtitle">
                     The ultimate SEAP extension.

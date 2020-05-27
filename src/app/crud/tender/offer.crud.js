@@ -44,6 +44,10 @@ export function getOffersForSupervisor(states, page, size) {
     return axios.get(OFFER_URL  + '/me/supervisor/'  + states.join(',') + '?page=' + page + '&size=' + size);
 }
 
+export function getOffersForExpert(states, page, size) {
+    return axios.get(OFFER_URL  + '/me/expert/'  + states.join(',') + '?page=' + page + '&size=' + size);
+}
+
 export function uploadTemplate(file) {
     return axios.post(OFFER_URL  + '/documents/templates', file, {headers: {'Content-Type': 'multipart/form-data'}});
 }

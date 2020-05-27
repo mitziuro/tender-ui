@@ -26,7 +26,8 @@ function Registration(props) {
             lastName: "",
             password: "",
             acceptTerms: true,
-            confirmPassword: ""
+            confirmPassword: "",
+            type: -1
           }}
           validate={values => {
             const errors = {};
@@ -85,7 +86,8 @@ function Registration(props) {
               values.email,
               values.firstname,
               values.lastname,
-              values.password
+              values.password,
+              values.type
             )
               .then(({ data: { accessToken } }) => {
                 //props.register(accessToken);
@@ -193,30 +195,63 @@ function Registration(props) {
               </div>
 
               <div className="form-group mb-0">
-                <FormControlLabel
-                  label={
-                    <>
-                      I agree the{" "}
-                      <Link
-                        to="/terms"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Terms & Conditions
-                      </Link>
-                    </>
-                  }
-                  control={
-                    <Checkbox
-                      color="primary"
-                      name="acceptTerms"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      checked={values.acceptTerms}
-                    />
-                  }
-                />
-              </div>
+                  <FormControlLabel
+                    label={
+                      <>
+                        I want to be a Tender
+                      </>
+                    }
+                    control={
+                      <Checkbox
+                        color="primary"
+                        name="type__1"
+                        onBlur={handleBlur}
+                        onClick={() => {values.type = -1; handleBlur()}}
+                        checked={values.type == -1}
+                      />
+                    }
+                  />
+                </div>
+
+              <div className="form-group mb-0">
+                                <FormControlLabel
+                                  label={
+                                    <>
+                                      I want to be a Technical Expert
+                                    </>
+                                  }
+                                  control={
+                                    <Checkbox
+                                      color="primary"
+                                      name="type_1"
+                                      onBlur={handleBlur}
+                                      onClick={() => {values.type = 1; handleBlur()}}
+                                      checked={values.type == 1}
+                                    />
+                                  }
+                                />
+                              </div>
+
+               <div className="form-group mb-0">
+                  <FormControlLabel
+                    label={
+                      <>
+                        I want to be a Public Acquisitions Expert
+                      </>
+                    }
+                    control={
+                      <Checkbox
+                        color="primary"
+                        name="type_2"
+                        onBlur={handleBlur}
+                        onClick={() => {values.type = 2; handleBlur()}}
+                        checked={values.type == 2}
+                      />
+                    }
+                  />
+                </div>
+
+
 
               <div className="kt-login__actions">
                 <Link
@@ -239,6 +274,33 @@ function Registration(props) {
                   Submit
                 </button>
               </div>
+
+               <div className="form-group mb-0" style={{position: 'relative', top: '-33px'}}>
+                  <FormControlLabel
+                    label={
+                      <div style={{}}>
+                        I agree the{" "}
+                        <Link
+                          to="/terms"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Terms & Conditions
+                        </Link>
+                      </div>
+                    }
+                    control={
+                      <Checkbox
+                        color="primary"
+                        name="acceptTerms"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        checked={values.acceptTerms}
+                      />
+                    }
+                  />
+                </div>
+
             </form>
           )}
         </Formik>

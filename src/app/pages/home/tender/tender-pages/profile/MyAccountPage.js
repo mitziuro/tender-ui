@@ -491,20 +491,24 @@ export default class MyAccountPage extends React.Component {
                                                                                                 </div>
                                                                                             </div>
 
-                                                                                            <div className="form-group form-group-last row">
-                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Profile Type</label>
-                                                                                                <div className="">
-                                                                                                    <select style={{position: "relative", top: "8px", left: "10px", width: '100%'}} value={this.state.s1.type} onChange={(e) => this.applyUserProp('type' , e.target.value)}    onBlur={(e) => this.setState({typeDirty : true})}
+                                                                                            {
+                                                                                                this.state.s1.type > 0 ?
+                                                                                                    <div className="form-group form-group-last row">
+                                                                                                        <label className="col-xl-3 col-lg-3 col-form-label">Profile Type</label>
+                                                                                                        <div className="">
+                                                                                                            <select style={{position: "relative", top: "8px", left: "10px", width: '100%'}} value={this.state.s1.type} onChange={(e) => this.applyUserProp('type' , e.target.value)}    onBlur={(e) => this.setState({typeDirty : true})}
 
-                                                                                                    >
-                                                                                                        <option  value=""> Select </option>
-                                                                                                        <option  value="1"> Bidder </option>
-                                                                                                        <option  value="2"> Expert </option>
-                                                                                                    </select>
-                                                                                                    {(this.state.s1.type == null || this.state.s1.type == '') && this.state.typeDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+                                                                                                            >
 
-                                                                                                </div>
-                                                                                            </div>
+                                                                                                                <option  value="1"> Technical Expert </option>
+                                                                                                                <option  value="2"> Public Acquisitions Expert </option>
+                                                                                                            </select>
+                                                                                                            {(this.state.s1.type == null || this.state.s1.type == '') && this.state.typeDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    : <span></span>
+                                                                                            }
 
                                                                                         </div>
                                                                                     </div>

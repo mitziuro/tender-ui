@@ -1,4 +1,6 @@
 import React from "react";
+import {Redirect} from "react-router-dom";
+
 import Notice from "../../../../partials/content/Notice";
 import CodeExample from "../../../../partials/content/CodeExample";
 import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
@@ -10,6 +12,7 @@ import  AlertListingComponent from '../components/AlertListingComponent';
 import  OfferListingComponent from '../components/OfferListingComponent';
 import  NoticeListingComponent from '../components/NoticeListingComponent';
 import  UserActivityComponent from '../components/UserActivityComponent';
+import {getUserByToken} from "../../../../crud/auth.crud";
 
 
 import './TenderDashboardPage.css';
@@ -37,12 +40,26 @@ export default class TenderDashboardPage extends React.Component {
 
     constructor(props) {
         super(props);
+
+        Promise.all([getUserByToken()]).then(response => {
+            this.setState({user: response[0].data});
+        })
     }
 
 
     render() {
         return (
+
             <>
+
+                { this.state && this.state.user ?
+                       this.state.user.authorities.indexOf('ROLE_TENDER') < 0 ?
+                       this.state.user.authorities.indexOf('ROLE_SUPERVISOR') >= 0 ? <Redirect to="/tender/tender-pages/SupervisorDashboardPage" /> :
+                       <Redirect to="/tender/tender-pages/ExpertDashboardPage" /> : '' :
+                 ''
+
+                }
+
                 <div className="row">
 
                     <div className="col-md-12" style={{display: 'flex'}}>
@@ -81,7 +98,7 @@ export default class TenderDashboardPage extends React.Component {
                                     <div className="kt-section">
                                         <div className="col-md-12">
                                             <div className="kt-separator kt-separator--dashed">
-                                                <OfferListingComponent states={[1,2]} />
+                                                <OfferListingComponent states={[1,2,3,4,5,10,11]} />
                                             </div>
                                         </div>
                                     </div>

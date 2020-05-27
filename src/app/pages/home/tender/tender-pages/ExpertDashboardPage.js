@@ -43,27 +43,13 @@ export default class SupervisorDashboardPage extends React.Component {
         return (
             <>
                 <div className="row">
-                    <div className="col-md-12" style={{display: 'flex'}}>
-                        <div className="col-md-6">
-                            <div className="offersResults">
-                                <CodeExample beforeCodeTitle="Open Offers">
-                                    <div className="kt-section">
-                                        <div className="col-md-12">
-                                            <div className="kt-separator kt-separator--dashed">
-                                                <OfferListingComponent user={'supervisor'} states={[1]} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </CodeExample>
-                            </div>
-                        </div>
                         <div className="col-md-6" style={{display: 'flex', flexDirection: 'column', minHeight: '300px'}}>
                             <div className="offersResults">
                                 <CodeExample beforeCodeTitle="My Work">
                                     <div className="kt-section">
                                         <div className="col-md-12">
                                             <div className="kt-separator kt-separator--dashed">
-                                                <OfferListingComponent user={'supervisor'} states={[2]} />
+                                                <OfferListingComponent user={'expert'} states={[4]} />
                                             </div>
                                         </div>
                                     </div>
@@ -74,7 +60,7 @@ export default class SupervisorDashboardPage extends React.Component {
                                     <div className="kt-section">
                                         <div className="col-md-12">
                                             <div className="kt-separator kt-separator--dashed">
-                                                <OfferListingComponent user={'supervisor'} states={[3,4,5,10,11]} />
+                                                <OfferListingComponent user={'expert'} states={[5]} />
                                             </div>
                                         </div>
                                     </div>

@@ -21,12 +21,13 @@ import * as routerHelpers from "../router/RouterHelpers";
 export const Routes = withRouter(({ Layout, history }) => {
   const lastLocation = useLastLocation();
   routerHelpers.saveLastLocation(lastLocation);
-  const { isAuthorized, menuConfig, userLastLocation, hasPhone } = useSelector(
+  const { isAuthorized, menuConfig, userLastLocation, hasPhone, user } = useSelector(
     ({ auth, urls, builder: { menuConfig } }) => ({
       menuConfig,
       isAuthorized: auth.user != null,
       hasPhone: auth.user != null && auth.user.phone != null,
-      userLastLocation: routerHelpers.getLastLocation()
+      userLastLocation: routerHelpers.getLastLocation(),
+      user: auth.user
     }),
     shallowEqual
   );
@@ -57,7 +58,7 @@ export const Routes = withRouter(({ Layout, history }) => {
           <Redirect to="/auth/login" />
         ) : (
           <Layout>
-            <HomePage userLastLocation={userLastLocation} />
+            <HomePage userLastLocation={userLastLocation} user={user} />
           </Layout>
         )}
       </Switch>

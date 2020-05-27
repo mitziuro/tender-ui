@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
+import { withRouter, Redirect, Route, Switch } from "react-router-dom";
 import Builder from "./Builder";
 import Dashboard from "./Dashboard";
 import DocsPage from "./docs/DocsPage";
@@ -14,6 +14,10 @@ const ReactBootstrapPage = lazy(() =>
 const TenderPage = lazy(() =>
   import("./tender/tender-pages/TenderPagesBootstrapPage")
 );
+
+export const Routes = withRouter(({ user }) => {
+  const current = user;
+});
 
 export default function HomePage() {
   return (

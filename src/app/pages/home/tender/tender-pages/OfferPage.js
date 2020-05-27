@@ -7,7 +7,7 @@ import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
 import './NoticeSearchPage.css';
 
 import {takeOffer, getChaptersContent, saveChapters, getSectionURI, saveChaptersContent, getChaptersForOffer, closeOffer, getOffer, saveOffer, declineOffer, uploadTemplate, getTemplateURI, getStructuresSupervisor} from "../../../../crud/tender/offer.crud";
-
+import {uploadFile, getFileURI, getFiles, deleteFile} from "../../../../crud/tender/files.crud";
 import {getUserByToken} from "../../../../crud/auth.crud";
 import {expertsInternal} from "../../../../crud/tender/user.details.crud";
 
@@ -71,6 +71,7 @@ export default class OfferPage extends React.Component {
             declineOpen: false, declineReason: null, user:{}, structures: [],
             content: [], contentSelected: {}, contentEditOpen: false, internalExperts : [],
             chapters: [], chaptersData: {}, selectedSection : null, selectedContent: null,
+            files: {},
 
             activeTab: 1
         };
@@ -100,13 +101,17 @@ export default class OfferPage extends React.Component {
             }
 
             this.setState({offer: response[0].data, user: response[1].data, chapters: this.state.chapters});
-            this.getStructures();
-            this.getExpertsInternal();
-            this.getChaptersData();
+            this.doStuff();
 
         });
 
 
+    }
+
+    doStuff = () => {
+            this.getStructures();
+            this.getExpertsInternal();
+            this.getChaptersData();
     }
 
 
@@ -128,6 +133,11 @@ export default class OfferPage extends React.Component {
 
     isForExperts = () => {
         return this.getFinalChapters().filter( c => c.assignee == null).length == 0;
+    }
+
+
+    isForExpertsExternal = () => {
+        return this.getFinalChapters().filter( c => c.type >= 0).length > 0;
     }
 
     getStructures = () => {
@@ -234,7 +244,7 @@ export default class OfferPage extends React.Component {
         this.state.offer.chapters = JSON.stringify(this.state.chapters);
         Promise.all([saveOffer(this.offerId, this.state.offer, state)]).then(response => {
             response[0].data.saveTemplate = null;
-            this.getStructures();
+
             this.setState({offer: response[0].data});
 
             if(state) {
@@ -243,6 +253,8 @@ export default class OfferPage extends React.Component {
                 addNotification("Success", "The offer has been saved", 'success');
             }
 
+             this.doStuff();
+
         });
     }
 
@@ -250,7 +262,8 @@ export default class OfferPage extends React.Component {
         Promise.all([takeOffer(this.offerId)]).then(response => {
             this.setState({offer: response[0].data});
 
-             addNotification("Success", "The offer has been take into work", 'success');
+            addNotification("Success", "The offer has been take into work", 'success');
+            this.getStructures();
 
         });
     }
@@ -286,7 +299,7 @@ export default class OfferPage extends React.Component {
             return 100;
         }
 
-        let days =  new Date(date).getDate() - new Date().getDate();
+        let days =  parseInt((new Date(date).getTime() - new Date().getTime()) / (24 * 60 * 60 * 1000));
         return days > 0 ? days : 0;
     }
 
@@ -325,7 +338,7 @@ export default class OfferPage extends React.Component {
                                     </div>
                                     <div className="kt-section__content" style={{textAlign: 'center'}}>
                                         {this.state.offer.state == 1 && this.state.user.authorities.indexOf('ROLE_SUPERVISOR') >= 0 ?
-                                            <Button style={{marginLeft: "10px"}}  onClick={this.handleTakeOffer} color="primary">
+                                            <Button style={{marginLeft: "10px", background: 'green'}}  onClick={this.handleTakeOffer} color="primary">
                                                 Work on It
                                             </Button>
                                             : <span></span>
@@ -352,7 +365,7 @@ export default class OfferPage extends React.Component {
 
                                         { this.state.offer.state == 5 && this.state.offer.tender.id == this.state.user.id ?
 
-                                            <Button style={{marginLeft: "10px"}}  onClick={() => this.handleSaveOffer(11)} color="primary"
+                                            <Button style={{marginLeft: "10px", background: 'green'}}  onClick={() => this.handleSaveOffer(11)} color="primary"
                                                 disabled={Object.keys(this.state.chaptersData).filter(k => this.state.chaptersData[k].percentage < 100).length > 0}
                                             >
                                                Close Offer
@@ -365,11 +378,11 @@ export default class OfferPage extends React.Component {
                                             (this.state.offer.clarificationDeadline == null || this.state.offer.contestationDeadline  == null
                                             || this.state.offer.clarificationDeadline.length == 0 || this.state.offer.contestationDeadline.length == 0
                                             || this.state.chapters == null || this.state.chapters.length == [] ?
-                                            <Button style={{marginLeft: "10px"}}  onClick={() => this.handleSaveOffer(3)} color="primary" disabled>
+                                            <Button style={{marginLeft: "10px", background: 'green'}}  onClick={() => this.handleSaveOffer(3)} color="primary" disabled>
                                                 Send it Back to Tender
                                             </Button>
                                             :
-                                            <Button style={{marginLeft: "10px"}}  onClick={() => this.handleSaveOffer(3)} color="primary" >
+                                            <Button style={{marginLeft: "10px", background: 'green'}}  onClick={() => this.handleSaveOffer(3)} color="primary" >
                                                 Send it Back to Tender
                                             </Button>)
 
@@ -377,14 +390,30 @@ export default class OfferPage extends React.Component {
                                         }
 
                                         {
-                                        this.state.offer.state == 3 && this.state.offer.tender.id == this.state.user.id ?
+                                        (this.state.offer.state == 3 && this.state.offer.tender.id == this.state.user.id)
+                                         ||  (this.state.offer.state == 4 && this.state.offer.tender.id == this.state.user.id)
+                                         ?
                                             (!this.isForExperts() ?
-                                            <Button style={{marginLeft: "10px"}}  onClick={() => this.handleSaveOffer(5)} color="primary" disabled>
+                                            <Button style={{marginLeft: "10px", background: 'green'}}  onClick={() => this.handleSaveOffer(5)} color="primary" disabled>
                                                 Send it to Experts
                                             </Button>
                                             :
-                                            <Button style={{marginLeft: "10px"}}  onClick={() => this.handleSaveOffer(5)} color="primary" >
+                                            <Button style={{marginLeft: "10px", background: 'green'}}  onClick={() => this.handleSaveOffer(5)} color="primary" >
                                                  Send it to Experts
+                                            </Button>)
+
+                                            : <span></span>
+                                        }
+
+                                        {
+                                        this.state.offer.state == 3 && this.state.offer.tender.id == this.state.user.id ?
+                                            (!this.isForExpertsExternal() ?
+                                            <Button style={{marginLeft: "10px", background: 'green'}}  color="primary" disabled>
+                                                Request Bid from Experts
+                                            </Button>
+                                            :
+                                            <Button style={{marginLeft: "10px", background: 'green'}}  onClick={() => this.handleSaveOffer(4)} color="primary" >
+                                                 Request Bid from Experts
                                             </Button>)
 
                                             : <span></span>
@@ -562,7 +591,7 @@ export default class OfferPage extends React.Component {
                                                                      {
                                                                         this.state.offer.state == 2 && this.state.offer.supervisor.id == this.state.user.id ?
 
-                                                                             <TextField className="date" label="Clarification Deadline" type="date"
+                                                                             <TextField className="date" label="Clarification Deadline" type="date" required
                                                                                         value={this.state.offer.clarificationDeadline}
                                                                                         onChange={(e) => {this.state.offer.clarificationDeadline = e.target.value; this.setState({offer: offer})}}
                                                                                         InputLabelProps={{shrink: true}}/>
@@ -579,7 +608,7 @@ export default class OfferPage extends React.Component {
                                                                      {
                                                                       this.state.offer.state == 2 && this.state.offer.supervisor.id == this.state.user.id ?
 
-                                                                         <TextField className="date" label="Contestation Deadline" type="date"
+                                                                         <TextField className="date" label="Contestation Deadline" type="date" required
                                                                                     value={this.state.offer.contestationDeadline}
                                                                                     onChange={(e) => {this.state.offer.contestationDeadline = e.target.value; this.setState({offer: offer})}}
                                                                                     InputLabelProps={{shrink: true}}/>
@@ -871,6 +900,15 @@ export default class OfferPage extends React.Component {
                                                                                     </TableHead>
                                                                                         {
                                                                                             ch.chapters.map((c, index) => {
+
+                                                                                                if(!this.state.files[c.id]) {
+                                                                                                    Promise.all([getFiles(this.state.offer.id, c.id)]).then(response => {
+
+                                                                                                        this.state.files[c.id] = response[0].data;
+                                                                                                        this.setState({});
+                                                                                                    });
+                                                                                                }
+
                                                                                         return (
 
                                                                                                     <TableRow key={c.id} onClick={() => this.handleSelect(c)} style={{background: this.state.selectedSection && this.state.selectedSection.id == c.id ? 'lightgray' : ''}}>
@@ -921,7 +959,7 @@ export default class OfferPage extends React.Component {
                                                                                                                             c.files.map((f, index) => {
                                                                                                                                 return (
                                                                                                                                 <>
-                                                                                                                                    <a target="_blank" href={getTemplateURI(f.fileId, f.fileName)}>
+                                                                                                                                    <a style={{marginRight: '20px'}}  target="_blank" href={getTemplateURI(f.fileId, f.fileName)}>
                                                                                                                                         <FileIcon size="25" extension={f.fileName.split('.')[f.fileName.split('.').length-1]} {...defaultStyles.docx} /> {f.fileName}
                                                                                                                                     </a>
                                                                                                                                     <i onClick={() => {c.files = c.files.filter(e => e.fileId != f.fileId); this.setState({});}} class="fa fa-trash" style={{color:'red', cursor: 'pointer', marginLeft: '5px'}}></i>
@@ -940,7 +978,7 @@ export default class OfferPage extends React.Component {
                                                                                                                             c.files.map((f, index) => {
                                                                                                                                 return (
                                                                                                                                 <>
-                                                                                                                                    <a target="_blank" href={getTemplateURI(f.fileId, f.fileName)}>
+                                                                                                                                    <a style={{marginRight: '20px'}} target="_blank" href={getTemplateURI(f.fileId, f.fileName)}>
                                                                                                                                         <FileIcon size="25" extension={f.fileName.split('.')[f.fileName.split('.').length-1]} {...defaultStyles.docx} /> {f.fileName}
                                                                                                                                     </a>
                                                                                                                                 </>
@@ -952,7 +990,65 @@ export default class OfferPage extends React.Component {
                                                                                                               }
                                                                                                         </TableCell>
                                                                                                         <TableCell align="left" >
+                                                {
+                                                                                                             this.state.selectedSection && this.state.offer.state == 5 && this.state.selectedSection.assignee == this.state.user.id ?
 
+                                                                                                                    <Dropzone onDrop={acceptedFiles => {
+
+                                                                                                                                acceptedFiles.forEach(f => {
+                                                                                                                                    var formData = new FormData();
+                                                                                                                                    formData.append("file", f);
+                                                                                                                                    Promise.all([uploadFile(this.state.offer.id, c.id, formData)]).then(response => {
+                                                                                                                                        if(this.state.files[c.id] == null) {
+                                                                                                                                            this.state.files[c.id] = [];
+                                                                                                                                        }
+                                                                                                                                        this.state.files[c.id].push(f.name);
+                                                                                                                                        this.setState({});
+                                                                                                                                    });
+                                                                                                                                });
+
+
+                                                                                                                          }}>
+                                                                                                                      {({getRootProps, getInputProps}) => (
+                                                                                                                        <section>
+                                                                                                                          <div {...getRootProps()}>
+                                                                                                                            <input {...getInputProps()} />
+                                                                                                                            <p style={{color: 'black'}}><i>Drag 'n' drop some files here, or click to select files</i></p>
+                                                                                                                          </div>
+                                                                                                                          {
+                                                                                                                            this.state.files[c.id] != null ?
+                                                                                                                            this.state.files[c.id].map((f, index) => {
+                                                                                                                                return (
+                                                                                                                                <>
+                                                                                                                                    <a  style={{marginRight: '20px'}} target="_blank" href={getFileURI(this.state.offer.id, c.id, f)}>
+                                                                                                                                        <FileIcon size="25" extension={f.split('.')[f.split('.').length-1]} {...defaultStyles.docx} /> {f}
+                                                                                                                                    </a>
+                                                                                                                                    <i onClick={() => {deleteFile(this.state.offer.id, c.id, f); this.state.files[c.id] = this.state.files[c.id].filter(e => e != f); this.setState({});}} class="fa fa-trash" style={{color:'red', cursor: 'pointer', marginLeft: '5px'}}></i>
+                                                                                                                                </>
+                                                                                                                                );
+                                                                                                                            }) : <></>
+
+                                                                                                                          }
+
+                                                                                                                        </section>
+                                                                                                                      )}
+                                                                                                                    </Dropzone>
+                                                                                                                    : <div>
+                                                                                                                            {
+                                                                                                                            this.state.files[c.id] != null ?
+                                                                                                                            this.state.files[c.id].map((f, index) => {
+                                                                                                                                return (
+                                                                                                                                <>
+                                                                                                                                    <a style={{marginRight: '20px'}} target="_blank" href={getFileURI(this.state.offer.id, c.id, f)}>
+                                                                                                                                        <FileIcon size="25" extension={f.split('.')[f.split('.').length-1]} {...defaultStyles.docx} /> {f}
+                                                                                                                                    </a>
+                                                                                                                                </>
+                                                                                                                                );
+                                                                                                                            }) : <></>
+
+                                                                                                                          }
+                                                                                                                    </div>
+                                                                                                              }
                                                                                                         </TableCell>
                                                                                                         <TableCell align="left" >
                                                                                                             {
@@ -962,6 +1058,7 @@ export default class OfferPage extends React.Component {
                                                                                                                                                 value={c.type}
                                                                                                                                                 onChange={(e) => {
                                                                                                                                                   c.type = e.target.value;
+                                                                                                                                                  c.assignee = null;
                                                                                                                                                   this.setState({});
                                                                                                                                                 }}
                                                                                                                                                 inputProps={{
@@ -972,6 +1069,12 @@ export default class OfferPage extends React.Component {
 
                                                                                                                                 <MenuItem value="-1">
                                                                                                                                     <em>Internal</em>
+                                                                                                                                </MenuItem>
+                                                                                                                                <MenuItem value="1">
+                                                                                                                                    <em>Technical Expert</em>
+                                                                                                                                </MenuItem>
+                                                                                                                                <MenuItem value="2">
+                                                                                                                                    <em>Public Acquisitions Expert</em>
                                                                                                                                 </MenuItem>
 
                                                                                                                         </Select>

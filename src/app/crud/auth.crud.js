@@ -19,13 +19,14 @@ export function activateAccount(key) {
   return axios.get(ACTIVATE_URL + '?key=' + key);
 }
 
-export function register(email, firstname, lastname, password) {
+export function register(email, firstname, lastname, password, type) {
   return axios.post(REGISTER_URL, {
     login : email,
     email: email,
     firstName: firstname,
     lastName: lastname,
-    password: password });
+    password: password,
+    type: type});
 }
 
 export function requestPassword(email) {

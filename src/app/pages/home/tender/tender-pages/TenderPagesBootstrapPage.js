@@ -3,6 +3,7 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import NoticeSearchPage from "./NoticeSearchPage";
 import TenderDashboardPage from './TenderDashboardPage';
 import SupervisorDashboardPage from './SupervisorDashboardPage';
+import ExpertDashboardPage from './SupervisorDashboardPage';
 import NoticePage from './NoticePage';
 import OfferPage from './OfferPage';
 
@@ -48,6 +49,11 @@ export default function TenderPagesBootstrapPage() {
             <Route
                 path="/tender/tender-pages/SupervisorDashboardPage"
                 component={SupervisorDashboardPage}
+            />
+
+            <Route
+                path="/tender/tender-pages/ExpertDashboardPage"
+                component={ExpertDashboardPage}
             />
 
             <Route
