@@ -14,6 +14,7 @@ import {getBidsForUserAndOffer, getBidsForOffer, saveBids } from "../../../../cr
 
 import  AlertListingComponent from '../components/AlertListingComponent';
 import  NoticeListingComponent from '../components/NoticeListingComponent';
+import  PartenersComponent from '../components/PartenersComponent';
 import  MessagesListingComponent from '../components/MessagesListingComponent';
 import  UserActivityComponent from '../components/UserActivityComponent';
 
@@ -295,6 +296,17 @@ export default class OfferPage extends React.Component {
         });
     }
 
+    handleIsStructureValid = () => {
+        let valid = true;
+        valid =  valid && (this.state.chapters.filter(c => c.chapters == null || c.chapters.length == 0).length > 0 ? false : valid);
+
+        this.state.chapters.forEach(ch => {
+            valid  = valid && (ch.chapters.filter(c => c.chapters == null || c.chapters.length == 0).length > 0 ? false : valid);
+        })
+
+        return valid;
+    }
+
     handleTakeOffer = () => {
         Promise.all([takeOffer(this.offerId)]).then(response => {
             this.setState({offer: response[0].data});
@@ -432,6 +444,7 @@ export default class OfferPage extends React.Component {
                                         {
                                         this.state.offer.state == 2 && this.state.offer.supervisor.id == this.state.user.id ?
                                             (this.state.offer.clarificationDeadline == null || this.state.offer.contestationDeadline  == null
+                                            || !this.handleIsStructureValid()
                                             || this.state.offer.clarificationDeadline.length == 0 || this.state.offer.contestationDeadline.length == 0
                                             || this.state.chapters == null || this.state.chapters.length == [] ?
                                             <Button style={{marginLeft: "10px", background: 'green'}}  onClick={() => this.handleSaveOffer(3)} color="primary" disabled>
@@ -642,12 +655,12 @@ export default class OfferPage extends React.Component {
                                                     <TableCell align="left" >
 
                                                             <div className="col-md-12">
-                                                                <div>
+                                                                <div style={{border: this.state.offer.clarificationDeadline == null || this.state.offer.clarificationDeadline.length == 0 ? '3px dotted red' : ''}}>
 
                                                                      {
                                                                         this.state.offer.state == 2 && this.state.offer.supervisor.id == this.state.user.id ?
 
-                                                                             <TextField className="date" label="Clarification Deadline" type="date" required
+                                                                             <TextField className="date" label="Clarification Deadline" type="date"
                                                                                         value={this.state.offer.clarificationDeadline}
                                                                                         onChange={(e) => {this.state.offer.clarificationDeadline = e.target.value; this.setState({offer: offer})}}
                                                                                         InputLabelProps={{shrink: true}}/>
@@ -660,7 +673,7 @@ export default class OfferPage extends React.Component {
                                                                      }
                                                                 </div>
 
-                                                                <div>
+                                                                <div style={{border: this.state.offer.contestationDeadline == null || this.state.offer.contestationDeadline.length == 0 ? '3px dotted red' : ''}}>
                                                                      {
                                                                       this.state.offer.state == 2 && this.state.offer.supervisor.id == this.state.user.id ?
 
@@ -748,7 +761,7 @@ export default class OfferPage extends React.Component {
 
 
             { (this.state.offer.state <= 1 && this.state.activeTab == 1) ||
-                    (this.state.activeTab != 1 && this.state.activeTab != 5 && this.state.activeTab != 4 && this.state.activeTab != 3) ?
+                    (this.state.activeTab != 1 && this.state.activeTab != 5 && this.state.activeTab != 4 && this.state.activeTab != 3 && this.state.activeTab != 2) ?
                 <div className="col-md-12">
                     <div className="kt-portlet kt-portlet--height-fluid">
                         <div className="kt-portlet__body kt-portlet__body--fit">
@@ -804,6 +817,10 @@ export default class OfferPage extends React.Component {
 
                                  : <span></span>
                   }
+
+             { this.state.activeTab == 2 ?
+                    <PartenersComponent offer={this.state.offer.id} readonly={this.state.offer.state != 3 || this.state.offer.tender.id != this.state.user.id}/>
+             : ''}
 
             { this.state.activeTab == 3 ?
 
@@ -1397,6 +1414,8 @@ export default class OfferPage extends React.Component {
                                                     </div>
                                             : <div></div>
                                         }
+
+                                        {!this.handleIsStructureValid() ? <p style={{color: 'red'}}> All sections must have 3rd levels </p> : ''}
 
                                         {
                                             this.state.selectedSection ?
