@@ -490,7 +490,6 @@ export default class MyAccountPage extends React.Component {
                                                                                                     </InputGroup>
                                                                                                 </div>
                                                                                             </div>
-
                                                                                             {
                                                                                                 this.state.s1.type > 0 ?
                                                                                                     <div className="form-group form-group-last row">

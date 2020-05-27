@@ -3,7 +3,7 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import NoticeSearchPage from "./NoticeSearchPage";
 import TenderDashboardPage from './TenderDashboardPage';
 import SupervisorDashboardPage from './SupervisorDashboardPage';
-import ExpertDashboardPage from './SupervisorDashboardPage';
+import ExpertDashboardPage from './ExpertDashboardPage';
 import NoticePage from './NoticePage';
 import OfferPage from './OfferPage';
 

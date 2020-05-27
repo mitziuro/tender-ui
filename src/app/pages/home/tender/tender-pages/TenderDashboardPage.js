@@ -36,8 +36,6 @@ import {
 
 export default class TenderDashboardPage extends React.Component {
 
-
-
     constructor(props) {
         super(props);
 

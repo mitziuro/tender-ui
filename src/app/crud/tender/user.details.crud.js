@@ -22,3 +22,8 @@ export function expertsInternal() {
 export function getUserDisplay(id) {
     return axios.get(USERS_DTO_URL + '/get/' + id);
 }
+
+
+export function expertsExternalForUser(id) {
+    return axios.get(USERS_DTO_URL + '/experts/external/' + id);
+}

@@ -199,12 +199,12 @@ export default {
       },
 
        {section: "Expert",
-              role: "ROLE_EXECUTOR"
+              role: "ROLE_EXPERT"
         },
         {
           title: "Dashboard",
           root: true,
-          role: "ROLE_EXECUTOR",
+          role: "ROLE_EXPERT",
           bullet: "dot",
           translate: "MENU.DASHBOARD",
           icon: "flaticon2-architecture-and-city",
@@ -214,7 +214,7 @@ export default {
         title: "Account Settings",
         root: true,
         bullet: "dot",
-        role: "ROLE_EXECUTOR",
+        role: "ROLE_EXPERT",
         translate: "MENU.PROFILE",
         icon: "flaticon2-architecture-and-city",
         submenu: [

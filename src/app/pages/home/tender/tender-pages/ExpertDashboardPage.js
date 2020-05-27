@@ -30,9 +30,7 @@ import {
 } from "@material-ui/core";
 
 
-export default class SupervisorDashboardPage extends React.Component {
-
-
+export default class ExpertDashboardPage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -45,7 +43,7 @@ export default class SupervisorDashboardPage extends React.Component {
                 <div className="row">
                         <div className="col-md-6" style={{display: 'flex', flexDirection: 'column', minHeight: '300px'}}>
                             <div className="offersResults">
-                                <CodeExample beforeCodeTitle="My Work">
+                                <CodeExample beforeCodeTitle="Bid offers">
                                     <div className="kt-section">
                                         <div className="col-md-12">
                                             <div className="kt-separator kt-separator--dashed">
@@ -55,8 +53,14 @@ export default class SupervisorDashboardPage extends React.Component {
                                     </div>
                                 </CodeExample>
                             </div>
+
+                        </div>
+
+
+                        <div className="col-md-6" style={{display: 'flex', flexDirection: 'column', minHeight: '300px'}}>
+
                             <div className="offersResults">
-                                <CodeExample beforeCodeTitle="My Completed Offers">
+                                <CodeExample beforeCodeTitle="Assigned to me">
                                     <div className="kt-section">
                                         <div className="col-md-12">
                                             <div className="kt-separator kt-separator--dashed">
@@ -67,7 +71,7 @@ export default class SupervisorDashboardPage extends React.Component {
                                 </CodeExample>
                             </div>
                         </div>
-                    </div>
+
                 </div>
             </>
     )}

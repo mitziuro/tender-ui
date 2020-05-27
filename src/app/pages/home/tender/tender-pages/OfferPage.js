@@ -9,7 +9,8 @@ import './NoticeSearchPage.css';
 import {takeOffer, getChaptersContent, saveChapters, getSectionURI, saveChaptersContent, getChaptersForOffer, closeOffer, getOffer, saveOffer, declineOffer, uploadTemplate, getTemplateURI, getStructuresSupervisor} from "../../../../crud/tender/offer.crud";
 import {uploadFile, getFileURI, getFiles, deleteFile} from "../../../../crud/tender/files.crud";
 import {getUserByToken} from "../../../../crud/auth.crud";
-import {expertsInternal} from "../../../../crud/tender/user.details.crud";
+import {expertsInternal, expertsExternalForUser} from "../../../../crud/tender/user.details.crud";
+import {getBidsForUserAndOffer, getBidsForOffer, saveBids } from "../../../../crud/tender/bid.crud";
 
 import  AlertListingComponent from '../components/AlertListingComponent';
 import  NoticeListingComponent from '../components/NoticeListingComponent';
@@ -71,7 +72,7 @@ export default class OfferPage extends React.Component {
             declineOpen: false, declineReason: null, user:{}, structures: [],
             content: [], contentSelected: {}, contentEditOpen: false, internalExperts : [],
             chapters: [], chaptersData: {}, selectedSection : null, selectedContent: null,
-            files: {},
+            files: {}, externalExperts: [], myBids: [], allBids: [],
 
             activeTab: 1
         };
@@ -112,6 +113,9 @@ export default class OfferPage extends React.Component {
             this.getStructures();
             this.getExpertsInternal();
             this.getChaptersData();
+            this.getExpertsExternalForTender();
+            this.getMyBids();
+            this.getAllBidsForOffer();
     }
 
 
@@ -166,12 +170,45 @@ export default class OfferPage extends React.Component {
     }
 
     getExpertsInternal = () => {
-        if(this.state.offer.state != 3 || this.state.offer.tender.id != this.state.user.id) {
+        if(this.state.offer.state < 3 || this.state.offer.tender.id != this.state.user.id) {
             return;
         }
 
         Promise.all([expertsInternal()]).then(response => {
             this.setState({internalExperts: response[0].data});
+        });
+    }
+
+    getExpertsExternalForTender = () => {
+        if(this.state.offer.state < 4) {
+            return;
+        }
+
+        Promise.all([expertsExternalForUser(this.state.offer.tender.id)]).then(response => {
+            this.setState({externalExperts: response[0].data});
+        });
+    }
+
+
+    getAllBidsForOffer = () => {
+        if(this.state.offer.state < 4 || this.state.user.id != this.state.offer.tender.id) {
+            return;
+        }
+
+        Promise.all([getBidsForOffer(this.state.offer.id)]).then(response => {
+            this.setState({allBids: response[0].data});
+        });
+    }
+
+
+    getMyBids = () => {
+
+        if(this.state.offer.state < 4) {
+            return;
+        }
+
+        Promise.all([getBidsForUserAndOffer(this.state.user.id, this.state.offer.id)]).then(response => {
+            this.setState({myBids: response[0].data});
         });
     }
 
@@ -294,6 +331,13 @@ export default class OfferPage extends React.Component {
         this.setState({declineOpen: false, declineReason: null})
     }
 
+    handleSaveBids = () => {
+        Promise.all([saveBids(this.state.myBids, this.state.offer.id)]).then(response => {
+            addNotification("Success", "All the bids have been saved", 'success');
+        });
+    };
+
+
     getDays = (date) => {
         if(!date) {
             return 100;
@@ -343,14 +387,26 @@ export default class OfferPage extends React.Component {
                                             </Button>
                                             : <span></span>
                                         }
-                                        { this.state.offer.state == 2 && this.state.offer.supervisor.id == this.state.user.id
-                                          || this.state.offer.state == 3 && this.state.offer.tender.id == this.state.user.id ?
+                                        { (this.state.offer.state == 2 && this.state.offer.supervisor.id == this.state.user.id)
+                                          || (this.state.offer.state == 3 && this.state.offer.tender.id == this.state.user.id)
+                                          || this.state.offer.state == 4 && this.state.offer.tender.id == this.state.user.id?
                                             <Button style={{marginLeft: "10px"}}  onClick={() => this.handleSaveOffer()} color="primary"
                                                 disabled={this.state.chapters == null || this.state.chapters.length == []}
                                             >
                                                 Save Offer
                                             </Button>
                                             : <span></span>
+                                        }
+
+                                        { this.state.offer.state == 4 ?
+                                                <Button style={{marginLeft: "10px"}}  onClick={() => this.handleSaveBids()} color="primary"
+                                                    disabled={false}
+                                                >
+                                                Save Bids
+                                            </Button>
+                                            :
+                                            ''
+
                                         }
 
                                         { this.state.offer.state == 5 && this.state.selectedSection && this.state.selectedSection.assignee == this.state.user.id ?
@@ -692,7 +748,7 @@ export default class OfferPage extends React.Component {
 
 
             { (this.state.offer.state <= 1 && this.state.activeTab == 1) ||
-                    (this.state.activeTab != 1 && this.state.activeTab != 5 && this.state.activeTab != 4) ?
+                    (this.state.activeTab != 1 && this.state.activeTab != 5 && this.state.activeTab != 4 && this.state.activeTab != 3) ?
                 <div className="col-md-12">
                     <div className="kt-portlet kt-portlet--height-fluid">
                         <div className="kt-portlet__body kt-portlet__body--fit">
@@ -729,9 +785,6 @@ export default class OfferPage extends React.Component {
                 </div>
             </div>
 
-
-
-
               { (this.state.activeTab == 4) ?
                                  <div className="col-md-12">
                                      <div className="kt-portlet kt-portlet--height-fluid">
@@ -751,6 +804,137 @@ export default class OfferPage extends React.Component {
 
                                  : <span></span>
                   }
+
+            { this.state.activeTab == 3 ?
+
+                (this.state.allBids.length == 0 && this.state.myBids.length == 0) ?
+
+
+                            <div className="col-md-12">
+                                <div className="kt-portlet kt-portlet--height-fluid">
+                                    <div className="kt-portlet__body kt-portlet__body--fit">
+                                        <div className="kt-widget kt-widget--project-1">
+                                            <div className="kt-widget__head">
+                                                <div className="kt-widget__label" style={{width: '100%'}}>
+                                                    <div className="kt-widget__media" style={{width: '100%'}}>
+                                                         <div style={{textAlign: 'center', position: 'relative', top: '22px'}}><i>No Results</i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                             :
+                       <div className="col-md-12">
+                                <div className="kt-portlet kt-portlet--height-fluid">
+                                    <div className="kt-portlet__body kt-portlet__body--fit">
+                                        <div className="kt-widget kt-widget--project-1">
+                                            <div className="kt-widget__head">
+                                                <div className="kt-widget__label" style={{width: '100%'}}>
+                                                    <div className="kt-widget__media" style={{width: '100%'}}>
+
+                                                        {
+
+
+                                                            this.filterChapters().map((c1, index) => {
+
+                                                                var bids = this.state.offer.tender.id == this.state.user.id ?
+                                                                        this.state.allBids : this.state.myBids;
+
+                                                                return (
+                                                                    <>
+
+                                                                        <h1 style={{marginLeft: '50px'}} >{c1.name}</h1>
+
+                                                                        {
+                                                                            c1.chapters.map((c2, index) => {
+
+                                                                              return (<>
+                                                                                 <h2 style={{marginLeft: '100px'}} >{c2.name}</h2>
+
+                                                                                 {
+                                                                                    c2.chapters.map((c3, index) => {
+
+                                                                                        return (
+
+                                                                                            <>
+                                                                                                <h3 style={{marginLeft: '150px'}} >{c3.name}</h3>
+
+                                                                                                <div style={{marginLeft: '200px', display: bids.filter(b => b.chapter == c3.id).length > 0 ? '' : 'none'}} >
+                                                                                                    <Table>
+                                                                                                        <TableHead>
+                                                                                                            <TableRow>
+                                                                                                                <TableCell>
+                                                                                                                   User
+                                                                                                                </TableCell>
+
+                                                                                                                <TableCell>
+                                                                                                                   Value
+                                                                                                                </TableCell>
+                                                                                                            </TableRow>
+                                                                                                        </TableHead>
+
+                                                                                                         { bids
+                                                                                                            .filter(b => b.chapter == c3.id)
+                                                                                                            .map((b, index) => {
+                                                                                                                return (
+                                                                                                                <TableRow style={{background: c3.assignee == b.owner ? 'lightgray' : ''}} onClick={() => {
+                                                                                                                            if(this.state.offer.tender.id == this.state.user.id) {
+                                                                                                                                c3.assignee = b.owner
+                                                                                                                            }
+
+                                                                                                                            this.setState({});
+                                                                                                                        }}>
+                                                                                                                    <TableCell component="th" scope="row">
+
+                                                                                                                    <UserDisplay id={b.owner} />
+
+                                                                                                                   </TableCell>
+                                                                                                                   <TableCell component="th" scope="row">
+
+                                                                                                                    {b.value}
+
+                                                                                                                   </TableCell>
+                                                                                                                </TableRow>
+                                                                                                                )
+                                                                                                            })
+                                                                                                         }
+
+                                                                                                     </Table>
+                                                                                                </div>
+
+
+
+                                                                                            </>
+                                                                                        )
+
+                                                                                    })
+                                                                                 }
+
+                                                                              </>)
+
+                                                                            })
+                                                                        }
+
+                                                                    </>
+                                                                )
+
+                                                            })
+                                                        }
+
+                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                 : ''
+             }
 
             { this.state.offer.state > 1  && this.state.activeTab == 1 ?
 
@@ -1083,7 +1267,10 @@ export default class OfferPage extends React.Component {
                                                                                                                    </div>
                                                                                                                : <div>
                                                                                                                     {
-                                                                                                                        c.type == -1 ? 'Internal' : ''
+                                                                                                                        c.type == -1 ? 'Internal' :
+                                                                                                                        c.type == 1 ? 'Technical Expert' :
+                                                                                                                        c.type == 2 ? 'Public Acquisitions Expert' :
+                                                                                                                        ''
                                                                                                                     }
                                                                                                                 </div>
                                                                                                             }
@@ -1138,8 +1325,25 @@ export default class OfferPage extends React.Component {
                                                                                                             }
                                                                                                         </TableCell>
                                                                                                         <TableCell align="left" >
-                                                                                                            { this.state.chaptersData[c.id] != null ? <div style={{height: '31px', width: '37px'}}> <CircularProgressbar styles={buildStyles({textSize: '32px'})} value={this.state.chaptersData[c.id].percentage} text={this.state.chaptersData[c.id].percentage + '%'} /> </div>   : ''}
+                                                                                                            { this.state.chaptersData[c.id] != null && this.state.offer.state > 4 ? <div style={{height: '31px', width: '37px'}}> <CircularProgressbar styles={buildStyles({textSize: '32px'})} value={this.state.chaptersData[c.id].percentage} text={this.state.chaptersData[c.id].percentage + '%'} /> </div>   : ''}
+                                                                                                            { this.state.offer.state == 4 && c.type > 0 && this.state.externalExperts.map(u => u.id).indexOf(this.state.user.id) >= 0 && this.state.user.type == c.type ?
+                                                                                                                 <>
+                                                                                                                     <TextField className="" label="Value" type="number"
+                                                                                                                                value={this.state.myBids.filter(b => b.chapter == c.id).length > 0  ? this.state.myBids.filter(b => b.chapter == c.id)[0].value : 0}
+                                                                                                                                onChange={(e) => {this.state.myBids.filter(b => b.chapter == c.id).length > 0  ? this.state.myBids.filter(b => b.chapter == c.id)[0].value = e.target.value : this.state.myBids.push({entityId: this.state.offer.id, chapter: c.id, section: chapter.id}); this.setState({})}}
+                                                                                                                                InputLabelProps={{shrink: true}}/>
 
+                                                                                                                                { this.state.myBids.filter(b => b.chapter == c.id).length > 0 ?
+
+                                                                                                                                     <i style={{position: 'relative', top: '21px', cursor: 'pointer',marginLeft: '10px', color: "red"}} class="fa fa-trash" onClick={() => {this.state.myBids = this.state.myBids.filter(b => b.chapter != c.id) ; this.setState({myBids: this.state.myBids});}}></i>
+
+                                                                                                                                    : ''
+                                                                                                                                }
+
+                                                                                                                 </>
+
+                                                                                                                 : ''
+                                                                                                            }
                                                                                                         </TableCell>
 
                                                                                                         {
