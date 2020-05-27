@@ -69,9 +69,9 @@ export function getNoticeDocuments(noticeId) {
 }
 
 export function getNoticeDocumentContentURI(id, filename) {
-    return NOTIFICATION_EXTERNAL_DOCUMENTS  + '/notice/content/'  + id +'/'  + encodeURIComponent(filename);
+    return NOTIFICATION_EXTERNAL_DOCUMENTS_URI + '/notice/content/'  + id +'/'  + encodeURIComponent(filename);
 }
 
 export function getNoticeDocumentOriginalContentURI(id, filename) {
-    return NOTIFICATION_EXTERNAL_DOCUMENTS  + '/original/notice/content/' + id +'/'  + encodeURIComponent(filename);
+    return NOTIFICATION_EXTERNAL_DOCUMENTS_URI  + '/original/notice/content/' + id +'/'  + encodeURIComponent(filename);
 }
