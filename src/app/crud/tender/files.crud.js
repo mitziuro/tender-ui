@@ -3,6 +3,7 @@ import axios from "axios";
 import { SERVER_URL } from './search.notice.crud';
 
 export const FILES_URL = SERVER_URL + "/api/offers";
+export const FILES_URL_URI = ( SERVER_URL.indexOf(':8080') >= 0 ? SERVER_URL : SERVER_URL  + ':8080' ) + '/api/offers';
 
 
 export function uploadFile(offer, chapter, file) {
@@ -10,7 +11,7 @@ export function uploadFile(offer, chapter, file) {
 }
 
 export function getFileURI(offer, chapter, fileName) {
-    return FILES_URL  + '/documents/files/' + offer + '/'  + chapter + '/'+ fileName;
+    return FILES_URL_URI  + '/documents/files/' + offer + '/'  + chapter + '/'+ fileName;
 }
 
 export function getFiles(offer, chapter) {
