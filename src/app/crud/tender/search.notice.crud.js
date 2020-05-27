@@ -14,6 +14,7 @@ export const NOTICE_CONTENT_URL = SERVER_URL + "/api/notice-contents";
 
 export const NOTIFICATION_NOTICES_URL = SERVER_URL + "/api/notices";
 export const NOTIFICATION_EXTERNAL_DOCUMENTS = SERVER_URL + '/api/notice-external-documents';
+export const NOTIFICATION_EXTERNAL_DOCUMENTS_URI = (SERVER_URL.indexOf(':8080') >= 0 ? SERVER_URL : SERVER_URL  + ':8080') + '/api/notice-external-documents';
 
 export function getCpvs() {
     return axios.get(CPVS_URL + "?size=1000");

@@ -3,9 +3,12 @@ import axios from "axios";
 import { SERVER_URL } from './search.notice.crud';
 
 export const OFFER_URL = SERVER_URL + "/api/offers";
+export const OFFER_URL_URI = (SERVER_URL.indexOf(':8080') >= 0 ? SERVER_URL : SERVER_URL  + ':8080') + "/api/offers";
+
+
 export const STRUCTURE_URL = SERVER_URL + "/api/chapter-structures";
 export const CHAPTERS_URL = SERVER_URL + "/api/chapters";
-export const CHAPTERS_CONTENT_URL = SERVER_URL + "/api/chapter-contents";
+export const CHAPTERS_CONTENT_URL = (SERVER_URL.indexOf(':8080') >= 0 ? SERVER_URL : SERVER_URL  + ':8080') + "/api/chapter-contents";
 
 
 export function getOffer(id) {
@@ -53,11 +56,11 @@ export function uploadTemplate(file) {
 }
 
 export function getTemplateURI(fileId, fileName) {
-    return OFFER_URL  + '/documents/templates/' + fileId + '/' + fileName;
+    return OFFER_URL_URI  + '/documents/templates/' + fileId + '/' + fileName;
 }
 
 export function getSectionURI(id, section) {
-    return OFFER_URL  + '/content/' + id +  ( section != null ? '?section=' + section : '');
+    return OFFER_URL_URI  + '/content/' + id +  ( section != null ? '?section=' + section : '');
 }
 
 export function getStructuresSupervisor(e) {
