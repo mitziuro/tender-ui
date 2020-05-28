@@ -7,6 +7,9 @@ import ExpertDashboardPage from './ExpertDashboardPage';
 import NoticePage from './NoticePage';
 import OfferPage from './OfferPage';
 
+import InternalExpertsPage from './InternalExpertsPage';
+import ExternalExpertsPage from './ExternalExpertsPage';
+
 import AlertsPage from './alerts/AlertsPage';
 import AlertsConfigurationPage from './alerts/AlertsConfigurationPage';
 import NoticesPage from './alerts/NoticesPage';
@@ -128,6 +131,17 @@ export default function TenderPagesBootstrapPage() {
                 path="/tender/admin-pages/UsersPage"
                 component={UsersPage}
             />
+
+             <Route
+                path="/tender/tender-pages/InternalExperts"
+                component={InternalExpertsPage}
+            />
+
+            <Route
+                path="/tender/tender-pages/ExternalExperts"
+                component={ExternalExpertsPage}
+            />
+
 
             <Route
                 path="/tender/tender-pages/HistoryDashboardPage"

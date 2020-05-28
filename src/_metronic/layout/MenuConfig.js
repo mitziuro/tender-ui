@@ -93,6 +93,32 @@ export default {
           }*/
         ]
       },
+       {
+              title: "Experts Management",
+              root: true,
+              bullet: "dot",
+              role: "ROLE_TENDER",
+              icon: "flaticon2-architecture-and-city",
+              submenu: [
+              {
+                                        title: "Internal Experts",
+                                        icon: "flaticon2-expand",
+
+                                         role: "ROLE_TENDER",
+                                        page: "builder",
+                                        page: "tender/tender-pages/InternalExperts",
+                                      },
+                                      {
+                                        title: "External Experts",
+                                        icon: "flaticon2-expand",
+                                        page: "builder",
+                                        role: "ROLE_TENDER",
+
+                                        page: "tender/tender-pages/ExternalExperts",
+                                      },
+              ]
+      },
+
       {
         title: "Account Settings",
         root: true,

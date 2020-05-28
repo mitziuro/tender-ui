@@ -35,7 +35,10 @@ import {
 } from "@material-ui/core";
 
 
-import {getUsers, deleteUser, saveUser, doImport} from "../../../../../crud/admin/users.crud";
+import {getUsers, deleteUser, saveUser, doImport, searchUsers} from "../../../../../crud/admin/users.crud";
+import {addAssociation, deleteAssociationForUserId} from "../../../../../crud/tender/experts.association.crud";
+
+import addNotification from "../../../../../widgets/NotificationWidget";
 
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -49,7 +52,8 @@ export default class UsersPage extends React.Component {
 
         super(props);
         this.state = {
-            users: [], size: 10, page: 0, total: 0,
+            adm: props.type,
+            users: [], size: 10, page: 0, total: 0, name: null, type: null, association: null,
             onBeDeleted: null, confirmDelete: false, importing: false,
             onBeEdited: {authorities: []}, confirmEdit: false
 
@@ -65,12 +69,17 @@ export default class UsersPage extends React.Component {
 
         this.handleImport = this.handleImport.bind(this);
 
-        this.getUsers()
+        this.getUsers();
     }
 
     getUsers = () => {
 
-        Promise.all([getUsers(this.state.page, this.state.size)]).then(response => {
+        let type = this.state.type;
+        if(this.state.adm != null && type == null) {
+            type = 3;
+        }
+
+        Promise.all([searchUsers(this.state.page, this.state.size, this.state.name, type, this.state.association == true ? this.state.adm : null, this.state.adm)]).then(response => {
             this.setState({users: response[0].data, total: response[0].headers['x-total-count'], page: this.state.page});
         });
     }
@@ -97,8 +106,30 @@ export default class UsersPage extends React.Component {
 
     }
 
+    handleAddAssociation = (user) => {
+
+        Promise.all([addAssociation({type: this.state.adm == 'internal' ? 1 : 2, userId: user.id})]).then(response => {
+            user.associated = true;
+            this.setState({});
+            addNotification("Success", "The association has been made", 'success');
+
+        });
+
+    }
+
+    handleRemoveAssociation = (user) => {
+        Promise.all([deleteAssociationForUserId(user.id)]).then(response => {
+            user.associated = false;
+            this.setState({});
+            addNotification("Success", "The association has been deleted", 'success');
+
+        });
+    }
+
+
     handleChangePage = (page) => {
-        this.getNotices(null, page);
+        this.state.page = page;
+        this.getUsers(null, page);
     }
 
     handleFirstPageButtonClick = () =>  {
@@ -120,23 +151,105 @@ export default class UsersPage extends React.Component {
     render() {
         return (
             <>
+
+
+             <div style={{display: 'flex', marginBottom : '20px'}}>
+
+                <div className="col-md-3" style={{position: 'relative', top: '12px'}}>
+                   Type
+
+                   { this.state.adm == null ?
+                   <Select style={{width: '100%', position: 'relative'}}
+                                           onChange={(e) => {
+                                               this.state.type = e.target.value;
+                                               this.setState({});
+                                           }}
+                                           inputProps={{
+                       name: "type",
+                       id: "type",
+                       label: "type"
+                   }}
+                   >
+
+
+                     <MenuItem value={-1} >Tender</MenuItem>
+                     <MenuItem value={1}>Technical Expert</MenuItem>
+                     <MenuItem value={2}>Public Acquisitions Expert</MenuItem>
+
+                   </Select>
+                   :
+
+                    <Select style={{width: '100%', position: 'relative'}}
+                                                              onChange={(e) => {
+                                                                  this.state.type = e.target.value;
+                                                                  this.setState({});
+                                                              }}
+                                                              inputProps={{
+                                          name: "type",
+                                          id: "type",
+                                          label: "type"
+                                      }}
+                                      >
+
+                                        <MenuItem value={1}>Technical Expert</MenuItem>
+                                        <MenuItem value={2}>Public Acquisitions Expert</MenuItem>
+
+                                      </Select>
+
+
+                 }
+                </div>
+
+                <div className="col-md-3">
+                     <TextField label="Login"
+                              value={this.state.name}
+                              onChange={(e) => { this.state.name = e.target.value; this.setState({});}}
+                              margin="normal"/>
+                </div>
+
+
+                <div className="col-md-3" style={{position: 'relative', top: "20px"}}>
+                     <Button style={{marginLeft: "10px", background: 'green'}}  onClick={() => {this.getUsers();}} color="primary">
+                         Search
+                     </Button>
+                </div>
+
+
+
+            </div>
+
+            {this.state.adm != null ?
+                <div>
+                    <div>
+                        <FormControlLabel control={
+                                    <Checkbox
+                              checked={this.state.association}
+                              onChange={(e) => {this.state.association = e.target.checked; this.setState({}); this.getUsers()}}
+                              value={this.state.association}
+                              color="primary"
+                                />
+                          } label={'Display just ' +  this.state.adm + ' users'}/>
+
+                    </div>
+                    <div>
+
+                    </div>
+                </div>
+             : ''
+             }
+
             <div className="row">
                 <div className="col-md-12" style={{display: 'flex'}}>
                     <div className="alertsResults">
                         <CodeExample beforeCodeTitle="Users">
                             <div className="kt-section">
-                                /*{this.state.importing ?
-                                    <Button disabled style={{position: "relative",top: "-49px", left: "100px"}}
-                                            onClick={() => {this.handleImport();}} color="primary">
-                                        Importing...
-                                    </Button> :
-                                    <Button style={{position: "relative",top: "-49px", left: "100px"}}
-                                            onClick={() => {this.handleImport();}} color="primary">
-                                        Import
-                                    </Button>
-                                }*/
+
                                 <div className="col-md-12" >
                                     <div className="kt-section__content">
+
+
+
+
             <Paper>
                 <Table>
                     <TableHead>
@@ -148,11 +261,18 @@ export default class UsersPage extends React.Component {
                                 First Name
                             </TableCell>
                             <TableCell align="left">
-                                Last Value
+                                Last Name
                             </TableCell>
+
                             <TableCell align="left">
-                                Roles
+                                Type
                             </TableCell>
+                             {this.state.adm == null ?
+                                <TableCell align="left">
+                                    Roles
+                                </TableCell>
+                                : ''
+                             }
                             <TableCell align="right">
                                 Actions
                             </TableCell>
@@ -173,17 +293,46 @@ export default class UsersPage extends React.Component {
                                         <TableCell align="left">
                                             {user.lastName}
                                         </TableCell>
-                                        <TableCell align="left">
-                                            {user.authorities.map(a => <span> {a} &nbsp; </span>)}
+
+                                         <TableCell align="left">
+                                            {user.type == -1 ? 'Tender' : user.type == 1 ? 'Technical Expert' : 'Public Acquisitions Expert'}
                                         </TableCell>
+                                        {this.state.adm == null ?
+                                            <TableCell align="left">
+                                                {user.authorities.map(a => <span> {a} &nbsp; </span>)}
+                                            </TableCell>
+                                           : ''}
                                         <TableCell align="right">
-                                            <a onClick={() => this.setState({onBeEdited: user, confirmEdit: true})}>
-                                                <i className="fa fa-edit fa-lg"  title="Edit"> </i>
-                                            </a>
-                                            &nbsp;
-                                            <a onClick={() => this.setState({onBeDeleted: user.email, confirmDelete: true})}>
-                                                <i className="fa fa-trash fa-lg"  title="Delete"> </i>
-                                            </a>
+                                           {this.state.adm == null ?
+                                               <>
+                                                    <a onClick={() => this.setState({onBeEdited: user, confirmEdit: true})}>
+                                                        <i style={{color: 'blue'}} className="fa fa-edit fa-lg"  title="Edit"> </i>
+                                                    </a>
+                                                    &nbsp;
+                                                    <a onClick={() => this.setState({onBeDeleted: user.email, confirmDelete: true})}>
+                                                        <i style={{color: 'red'}} className="fa fa-trash fa-lg"  title="Delete"> </i>
+                                                    </a>
+                                                </>
+                                            : ''}
+
+                                            {this.state.adm != null  && !user.associated ?
+                                                <>
+                                                    <a onClick={() => this.handleAddAssociation(user)}>
+                                                        <i style={{color: 'green'}} className="fa fa-plus"  title="Edit"> </i>
+                                                    </a>
+                                                </>
+                                             : ''}
+
+                                                    &nbsp;
+
+                                             {this.state.adm != null && user.associated ?
+                                                 <>
+                                                     <a onClick={() => this.handleRemoveAssociation(user)}>
+                                                         <i style={{color: 'red'}} className="fa fa-trash"  title="Delete"> </i>
+                                                     </a>
+                                                 </>
+                                              : ''}
+
                                         </TableCell>
                                     </TableRow>
                                 )
@@ -330,6 +479,30 @@ export default class UsersPage extends React.Component {
                                                                 }}
                                                         />
                                                         ROLE_SUPERVISOR
+
+                                                         <Checkbox
+                                                            checked={this.state.onBeEdited.authorities.indexOf('ROLE_EXPERT') >= 0 }
+                                                            onChange={ (e) => {
+
+                                                                if(!e.target.checked)  {
+                                                                    this.state.onBeEdited.authorities = this.state.onBeEdited.authorities.filter(a => a != 'ROLE_EXPERT');
+                                                                } else {
+
+                                                                  if(this.state.onBeEdited.authorities.indexOf('ROLE_EXPERT') < 0) {
+                                                                    this.state.onBeEdited.authorities.push('ROLE_EXPERT');
+                                                                  }
+                                                                }
+
+                                                                this.setState({onBeEdited : this.state.onBeEdited})
+                                                                }
+                                                             }
+                                                            value={this.state.onBeEdited.authorities.indexOf('ROLE_EXPERT') >= 0 }
+
+                                                            inputProps={{
+                                                                  "aria-label": "primary checkbox"
+                                                                }}
+                                                        />
+                                                        ROLE_EXPERT
                                                     </div>
                                                 </DialogContentText>
                                             </DialogContent>
