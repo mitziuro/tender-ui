@@ -43,7 +43,7 @@ export default class PartenersComponent extends React.Component {
     constructor(props) {
 
         super(props);
-        this.state = {users: [], offer: props.offer, cn: null, cui: null, partners: [], readonly: true};
+        this.state = {users: [], offer: props.offer, cn: null, cui: null, partners: [], readonly: props.readonly};
 
        this.handleSearch();
        this.handleGetPartners();

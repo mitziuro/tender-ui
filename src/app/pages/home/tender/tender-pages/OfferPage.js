@@ -11,6 +11,8 @@ import {uploadFile, getFileURI, getFiles, deleteFile} from "../../../../crud/ten
 import {getUserByToken} from "../../../../crud/auth.crud";
 import {expertsInternal, expertsExternalForUser} from "../../../../crud/tender/user.details.crud";
 import {getBidsForUserAndOffer, getBidsForOffer, saveBids } from "../../../../crud/tender/bid.crud";
+import {getPartnersForOffer, savePartner, deletePartnerByEntry} from "../../../../crud/tender/partner.crud";
+
 
 import  AlertListingComponent from '../components/AlertListingComponent';
 import  NoticeListingComponent from '../components/NoticeListingComponent';
@@ -73,7 +75,7 @@ export default class OfferPage extends React.Component {
             declineOpen: false, declineReason: null, user:{}, structures: [],
             content: [], contentSelected: {}, contentEditOpen: false, internalExperts : [],
             chapters: [], chaptersData: {}, selectedSection : null, selectedContent: null,
-            files: {}, externalExperts: [], myBids: [], allBids: [],
+            files: {}, externalExperts: [], myBids: [], allBids: [], myPartners: [],
 
             activeTab: 1
         };
@@ -117,6 +119,7 @@ export default class OfferPage extends React.Component {
             this.getExpertsExternalForTender();
             this.getMyBids();
             this.getAllBidsForOffer();
+            this.getPartnersForOffer();
     }
 
 
@@ -187,6 +190,17 @@ export default class OfferPage extends React.Component {
 
         Promise.all([expertsExternalForUser(this.state.offer.tender.id)]).then(response => {
             this.setState({externalExperts: response[0].data});
+        });
+    }
+
+    getPartnersForOffer = () => {
+
+        if(this.state.offer.state < 3 || this.state.offer.tender.id != this.state.user.id) {
+            return;
+        }
+
+        Promise.all([getPartnersForOffer(this.state.offer.id)]).then(response => {
+            this.setState({myPartners: response[0].data});
         });
     }
 
@@ -754,7 +768,7 @@ export default class OfferPage extends React.Component {
             <div className="tabs" style={{display: 'flex'}}>
                 <div onClick={() => this.setState({activeTab: 2})} style={{background: this.state.activeTab == 2 ? 'white' : ''}} className="tab">Partnerships</div>
                 <div onClick={() => this.setState({activeTab: 3})} style={{background: this.state.activeTab == 3 ? 'white' : ''}} className="tab">External attributions</div>
-                <div onClick={() => this.setState({activeTab: 1})} style={{background: this.state.activeTab == 1 ? 'white' : ''}} className="tab">Offer Content</div>
+                <div onClick={() => {this.getPartnersForOffer();this.setState({activeTab: 1});}} style={{background: this.state.activeTab == 1 ? 'white' : ''}} className="tab">Offer Content</div>
                 <div onClick={() => this.setState({activeTab: 4})} style={{background: this.state.activeTab == 4 ? 'white' : ''}} className="tab">Alerts</div>
                 <div onClick={() => this.setState({activeTab: 5})} style={{background: this.state.activeTab == 5 ? 'white' : ''}} className="tab">Messages</div>
             </div>
@@ -1255,6 +1269,8 @@ export default class OfferPage extends React.Component {
                                                                                                             {
                                                                                                                this.state.offer.state == 3 && this.state.offer.tender.id == this.state.user.id ?
                                                                                                                    <div>
+                                                                                                                     {
+                                                                                                                         this.state.myPartners != null && this.state.myPartners.length > 0 ?
                                                                                                                         <Select style={{minWidth: '50px', width: '100%', position: 'relative'}}
                                                                                                                                                 value={c.type}
                                                                                                                                                 onChange={(e) => {
@@ -1278,15 +1294,50 @@ export default class OfferPage extends React.Component {
                                                                                                                                     <em>Public Acquisitions Expert</em>
                                                                                                                                 </MenuItem>
 
+                                                                                                                                    <MenuItem value="-2">
+                                                                                                                                        <em>Partner</em>
+                                                                                                                                    </MenuItem>
+
+
                                                                                                                         </Select>
 
+                                                                                                                        :
 
+                                                                                                                                    <Select style={{minWidth: '50px', width: '100%', position: 'relative'}}
+                                                                                                                                                value={c.type}
+                                                                                                                                                onChange={(e) => {
+                                                                                                                                                  c.type = e.target.value;
+                                                                                                                                                  c.assignee = null;
+                                                                                                                                                  this.setState({});
+                                                                                                                                                }}
+                                                                                                                                                inputProps={{
+                                                                                                                            name: "user-type",
+                                                                                                                            id: "user-type"
+                                                                                                                        }}
+                                                                                                                        >
+
+                                                                                                                                <MenuItem value="-1">
+                                                                                                                                    <em>Internal</em>
+                                                                                                                                </MenuItem>
+                                                                                                                                <MenuItem value="1">
+                                                                                                                                    <em>Technical Expert</em>
+                                                                                                                                </MenuItem>
+                                                                                                                                <MenuItem value="2">
+                                                                                                                                    <em>Public Acquisitions Expert</em>
+                                                                                                                                </MenuItem>
+
+
+
+
+                                                                                                                        </Select>
+                                                                                                                        }
                                                                                                                    </div>
                                                                                                                : <div>
                                                                                                                     {
                                                                                                                         c.type == -1 ? 'Internal' :
                                                                                                                         c.type == 1 ? 'Technical Expert' :
                                                                                                                         c.type == 2 ? 'Public Acquisitions Expert' :
+                                                                                                                        c.type == -2 ? 'Partner' :
                                                                                                                         ''
                                                                                                                     }
                                                                                                                 </div>
@@ -1295,7 +1346,7 @@ export default class OfferPage extends React.Component {
 
                                                                                                         <TableCell align="left" >
                                                                                                             {
-                                                                                                               this.state.offer.state == 3 && this.state.offer.tender.id == this.state.user.id  && c.type == -1 ?
+                                                                                                               this.state.offer.state == 3 && this.state.offer.tender.id == this.state.user.id  && c.type < 0  ?
                                                                                                                    <div>
                                                                                                                         <Select style={{minWidth: '100px', width: '100%', position: 'relative'}}
                                                                                                                                                 value={c.assignee}
@@ -1310,8 +1361,10 @@ export default class OfferPage extends React.Component {
                                                                                                                         >
 
                                                                                                                                 {
-                                                                                                                                    this.state.internalExperts.map(e => (
-                                                                                                                                            <MenuItem value={e.id}>{e.firstName} {e.lastName} &lt; {e.login} &gt;</MenuItem>
+                                                                                                                                    (c.type == -1 ? this.state.internalExperts : this.state.myPartners.map(p => {return {
+                                                                                                                                        firstName : p.companyName, lastName : '', id : p.userId
+                                                                                                                                        }})).map(e => (
+                                                                                                                                            <MenuItem value={e.id}>{e.firstName} {e.lastName} &lt; {e.login ? e.login : ''} &gt;</MenuItem>
                                                                                                                                         )
                                                                                                                                     )
 
@@ -1319,6 +1372,7 @@ export default class OfferPage extends React.Component {
 
                                                                                                                         </Select>
                                                                                                                    </div>
+
                                                                                                                : <div>
                                                                                                                 {
                                                                                                                    c.assignee ?
