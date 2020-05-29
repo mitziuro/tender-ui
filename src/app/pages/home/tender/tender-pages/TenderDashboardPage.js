@@ -10,6 +10,7 @@ import {getCpvs, getContractingAuthorities, getBusinessFields} from "../../../..
 import {saveAlert, getAlert} from "../../../../crud/tender/alert.crud";
 import  AlertListingComponent from '../components/AlertListingComponent';
 import  OfferListingComponent from '../components/OfferListingComponent';
+import MostActiveExpertsComponent from '../components/MostActiveExpertsComponent';
 import  NoticeListingComponent from '../components/NoticeListingComponent';
 import  UserActivityComponent from '../components/UserActivityComponent';
 import {getUserByToken} from "../../../../crud/auth.crud";
@@ -106,11 +107,11 @@ export default class TenderDashboardPage extends React.Component {
 
                         <div className="col-md-6">
                             <div className="offersResults">
-                                <CodeExample beforeCodeTitle="Recently Active Experts">
+                                <CodeExample beforeCodeTitle="Most Active Experts">
                                     <div className="kt-section">
                                         <div className="col-md-12">
                                             <div className="kt-separator kt-separator--dashed" style={{textAlign: 'center', paddingTop: '22px',minHeight: '123px'}}>
-                                                <b>No Results</b>
+                                                <MostActiveExpertsComponent />
                                             </div>
                                         </div>
                                     </div>

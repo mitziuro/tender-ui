@@ -29,17 +29,34 @@ import {
     DialogContentText
 } from "@material-ui/core";
 
+import { getUserByToken, saveUserByToken } from '../../../../crud/auth.crud';
+
 
 export default class ExpertDashboardPage extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {};
+
+        Promise.all([getUserByToken()]).then(response => {
+            this.setState({user: response[0].data});
+        });
+
     }
 
 
     render() {
         return (
             <>
+
+                {this.state.user && !this.state.user.approved ?
+                    <div className="row" className="no_supervised">
+                        <div>You are not approved by supervisor</div>
+                    </div>
+
+                :
+
                 <div className="row">
                         <div className="col-md-6" style={{display: 'flex', flexDirection: 'column', minHeight: '300px'}}>
                             <div className="offersResults">
@@ -73,6 +90,8 @@ export default class ExpertDashboardPage extends React.Component {
                         </div>
 
                 </div>
+
+                }
             </>
     )}
 }

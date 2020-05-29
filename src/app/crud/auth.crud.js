@@ -4,6 +4,7 @@ import { SERVER_URL } from './tender/search.notice.crud';
 
 export const LOGIN_URL = SERVER_URL + "/api/authenticate";
 export const ACTIVATE_URL = SERVER_URL + "/api/activate";
+export const PROFILE_URL = SERVER_URL + "/api/profile";
 export const REGISTER_URL = SERVER_URL +  "/api/register";
 export const REQUEST_PASSWORD_URL = SERVER_URL +  "/api/account/reset-password/init";
 export const FINISH_PASSWORD_URL = SERVER_URL +  "/api/account/reset-password/finish";
@@ -44,6 +45,11 @@ export function changePassword(password, newPassword) {
 
 export function getUserByToken() {
   return axios.get(ME_URL);
+}
+
+
+export function getUserById(id) {
+  return axios.get(PROFILE_URL + '/' + id);
 }
 
 export function saveUserByToken(user) {

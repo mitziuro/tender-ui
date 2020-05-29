@@ -10,6 +10,8 @@ import OfferPage from './OfferPage';
 import InternalExpertsPage from './InternalExpertsPage';
 import ExternalExpertsPage from './ExternalExpertsPage';
 
+import SupervisorAdminPage from './SupervisorAdminPage';
+
 import AlertsPage from './alerts/AlertsPage';
 import AlertsConfigurationPage from './alerts/AlertsConfigurationPage';
 import NoticesPage from './alerts/NoticesPage';
@@ -140,6 +142,11 @@ export default function TenderPagesBootstrapPage() {
             <Route
                 path="/tender/tender-pages/ExternalExperts"
                 component={ExternalExpertsPage}
+            />
+
+             <Route
+                path="/tender/tender-pages/SuperVisorAdminPage"
+                component={SupervisorAdminPage}
             />
 
 

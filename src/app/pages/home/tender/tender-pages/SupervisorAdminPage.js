@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 
-import CodeExample from "../../../../../partials/content/CodeExample";
+import CodeExample from "../../../../partials/content/CodeExample";
 import { Button, Form, InputGroup, Col, Row } from "react-bootstrap";
 
 import {
@@ -35,10 +35,9 @@ import {
 } from "@material-ui/core";
 
 
-import {getUsers, deleteUser, saveUser, doImport, searchUsers} from "../../../../../crud/admin/users.crud";
-import {addAssociation, deleteAssociationForUserId} from "../../../../../crud/tender/experts.association.crud";
+import {getUsers, deleteUser, saveUser, doImport, searchUsers, acceptUser, rejectUser} from "../../../../crud/admin/users.crud";
 
-import addNotification from "../../../../../widgets/NotificationWidget";
+import addNotification from "../../../../widgets/NotificationWidget";
 
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -51,9 +50,19 @@ export default class UsersPage extends React.Component {
     constructor(props) {
 
         super(props);
+
+        let accept = null;
+        if(props.location.search.indexOf('approve=') > 0){
+            accept = props.location.search.split('=')[1];
+        }
+
+        let reject = null;
+        if(props.location.search.indexOf('reject=') > 0){
+            reject = props.location.search.split('=')[1];
+        }
+
         this.state = {
-            adm: props.type,
-            users: [], size: 10, page: 0, total: 0, name: null, type: null, association: props.type != null ? true : false,
+            users: [], size: 10, page: 0, total: 0,
             onBeDeleted: null, confirmDelete: false, importing: false,
             onBeEdited: {authorities: []}, confirmEdit: false
 
@@ -69,18 +78,27 @@ export default class UsersPage extends React.Component {
 
         this.handleImport = this.handleImport.bind(this);
 
-        this.getUsers();
+        this.getUsers(accept, reject);
     }
 
-    getUsers = () => {
+    getUsers = (accept, reject) => {
 
-        let type = this.state.type;
-        if(this.state.adm != null && type == null) {
-            type = 3;
+        if(accept == null && reject == null) {
+            Promise.all([getUsers(this.state.page, this.state.size, true)]).then(response => {
+                this.setState({users: response[0].data, total: response[0].headers['x-total-count'], page: this.state.page});
+            });
+
+            return;
         }
 
-        Promise.all([searchUsers(this.state.page, this.state.size, this.state.name, type, this.state.association == true ? this.state.adm : null, this.state.adm)]).then(response => {
-            this.setState({users: response[0].data, total: response[0].headers['x-total-count'], page: this.state.page});
+
+        Promise.all([accept != null ? acceptUser(accept) : rejectUser(reject)]).then(response => {
+
+            addNotification("Success", 'The expert has been ' + (accept ? 'accepted' : 'rejected'), 'success');
+
+            Promise.all([getUsers(this.state.page, this.state.size, true)]).then(response => {
+                this.setState({users: response[0].data, total: response[0].headers['x-total-count'], page: this.state.page});
+            });
         });
     }
 
@@ -106,25 +124,7 @@ export default class UsersPage extends React.Component {
 
     }
 
-    handleAddAssociation = (user) => {
 
-        Promise.all([addAssociation({type: this.state.adm == 'internal' ? 1 : 2, userId: user.id})]).then(response => {
-            user.associated = true;
-            this.setState({});
-            addNotification("Success", "The association has been made", 'success');
-
-        });
-
-    }
-
-    handleRemoveAssociation = (user) => {
-        Promise.all([deleteAssociationForUserId(user.id)]).then(response => {
-            user.associated = false;
-            this.setState({});
-            addNotification("Success", "The association has been deleted", 'success');
-
-        });
-    }
 
 
     handleChangePage = (page) => {
@@ -153,90 +153,6 @@ export default class UsersPage extends React.Component {
             <>
 
 
-             <div style={{display: 'flex', marginBottom : '20px'}}>
-
-                <div className="col-md-3" style={{position: 'relative', top: '12px'}}>
-                   Type
-
-                   { this.state.adm == null ?
-                   <Select style={{width: '100%', position: 'relative'}}
-                                           onChange={(e) => {
-                                               this.state.type = e.target.value;
-                                               this.setState({});
-                                           }}
-                                           inputProps={{
-                       name: "type",
-                       id: "type",
-                       label: "type"
-                   }}
-                   >
-
-
-                     <MenuItem value={-1} >Tender</MenuItem>
-                     <MenuItem value={1}>Technical Expert</MenuItem>
-                     <MenuItem value={2}>Public Acquisitions Expert</MenuItem>
-
-                   </Select>
-                   :
-
-                    <Select style={{width: '100%', position: 'relative'}}
-                                                              onChange={(e) => {
-                                                                  this.state.type = e.target.value;
-                                                                  this.setState({});
-                                                              }}
-                                                              inputProps={{
-                                          name: "type",
-                                          id: "type",
-                                          label: "type"
-                                      }}
-                                      >
-
-                                        <MenuItem value={1}>Technical Expert</MenuItem>
-                                        <MenuItem value={2}>Public Acquisitions Expert</MenuItem>
-
-                                      </Select>
-
-
-                 }
-                </div>
-
-                <div className="col-md-3">
-                     <TextField label="Login"
-                              value={this.state.name}
-                              onChange={(e) => { this.state.name = e.target.value; this.setState({});}}
-                              margin="normal"/>
-                </div>
-
-
-                <div className="col-md-3" style={{position: 'relative', top: "20px"}}>
-                     <Button style={{marginLeft: "10px", background: 'green'}}  onClick={() => {this.getUsers();}} color="primary">
-                         Search
-                     </Button>
-                </div>
-
-
-
-            </div>
-
-            {this.state.adm != null ?
-                <div>
-                    <div>
-                        <FormControlLabel control={
-                                    <Checkbox
-                              checked={this.state.association}
-                              onChange={(e) => {this.state.association = e.target.checked; this.setState({}); this.getUsers()}}
-                              value={this.state.association}
-                              color="primary"
-                                />
-                          } label={'Display just ' +  this.state.adm + ' users'}/>
-
-                    </div>
-                    <div>
-
-                    </div>
-                </div>
-             : ''
-             }
 
             <div className="row">
                 <div className="col-md-12" style={{display: 'flex'}}>
@@ -267,12 +183,7 @@ export default class UsersPage extends React.Component {
                             <TableCell align="left">
                                 Type
                             </TableCell>
-                             {this.state.adm == null ?
-                                <TableCell align="left">
-                                    Roles
-                                </TableCell>
-                                : ''
-                             }
+
                             <TableCell align="right">
                                 Actions
                             </TableCell>
@@ -297,41 +208,14 @@ export default class UsersPage extends React.Component {
                                          <TableCell align="left">
                                             {user.type == -1 ? 'Tender' : user.type == 1 ? 'Technical Expert' : 'Public Acquisitions Expert'}
                                         </TableCell>
-                                        {this.state.adm == null ?
-                                            <TableCell align="left">
-                                                {user.authorities.map(a => <span> {a} &nbsp; </span>)}
-                                            </TableCell>
-                                           : ''}
+
                                         <TableCell align="right">
-                                           {this.state.adm == null ?
-                                               <>
-                                                    <a onClick={() => this.setState({onBeEdited: user, confirmEdit: true})}>
-                                                        <i style={{color: 'blue'}} className="fa fa-edit fa-lg"  title="Edit"> </i>
-                                                    </a>
-                                                    &nbsp;
-                                                    <a onClick={() => this.setState({onBeDeleted: user.email, confirmDelete: true})}>
-                                                        <i style={{color: 'red'}} className="fa fa-trash fa-lg"  title="Delete"> </i>
-                                                    </a>
-                                                </>
-                                            : ''}
 
-                                            {this.state.adm != null  && !user.associated ?
-                                                <>
-                                                    <a onClick={() => this.handleAddAssociation(user)}>
-                                                        <i style={{color: 'green'}} className="fa fa-plus"  title="Edit"> </i>
-                                                    </a>
-                                                </>
-                                             : ''}
 
-                                                    &nbsp;
-
-                                             {this.state.adm != null && user.associated ?
-                                                 <>
-                                                     <a onClick={() => this.handleRemoveAssociation(user)}>
-                                                         <i style={{color: 'red'}} className="fa fa-trash"  title="Delete"> </i>
-                                                     </a>
-                                                 </>
-                                              : ''}
+                                             <Link
+                                                to={`/tender/tender-pages/MyAccountPage?user=${user.id}`}>
+                                                 <i style={{color: 'blue'}} className="fa fa-eye"  title="Edit"> </i>
+                                            </Link>
 
                                         </TableCell>
                                     </TableRow>

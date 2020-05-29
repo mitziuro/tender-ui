@@ -11,6 +11,8 @@ import LanguageSelector from "../../../../../partials/layout/LanguageSelector";
 
 import addNotification from "../../../../../widgets/NotificationWidget";
 
+import { Link } from 'react-router-dom';
+
 import {
     Button,
     InputGroup,
@@ -22,13 +24,18 @@ import {
     Row
 } from "react-bootstrap";
 
-import { getUserByToken, saveUserByToken } from '../../../../../crud/auth.crud';
+import { getUserByToken, saveUserByToken, getUserById } from '../../../../../crud/auth.crud';
 import { getUser, saveUser } from '../../../../../crud/tender/user.details.crud';
+import {uploadFile, getFileURI, getFiles, deleteFile} from '../../../../../crud/tender/experts.files.crud';
 
 import './wizard.css';
 
 import $ from 'jquery';
 import 'jquery-ui-bundle';
+
+
+import Dropzone from 'react-dropzone';
+import FileIcon, { defaultStyles } from 'react-file-icon';
 
 import {
     Checkbox,
@@ -52,8 +59,16 @@ export default class MyAccountPage extends React.Component {
 
         super(props);
 
-        this.state = {s1: {}, s2:{}, s3: {},  img:'', active: 's1'};
-        Promise.all([getUserByToken()]).then(response => {
+
+        let userId = null;
+        if(props.location.search.indexOf('user=') > 0){
+            userId = props.location.search.split('=')[1];
+        }
+
+        this.state = {s1: {}, s2:{}, s3: {},  img:'', active: 's1', files: [], userId : userId};
+
+
+        Promise.all(userId == null ? [getUserByToken()] : [getUserById(userId), getUserByToken()]).then(response => {
             var md5 = require('md5');
             var user = response[0].data;
             this.setState({s1: user, img: 'http://gravatar.com/avatar/' + md5(user.login)});
@@ -104,10 +119,21 @@ export default class MyAccountPage extends React.Component {
         this.moveToState = this.moveToState.bind(this);
         this.moveToPage = this.moveToPage.bind(this);
 
+        Promise.all([getFiles(this.state.userId ? this.state.userId : '-1')]).then(response => {
+            this.state.files = response[0].data;
+            this.setState({});
+        });
+
+
     }
 
 
     moveToPage = (props) => {
+
+        if(this.state.userId != null) {
+           this.moveToState('s4', true);
+           return;
+        }
 
         if(props.location.pathname.split('/')[props.location.pathname.split('/').length - 1] == 'MyInvoicePage'){
             this.moveToState('s2');
@@ -231,10 +257,16 @@ export default class MyAccountPage extends React.Component {
         return 's1';
     }
 
-    moveToState(state) {
+    moveToState(state, forced) {
         this.makeAllDirty(false);
 
         if(state == 's4') {
+
+            if(forced) {
+                this.setState({active: 's4'});
+                return;
+            }
+
             if(this.valid('s3')) {
                 this.setState({active: 's4'});
                 return;
@@ -296,51 +328,53 @@ export default class MyAccountPage extends React.Component {
                                             <div className="kt-wizard-v4" id="kt_user_add_user" data-ktwizard-state="first">
                                                 <div className="kt-wizard-v4__nav">
                                                     <div className="kt-wizard-v4__nav-items nav">
-                                                        <a className="kt-wizard-v4__nav-item nav-item"  onClick={(e) => this.moveToState('s1')} href="#"  data-ktwizard-state={this.state.active == 's1' ? 'current' : 'pending'}>
-                                                            <div className="kt-wizard-v4__nav-body">
-                                                                <div className="kt-wizard-v4__nav-number">
-                                                                    1
-                                                                </div>
-                                                                <div className="kt-wizard-v4__nav-label">
-                                                                    <div className="kt-wizard-v4__nav-label-title">
-                                                                        Profile
+                                                        {this.state.userId == null ? <>
+                                                            <a className="kt-wizard-v4__nav-item nav-item"  onClick={(e) => this.moveToState('s1')} href="#"  data-ktwizard-state={this.state.active == 's1' ? 'current' : 'pending'}>
+                                                                <div className="kt-wizard-v4__nav-body">
+                                                                    <div className="kt-wizard-v4__nav-number">
+                                                                        1
                                                                     </div>
-                                                                    <div className="kt-wizard-v4__nav-label-desc">
-                                                                       Personal Information
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                        <a className="kt-wizard-v4__nav-item nav-item" href="#" onClick={(e) => this.moveToState('s2')} data-ktwizard-state={this.state.active == 's2' ? 'current' : 'pending'}>
-                                                            <div className="kt-wizard-v4__nav-body">
-                                                                <div className="kt-wizard-v4__nav-number">
-                                                                    2
-                                                                </div>
-                                                                <div className="kt-wizard-v4__nav-label">
-                                                                    <div className="kt-wizard-v4__nav-label-title">
-                                                                        Invoicing
-                                                                    </div>
-                                                                    <div className="kt-wizard-v4__nav-label-desc">
-                                                                        Invoicing Details
+                                                                    <div className="kt-wizard-v4__nav-label">
+                                                                        <div className="kt-wizard-v4__nav-label-title">
+                                                                            Profile
+                                                                        </div>
+                                                                        <div className="kt-wizard-v4__nav-label-desc">
+                                                                           Personal Information
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </a>
-                                                        <a className="kt-wizard-v4__nav-item nav-item" href="#" onClick={(e) => this.moveToState('s3')} data-ktwizard-state={this.state.active == 's3' ? 'current' : 'pending'}>
-                                                            <div className="kt-wizard-v4__nav-body">
-                                                                <div className="kt-wizard-v4__nav-number">
-                                                                    3
-                                                                </div>
-                                                                <div className="kt-wizard-v4__nav-label">
-                                                                    <div className="kt-wizard-v4__nav-label-title">
-                                                                        Mail
+                                                            </a>
+                                                            <a className="kt-wizard-v4__nav-item nav-item" href="#" onClick={(e) => this.moveToState('s2')} data-ktwizard-state={this.state.active == 's2' ? 'current' : 'pending'}>
+                                                                <div className="kt-wizard-v4__nav-body">
+                                                                    <div className="kt-wizard-v4__nav-number">
+                                                                        2
                                                                     </div>
-                                                                    <div className="kt-wizard-v4__nav-label-desc">
-                                                                       Mailing Address
+                                                                    <div className="kt-wizard-v4__nav-label">
+                                                                        <div className="kt-wizard-v4__nav-label-title">
+                                                                            Invoicing
+                                                                        </div>
+                                                                        <div className="kt-wizard-v4__nav-label-desc">
+                                                                            Invoicing Details
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </a>
+                                                            </a>
+                                                            <a className="kt-wizard-v4__nav-item nav-item" href="#" onClick={(e) => this.moveToState('s3')} data-ktwizard-state={this.state.active == 's3' ? 'current' : 'pending'}>
+                                                                <div className="kt-wizard-v4__nav-body">
+                                                                    <div className="kt-wizard-v4__nav-number">
+                                                                        3
+                                                                    </div>
+                                                                    <div className="kt-wizard-v4__nav-label">
+                                                                        <div className="kt-wizard-v4__nav-label-title">
+                                                                            Mail
+                                                                        </div>
+                                                                        <div className="kt-wizard-v4__nav-label-desc">
+                                                                           Mailing Address
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </> : ''}
                                                         <a className="kt-wizard-v4__nav-item nav-item" href="#" onClick={(e) => this.moveToState('s4')} data-ktwizard-state={this.state.active == 's4' ? 'current' : 'pending'}>
                                                             <div className="kt-wizard-v4__nav-body">
                                                                 <div className="kt-wizard-v4__nav-number">
@@ -777,6 +811,46 @@ export default class MyAccountPage extends React.Component {
                                                                                                     {(this.state.s2.invPaymentType == null || this.state.s2.invPaymentType == '') && this.state.invPaymentTypeDirty ? <p className="error_field MuiFormHelperText-root Mui-error">Required field</p> : <></>}
 
                                                                                                 </div>
+                                                                                            </div>
+
+                                                                                            <div style={{position: 'relative', top: '25px'}}>
+                                                                                            <Dropzone onDrop={acceptedFiles => {
+
+                                                                                                        acceptedFiles.forEach(f => {
+                                                                                                            var formData = new FormData();
+                                                                                                            formData.append("file", f);
+                                                                                                            Promise.all([uploadFile(formData, this.state.userId ? this.state.userId : '-1')]).then(response => {
+                                                                                                                this.state.files.push(f.name);
+                                                                                                                this.setState({});
+                                                                                                            });
+                                                                                                        });
+
+
+                                                                                                  }}>
+                                                                                              {({getRootProps, getInputProps}) => (
+                                                                                                <section>
+                                                                                                  <div {...getRootProps()}>
+                                                                                                    <input {...getInputProps()} />
+                                                                                                    <p style={{color: 'gray'}}><i>Drag 'n' drop some files here, or click to select files</i></p>
+                                                                                                  </div>
+                                                                                                  {
+                                                                                                    this.state.files != null ?
+                                                                                                    this.state.files.map((f, index) => {
+                                                                                                        return (
+                                                                                                        <>
+                                                                                                            <a style={{marginRight: '20px'}}  target="_blank" href={getFileURI(f, this.state.userId ? this.state.userId : '-1')}>
+                                                                                                                <FileIcon size="25" extension={f.split('.')[f.split('.').length-1]} {...defaultStyles.docx} /> {f}
+                                                                                                            </a>
+                                                                                                            <i onClick={() => {this.state.files = this.state.files.filter(e => e != f); this.setState({});}} class="fa fa-trash" style={{color:'red', cursor: 'pointer', marginLeft: '5px'}}></i>
+                                                                                                        </>
+                                                                                                        );
+                                                                                                    }) : <></>
+
+                                                                                                  }
+
+                                                                                                </section>
+                                                                                              )}
+                                                                                               </Dropzone>
                                                                                             </div>
 
 
@@ -1462,10 +1536,28 @@ export default class MyAccountPage extends React.Component {
                                                                                          }
                                                                                     </div>
                                                                                 </div>
-                                                                            </div>
+
+                                                                                <div style={{position: 'relative', top: '25px'}}>
+                                                                                    Files
+                                                                                  {
+                                                                                    this.state.files != null ?
+                                                                                    this.state.files.map((f, index) => {
+                                                                                        return (
+                                                                                        <>
+                                                                                            <a style={{marginRight: '20px'}}  target="_blank" href={getFileURI(f)}>
+                                                                                                <FileIcon size="25" extension={f.split('.')[f.split('.').length-1]} {...defaultStyles.docx} /> {f}
+                                                                                            </a>
+                                                                                        </>
+                                                                                        );
+                                                                                    }) : <></>
+
+                                                                                  }
+                                                                                  </div>
+                                                                             </div>
                                                                         </div>
                                                                     </div>
 
+                                                                    { this.state.userId == null ?
                                                                     <div className="kt-form__actions">
 
                                                                         {this.state.active != 's1' ? (
@@ -1525,6 +1617,32 @@ export default class MyAccountPage extends React.Component {
 
                                                                         </div>
                                                                     </div>
+                                                                    :
+                                                                     <div className="kt-form__actions">
+                                                                         <Link to={`/tender/tender-pages/SupervisorAdminPage?approve=${this.state.s1 ? this.state.s1.id : ''}`}>
+
+                                                                            <button
+                                                                                    type="button" style={{background: 'green'}}
+                                                                                    className="btn btn-primary btn-elevate kt-login__btn-primary"
+                                                                                    onClick={(e) => {}}>
+
+                                                                             Approve
+                                                                            </button>
+
+                                                                         </Link>
+
+                                                                         <Link to={`/tender/tender-pages/SupervisorAdminPage?reject=${this.state.s1 ? this.state.s1.id : ''}`}>
+                                                                                <button
+                                                                                    type="button" type="button" style={{background: 'red'}}
+                                                                                    className="btn btn-primary btn-elevate kt-login__btn-primary"
+                                                                                    onClick={(e) => {}}
+
+                                                                            >
+                                                                                Reject
+                                                                            </button>
+                                                                        </Link>
+                                                                     </div>
+                                                                    }
                                                                 </form>
                                                             </div>
                                                         </div>

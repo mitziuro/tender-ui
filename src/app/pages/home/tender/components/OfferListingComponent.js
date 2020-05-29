@@ -40,7 +40,7 @@ export default class OfferListingComponent extends React.Component {
     constructor(props) {
 
         super(props);
-        this.state = {offers: [], size: 10, page: 0, total: 0, user: props['user'], states: props['states'], type: props['type']};
+        this.state = {offers: [], size: 5, page: 0, total: 0, user: props['user'], states: props['states'], type: props['type']};
 
         this.getOffers = this.getOffers.bind(this);
         this.handleChangePage = this.handleChangePage.bind(this);

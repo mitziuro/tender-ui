@@ -164,7 +164,7 @@ export default {
             translate: "MENU.CHANGE_PASSWORD",
             page: "tender/tender-pages/ChangePasswordPage"
           },
-          {
+        /*  {
             title: "Change Password",
             icon: "flaticon2-expand",
             page: "builder",
@@ -177,7 +177,7 @@ export default {
             page: "builder",
             translate: "MENU.NOTIFICATIONS",
             page: "tender/tender-pages/ChangePasswordPage"
-          }
+          }*/
         ]
       },
       /*{
@@ -223,6 +223,55 @@ export default {
         icon: "flaticon2-architecture-and-city",
         page: "tender/tender-pages/SupervisorDashboardPage",
       },
+    {
+        title: "Experts Management",
+        root: true,
+        role: "ROLE_SUPERVISOR",
+        bullet: "dot",
+       icon: "flaticon2-architecture-and-city",
+        page: "tender/tender-pages/SupervisorAdminPage",
+      },
+
+      {
+              title: "Account Settings",
+              root: true,
+              bullet: "dot",
+              role: "ROLE_SUPERVISOR",
+              translate: "MENU.PROFILE",
+              icon: "flaticon2-architecture-and-city",
+              submenu: [
+                {
+                  title: "My Account",
+                  bullet: "dot",
+                  icon: "flaticon2-expand",
+                  page: "builder",
+                  translate: "MENU.MY_ACCOUNT",
+                  submenu: [
+                    {
+                      title: "Personal Info",
+                      icon: "flaticon2-expand",
+                      page: "builder",
+                      translate: "MENU.MY_PAGE",
+                      page: "tender/tender-pages/MyAccountPage"
+                    },
+                    {
+                      title: "My Account",
+                      icon: "flaticon2-expand",
+                      page: "builder",
+                      translate: "MENU.INVOICE",
+                      page: "tender/tender-pages/MyInvoicePage"
+                    },
+                    {
+                      title: "Change Password",
+                      icon: "flaticon2-expand",
+                      page: "builder",
+                      translate: "MENU.MAIL",
+                      page: "tender/tender-pages/MyMailPage"
+                    }
+                  ]
+                },
+            ]},
+
 
        {section: "Expert",
               role: "ROLE_EXPERT"

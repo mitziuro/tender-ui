@@ -69,6 +69,11 @@ export default class SupervisorDashboardPage extends React.Component {
                                     </div>
                                 </CodeExample>
                             </div>
+                        </div>
+                     </div>
+                 </div>
+                <div className="row">
+                       <div className="col-md-12" style={{display: 'flex', flexDirection: 'column', minHeight: '300px'}}>
                             <div className="offersResults">
                                 <CodeExample beforeCodeTitle="My Completed Offers">
                                     <div className="kt-section">
@@ -81,7 +86,7 @@ export default class SupervisorDashboardPage extends React.Component {
                                 </CodeExample>
                             </div>
                         </div>
-                    </div>
+
                 </div>
             </>
     )}
