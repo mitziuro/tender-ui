@@ -10,6 +10,8 @@ import './NoticeSearchPage.css';
 import {getNotice, getNoticeContent, getNoticeDocuments, getNoticeDocumentContentURI, getNoticeDocumentOriginalContentURI} from "../../../../crud/tender/search.notice.crud";
 import {getMyOfferForNotice, putMyOfferForNotice} from "../../../../crud/tender/offer.crud";
 
+import { PdfViewerComponent, Toolbar, Magnification, Navigation, LinkAnnotation, BookmarkView, ThumbnailView, Print, TextSelection, TextSearch, Annotation, FormFields, Inject } from '@syncfusion/ej2-react-pdfviewer';
+import FileIcon, { defaultStyles } from 'react-file-icon';
 
 import  AlertListingComponent from '../components/AlertListingComponent';
 import  NoticeListingComponent from '../components/NoticeListingComponent';
@@ -41,7 +43,7 @@ export default class NoticePage extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {notice: {name: null}, offer: {id: null}, documents:[]};
+        this.state = {notice: {name: null}, offer: {id: null}, documents:[], selectedFile: null};
         this.noticeId = this.props.location.search != null && this.props.location.search.split('id=').length == 2 ? this.props.location.search.split('id=')[1] : null;
 
         this.handleCreateOffer = this.handleCreateOffer.bind(this);
@@ -122,7 +124,7 @@ export default class NoticePage extends React.Component {
 
                                                     <div className="row ng-scope">
                                                         <div className="col-md-12">
-                                                            <h4>PDF Files: </h4>
+                                                            <h4>Files: </h4>
                                                             <div className="c-df-notice__box">
                                                                 <div className="u-displayfield s-row">
 
@@ -130,29 +132,27 @@ export default class NoticePage extends React.Component {
                                                                         this.state.documents.filter(d => d.type === 1).map((d) => {
 
                                                                             return (
-                                                                                <div style={{float: "left"}}>
-                                                                                    {d.fileName.toLowerCase().indexOf('.pdf') >= 0 && (d.fileName.toLowerCase().indexOf('.p7m') >= 0 || d.fileName.toLowerCase().indexOf('.p7s') >= 0) ? (
-                                                                                        <>
+                                                                                <div style={{float: "left", marginBottom: '20px'}}>
+                                                                                    {(d.fileName.toLowerCase().indexOf('.p7m') >= 0 || d.fileName.toLowerCase().indexOf('.p7s') >= 0) ? (
+                                                                                        <span>
                                                                                             <a target="_blank" style={{marginLeft: '5px'}} href={this.handleGetNoticeDocumentOriginalContentURI(d.id, d.fileName.replace('.p7m', '').replace('.p7s', ''))}>
-                                                                                            <i style={{color: "red"}} class="fa fa-file"> </i>
-
-                                                                                                <span> {d.fileName} </span>
-
-
+                                                                                                <FileIcon size="30" extension={d.fileName.split('.')[d.fileName.split('.').length-2]} {...defaultStyles.docx} />
                                                                                             </a>
-                                                                                            <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)} download={d.fileName} >
-                                                                                                <i class="fa fa-download" style={{color: 'red', cursor: 'pointer'}}> </i>
+                                                                                            <a target="_blank" style={{marginLeft: '5px'}} href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)} download={d.fileName} >
+                                                                                               <FileIcon size="30" extension={d.fileName.split('.')[d.fileName.split('.').length-1]} {...defaultStyles.docx} />
                                                                                             </a>
-                                                                                        </>
+                                                                                            <span> {d.fileName} </span>
+
+                                                                                        </span>
                                                                                         ) : (
-                                                                                        <>
-                                                                                            <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
-                                                                                                <i style={{color: "red"}} class="fa fa-file-pdf"> </i>
-                                                                                                <span> {d.fileName} </span>
+                                                                                        <span>
 
+                                                                                            <a  target="_blank" style={{marginLeft: '5px'}}  href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
+                                                                                                <FileIcon size="30" extension={d.fileName.split('.')[d.fileName.split('.').length-1]} {...defaultStyles.docx} />
+                                                                                                <span> {d.fileName} </span>
                                                                                             </a>
 
-                                                                                        </>
+                                                                                        </span>
                                                                                     )
                                                                                     }
                                                                                 </div>
@@ -174,24 +174,16 @@ export default class NoticePage extends React.Component {
                                                             <div className="c-df-notice__box">
                                                                 <div className="u-displayfield s-row">
 
-                                                                    { this.state.documents.filter(d => d.type === 1).length > 0 ?
+                                                                    { this.state.documents.filter(d => d.type === 2).length > 0 ?
                                                                         this.state.documents.filter(d => d.type === 2).map((d) => {
 
                                                                             return (
                                                                                 <div style={{float: "left"}}>
-                                                                                    {d.fileName.indexOf('.pdf') >= 0 ? (
-                                                                                        <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
-                                                                                            <i style={{color: "red"}} class="fa fa-file-pdf"> </i>
 
-                                                                                            <span> {d.fileName} </span>
-                                                                                        </a>) : ( <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
-                                                                                        <i style={{color: "red"}} class="fa fa-file"> </i>
-
+                                                                                    <a target="_blank" href={this.handleGetNoticeDocumentContentURI(d.id, d.fileName)}>
+                                                                                        <FileIcon size="30" extension={d.fileName.split('.')[d.fileName.split('.').length-1]} {...defaultStyles.docx} />
                                                                                         <span> {d.fileName} </span>
-
-
-                                                                                    </a>)
-                                                                                    }
+                                                                                    </a>
                                                                                 </div>
                                                                             )
                                                                         }) : <></>
@@ -239,6 +231,18 @@ export default class NoticePage extends React.Component {
                     </div>
                 </div>
             </div>
+
+/*
+            { this.state.selectedFile != null && this.state.selectedFile.indexOf('.pdf') >= 0 ?
+                <div>
+                    <PdfViewerComponent id="container" documentPath={'http://84.232.182.107:8080/api/notice-external-documents/notice/content/14879/FisaDate_DF1085086.pdf'} serviceUrl="https://ej2services.syncfusion.com/production/web-services/api/pdfviewer"  style={{ 'height': '640px' }}>
+                        <Inject services={[Toolbar, Magnification, Navigation, LinkAnnotation, BookmarkView, ThumbnailView, Print, TextSelection, TextSearch, Annotation, FormFields]}/>
+                    </PdfViewerComponent>
+                </div>
+                : ''
+            }
+*/
+
             </>
         )}
 }

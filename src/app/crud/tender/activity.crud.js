@@ -10,3 +10,7 @@ export function getLastActivities() {
 export function getActivitiesForOffer(offer) {
     return axios.get(ACTIVITIES_URL + '/offer/' + offer);
 }
+
+export function getActivities() {
+    return axios.get(ACTIVITIES_URL);
+}

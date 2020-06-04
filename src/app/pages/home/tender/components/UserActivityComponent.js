@@ -45,19 +45,6 @@ export default class UserActivityComponent extends React.Component {
 
     }
 
-    getActivity(activity) {
-        if (activity.type == 1) return 'Password Reset';
-
-        if (activity.type == 2) return 'An alert with the name "' + activity.entity1Data + '" has been created';
-        if (activity.type == 3) return 'An alert with the name "' + activity.entity1Data + '" has been updated';
-
-        if (activity.type == 4) return 'A procedure for "' + activity.entity1Data + '" has been created';
-        if (activity.type == 5) return 'A procedure for "' + activity.entity1Data + '" has been declined';
-
-        if (activity.type == 6) return 'A chapter has been assigned to you on  <a target="_blank" href="/tender/tender-pages/OfferPage?id=' + activity.entity1 + '">' +  activity.entity1Data + '</a>';
-        return '';
-    }
-
 
     render() {
         return (
@@ -109,7 +96,7 @@ export default class UserActivityComponent extends React.Component {
                                                <DateFormat value={activity.date} withTime={true} />
                                             </TableCell>
                                             <TableCell align="left">
-                                               <div dangerouslySetInnerHTML={{__html: this.getActivity(activity)}}></div>
+                                               <div dangerouslySetInnerHTML={{__html: activity.html}}></div>
                                             </TableCell>
                                         </TableRow>
                                     )

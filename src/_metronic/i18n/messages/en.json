@@ -23,6 +23,13 @@
   "MENU.NOTICE_ANALYSIS": "Contract Notice Analysis",
 
 
+  "MENU.EXPERTS_MANAGEMENT": "Experts Management",
+  "MENU.INTERNAL_EXPERTS": "Internal Experts",
+  "MENU.EXTERNAL_EXPERTS": "External Experts",
+
+  "MENU.NOTIFICATIONS": "Notifications",
+
+
   "MENU.ALERTS": "Alerts",
   "MENU.MY_ALERTS": "My Alerts",
   "MENU.MY_NOTIFICATIONS": "My Notifications",

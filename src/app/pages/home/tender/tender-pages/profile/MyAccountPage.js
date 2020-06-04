@@ -59,18 +59,21 @@ export default class MyAccountPage extends React.Component {
 
         super(props);
 
-
         let userId = null;
         if(props.location.search.indexOf('user=') > 0){
             userId = props.location.search.split('=')[1];
         }
 
-        this.state = {s1: {}, s2:{}, s3: {},  img:'', active: 's1', files: [], userId : userId};
+        this.state = {s1: {}, s2:{}, s3: {},  img:'', active: 's1', files: [], userId : userId, supervisor : null};
 
 
         Promise.all(userId == null ? [getUserByToken()] : [getUserById(userId), getUserByToken()]).then(response => {
             var md5 = require('md5');
             var user = response[0].data;
+            if(response.length > 1 && response[1].data.authorities.indexOf('ROLE_SUPERVISOR') >= 0) {
+               this.supervisor = response[1].data;
+            }
+
             this.setState({s1: user, img: 'http://gravatar.com/avatar/' + md5(user.login)});
 
             if(this.state.s1.id != null) {
@@ -127,6 +130,13 @@ export default class MyAccountPage extends React.Component {
 
     }
 
+    handleDeleteFile = (fileName) => {
+        Promise.all([deleteFile(fileName)]).then(response => {
+             this.state.files = this.state.files.filter(e => e != fileName);
+             this.setState({});
+             addNotification("Success", "The file has been deleted", 'success');
+        });
+    }
 
     moveToPage = (props) => {
 
@@ -145,6 +155,7 @@ export default class MyAccountPage extends React.Component {
         }
 
     }
+
 
     save = () => {
 
@@ -199,7 +210,7 @@ export default class MyAccountPage extends React.Component {
 
 
         if(activeState == 's1') {
-            return  ["firstName", "lastName", "email", "phone", "company", "type"];
+            return  ["firstName", "lastName", "email", "phone", "company", "type", "notificationType"];
         }
 
         if(activeState == 's2') {
@@ -524,6 +535,37 @@ export default class MyAccountPage extends React.Component {
                                                                                                     </InputGroup>
                                                                                                 </div>
                                                                                             </div>
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Notification Type</label>
+                                                                                                <div className="">
+                                                                                                    <select style={{position: "relative", top: "8px", left: "10px", width: '100%'}} value={this.state.s1.notificationType} onChange={(e) => this.applyUserProp('notificationType' , e.target.value)}    onBlur={(e) => this.setState({typeDirty : true})}
+
+                                                                                                    >
+                                                                                                        <option  value="1"> Platform </option>
+                                                                                                        <option  value="2"> Platform and Email </option>
+                                                                                                    </select>
+
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div className="form-group row">
+                                                                                                <label className="col-xl-3 col-lg-3 col-form-label">Skype</label>
+                                                                                                <div className="col-lg-9 col-xl-6">
+                                                                                                    <InputGroup className="col-form-label">
+                                                                                                        <FormControl
+                                                                                                            style={{width: '100%'}}
+
+                                                                                                            value={this.state.s1.skype}
+                                                                                                            placeholder="Skype"
+                                                                                                            aria-label="Skype"
+                                                                                                            aria-describedby="basic-addon2" onChange={(e) => this.applyUserProp('skype' , e.target.value)}
+                                                                                                            onBlur={(e) => this.setState({skypeDirty : true})}
+                                                                                                        />
+
+                                                                                                    </InputGroup>
+                                                                                                </div>
+                                                                                            </div>
+
                                                                                             {
                                                                                                 this.state.s1.type > 0 ?
                                                                                                     <div className="form-group form-group-last row">
@@ -822,6 +864,8 @@ export default class MyAccountPage extends React.Component {
                                                                                                             Promise.all([uploadFile(formData, this.state.userId ? this.state.userId : '-1')]).then(response => {
                                                                                                                 this.state.files.push(f.name);
                                                                                                                 this.setState({});
+                                                                                                                 addNotification("Success", "The file has been added", 'success');
+
                                                                                                             });
                                                                                                         });
 
@@ -841,7 +885,7 @@ export default class MyAccountPage extends React.Component {
                                                                                                             <a style={{marginRight: '20px'}}  target="_blank" href={getFileURI(f, this.state.userId ? this.state.userId : '-1')}>
                                                                                                                 <FileIcon size="25" extension={f.split('.')[f.split('.').length-1]} {...defaultStyles.docx} /> {f}
                                                                                                             </a>
-                                                                                                            <i onClick={() => {this.state.files = this.state.files.filter(e => e != f); this.setState({});}} class="fa fa-trash" style={{color:'red', cursor: 'pointer', marginLeft: '5px'}}></i>
+                                                                                                            <i onClick={() => {this.handleDeleteFile(f);}} class="fa fa-trash" style={{color:'red', cursor: 'pointer', marginLeft: '5px'}}></i>
                                                                                                         </>
                                                                                                         );
                                                                                                     }) : <></>
@@ -1538,7 +1582,7 @@ export default class MyAccountPage extends React.Component {
                                                                                 </div>
 
                                                                                 <div style={{position: 'relative', top: '25px'}}>
-                                                                                    Files
+                                                                                  { this.state.files != null && this.state.files.length > 0 ? <span style={{marginRight: '20px', marginBottom: '20px'}}>Files</span> : '' }
                                                                                   {
                                                                                     this.state.files != null ?
                                                                                     this.state.files.map((f, index) => {
@@ -1618,7 +1662,7 @@ export default class MyAccountPage extends React.Component {
                                                                         </div>
                                                                     </div>
                                                                     :
-                                                                     <div className="kt-form__actions">
+                                                                     <div className="kt-form__actions" style={{display: this.supervisor != null && this.state.s1.approved == false ? '' : 'none'}}>
                                                                          <Link to={`/tender/tender-pages/SupervisorAdminPage?approve=${this.state.s1 ? this.state.s1.id : ''}`}>
 
                                                                             <button
@@ -1633,7 +1677,7 @@ export default class MyAccountPage extends React.Component {
 
                                                                          <Link to={`/tender/tender-pages/SupervisorAdminPage?reject=${this.state.s1 ? this.state.s1.id : ''}`}>
                                                                                 <button
-                                                                                    type="button" type="button" style={{background: 'red'}}
+                                                                                    type="button" type="button" style={{background: 'red', border: '1px solid red'}}
                                                                                     className="btn btn-primary btn-elevate kt-login__btn-primary"
                                                                                     onClick={(e) => {}}
 

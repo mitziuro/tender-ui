@@ -35,12 +35,21 @@ export default class UserDisplay extends React.Component {
                         </div>
 
                         <div style={{marginLeft: '5px'}}>
-                            <div> {this.state.user.firstName}  {this.state.user.lastName} </div>
+                            <div>
+                                <a target="_blank" href={`/tender/tender-pages/MyAccountPage?user=${this.state.user.id}`}>
+                                    {this.state.user.firstName}  {this.state.user.lastName}
+                                </a>
+                            </div>
                             <div>
                                 <a href={ 'mailto:' + this.state.user.login}>
                                     {this.state.user.login}
                                 </a>
                             </div>
+                        </div>
+                        <div style={{fontSize: '21px', left: '8px', position: 'relative', top: '2px', display: this.state.user.skype != null && this.state.user.skype.length > 0 ? '' : 'none'}}>
+                            <a href={`skype:${this.state.user.skype}?chat`}>
+                                <i style={{color: 'green'}} className="fab fa-skype"></i>
+                             </a>
                         </div>
 
                     </div> :

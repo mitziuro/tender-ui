@@ -19,6 +19,6 @@ export function getFiles(id) {
 }
 
 
-export function deleteFile(filename, id) {
-    return axios.delete(FILES_URL  + '/documents' + (id != null ? '/' + id : '') + '/' + filename);
+export function deleteFile(filename) {
+    return axios.delete(FILES_URL  + '/documents/' + filename);
 }

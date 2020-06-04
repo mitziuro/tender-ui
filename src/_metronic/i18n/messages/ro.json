@@ -20,6 +20,11 @@
 
   "MENU.USERS": "Utilizatori",
 
+  "MENU.EXPERTS_MANAGEMENT": "Management Experti",
+  "MENU.INTERNAL_EXPERTS": "Experti Interni",
+  "MENU.EXTERNAL_EXPERTS": "Experti Externi",
+
+  "MENU.NOTIFICATIONS": "Notificari",
 
   "MENU.SICAP": "Integrare SICAP",
   "MENU.SEARCH": "Cautare",

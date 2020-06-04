@@ -98,24 +98,25 @@ export default {
               root: true,
               bullet: "dot",
               role: "ROLE_TENDER",
+              translate: "MENU.EXPERTS_MANAGEMENT",
               icon: "flaticon2-architecture-and-city",
               submenu: [
               {
-                                        title: "Internal Experts",
-                                        icon: "flaticon2-expand",
-
-                                         role: "ROLE_TENDER",
-                                        page: "builder",
-                                        page: "tender/tender-pages/InternalExperts",
-                                      },
-                                      {
-                                        title: "External Experts",
-                                        icon: "flaticon2-expand",
-                                        page: "builder",
-                                        role: "ROLE_TENDER",
-
-                                        page: "tender/tender-pages/ExternalExperts",
-                                      },
+                    title: "Internal Experts",
+                    icon: "flaticon2-expand",
+                    translate: "MENU.INTERNAL_EXPERTS",
+                    role: "ROLE_TENDER",
+                    page: "builder",
+                    page: "tender/tender-pages/InternalExperts",
+                  },
+                  {
+                    title: "External Experts",
+                    icon: "flaticon2-expand",
+                    page: "builder",
+                    role: "ROLE_TENDER",
+                    translate: "MENU.EXTERNAL_EXPERTS",
+                    page: "tender/tender-pages/ExternalExperts",
+                  },
               ]
       },
 
@@ -156,7 +157,7 @@ export default {
                 page: "tender/tender-pages/MyMailPage"
               }
             ]
-          },
+         },
           {
             title: "Change Password",
             icon: "flaticon2-expand",
@@ -164,6 +165,9 @@ export default {
             translate: "MENU.CHANGE_PASSWORD",
             page: "tender/tender-pages/ChangePasswordPage"
           },
+
+
+
         /*  {
             title: "Change Password",
             icon: "flaticon2-expand",
@@ -179,6 +183,16 @@ export default {
             page: "tender/tender-pages/ChangePasswordPage"
           }*/
         ]
+      },
+
+       {
+        title: "Notifications",
+        root: true,
+        bullet: "dot",
+        role: "ROLE_TENDER",
+        translate: "MENU.NOTIFICATIONS",
+        icon: "flaticon2-expand",
+        page: "tender/tender-pages/NotificationsPage"
       },
       /*{
         title: "Procedures",
