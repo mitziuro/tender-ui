@@ -11,6 +11,6 @@ export function getActivitiesForOffer(offer) {
     return axios.get(ACTIVITIES_URL + '/offer/' + offer);
 }
 
-export function getActivities() {
-    return axios.get(ACTIVITIES_URL);
+export function getActivities(page, size) {
+    return axios.get(ACTIVITIES_URL + (page != null ? '?page=' + page : '') + (size != null ? '&size=' + size : ''));
 }

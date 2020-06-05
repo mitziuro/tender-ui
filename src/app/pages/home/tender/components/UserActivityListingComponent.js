@@ -37,13 +37,40 @@ export default class UserActivityListingComponent extends React.Component {
     constructor(props) {
 
         super(props);
-        this.state = {activities: []};
+        this.state = {activities: [], page: 0, size: 20};
 
-        Promise.all([getActivities()]).then(response => {
-            this.setState({activities: response[0].data});
-        });
+
+        this.getActivities();
 
     }
+
+    getActivities = (page) => {
+
+        Promise.all([getActivities(page != null ? page : this.state.page, this.state.size)]).then(response => {
+            this.setState({activities: response[0].data, total: response[0].headers['x-total-count'], page: page != null ? page : this.state.page});
+        });
+    }
+
+    handleChangePage = (page) => {
+        this.getActivities(page);
+    }
+
+    handleFirstPageButtonClick = () =>  {
+        this.handleChangePage(0);
+    }
+
+    handleBackButtonClick = () =>  {
+        this.handleChangePage(this.state.page - 1);
+    }
+
+    handleNextButtonClick = () =>  {
+        this.handleChangePage(this.state.page + 1);
+    }
+
+    handleLastPageButtonClick = () =>  {
+        this.handleChangePage(Math.max(0, Math.ceil(this.state.total / this.state.size) - 1));
+    }
+
 
     render() {
             return (
@@ -103,7 +130,45 @@ export default class UserActivityListingComponent extends React.Component {
                                                 })
                                             }
                                         </TableBody>
-
+                                         <TableFooter>
+                                                <TableRow>
+                                                    <td colspan="3">
+                                                        <div style={{width: '100%', textAlign: 'center'}}>
+                                                            <span>
+                                                                {(this.state.page * this.state.size) + 1} - {((this.state.page + 1)* this.state.size) > this.state.total ? this.state.total : ((this.state.page + 1)* this.state.size)}  of {this.state.total}
+                                                            </span>
+                                                            <IconButton
+                                                                onClick={this.handleFirstPageButtonClick}
+                                                                disabled={this.state.page == 0}
+                                                                aria-label="First Page"
+                                                            >
+                                                                <FirstPageIcon />
+                                                            </IconButton>
+                                                            <IconButton
+                                                                onClick={this.handleBackButtonClick}
+                                                                disabled={this.state.page == 0}
+                                                                aria-label="Previous Page"
+                                                            >
+                                                                <KeyboardArrowLeft />
+                                                            </IconButton>
+                                                            <IconButton
+                                                                onClick={this.handleNextButtonClick}
+                                                                disabled={this.state.page >= Math.ceil(this.state.total / this.state.size) - 1}
+                                                                aria-label="Next Page"
+                                                            >
+                                                                <KeyboardArrowRight />
+                                                            </IconButton>
+                                                            <IconButton
+                                                                onClick={this.handleLastPageButtonClick}
+                                                                disabled={this.state.page >= Math.ceil(this.state.total / this.state.size) - 1}
+                                                                aria-label="Last Page"
+                                                            >
+                                                                <LastPageIcon />
+                                                            </IconButton>
+                                                        </div>
+                                                    </td>
+                                                </TableRow>
+                                            </TableFooter>
                                     </Table>
                                 </Paper>
                             </div>

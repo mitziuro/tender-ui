@@ -109,7 +109,7 @@ export default class NoticeListingComponent extends React.Component {
                             <TableCell align="left">
                                 Contract Name
                             </TableCell>
-                            <TableCell align="left">
+                            <TableCell align="center">
                                 Estimated Value
                             </TableCell>
                         </TableRow>
@@ -168,7 +168,7 @@ export default class NoticeListingComponent extends React.Component {
 
                                             </div>
                                         </TableCell>
-                                        <TableCell component="th" scope="row" style={{fontSize: "15px", fontStyle: "italic"}}>
+                                        <TableCell component="th" scope="row" style={{fontSize: "15px", fontStyle: "italic", width: "20%", textAlign: "center"}}>
                                             <Price value={notice.estimatedValue} /> RON
                                         </TableCell>
                                     </TableRow>

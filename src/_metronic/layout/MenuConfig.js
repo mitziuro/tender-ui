@@ -185,7 +185,7 @@ export default {
         ]
       },
 
-       {
+      {
         title: "Notifications",
         root: true,
         bullet: "dot",
@@ -285,7 +285,15 @@ export default {
                   ]
                 },
             ]},
-
+         {
+            title: "Notifications",
+            root: true,
+            bullet: "dot",
+            role: "ROLE_SUPERVISOR",
+            translate: "MENU.NOTIFICATIONS",
+            icon: "flaticon2-expand",
+            page: "tender/tender-pages/NotificationsPage"
+         },
 
        {section: "Expert",
               role: "ROLE_EXPERT"
@@ -338,6 +346,15 @@ export default {
             ]
           },
       ]},
+       {
+          title: "Notifications",
+          root: true,
+          bullet: "dot",
+          role: "ROLE_EXPERT",
+          translate: "MENU.NOTIFICATIONS",
+          icon: "flaticon2-expand",
+          page: "tender/tender-pages/NotificationsPage"
+        },
 
       { section: "Admin",
         role: "ROLE_ADMIN"
